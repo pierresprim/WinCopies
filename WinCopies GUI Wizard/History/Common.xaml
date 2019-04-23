@@ -1,0 +1,28 @@
+﻿<Page x:Class="WinCopiesGUIWizard.History.Common"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WinCopiesGUIWizard"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Page.Template>
+        <ControlTemplate TargetType="{x:Type Page}" >
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <GroupBox Header="{StaticResource HistorySettings}" >
+                    <StackPanel >
+                    <CheckBox Content="{StaticResource ShowFileHistory}" />
+                    <CheckBox Content="{StaticResource ShowFolderHistory}" />
+                    </StackPanel>
+                </GroupBox>
+
+                <Button Grid.Row="1" Content="{StaticResource DeleteHistory}" HorizontalAlignment="Right" VerticalAlignment="Top" /> 
+            </Grid>
+        </ControlTemplate>
+    </Page.Template>
+</Page>

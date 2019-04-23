@@ -1,0 +1,34 @@
+﻿<Page x:Class="WinCopiesGUIWizard.IOOperations.Common"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WinCopiesGUIWizard.IOOperations"
+      xmlns:converters="clr-namespace:WinCopies.Util.DataConverters;assembly=WinCopies.Util"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Common">
+    <Page.Resources>
+        <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
+    </Page.Resources>
+    <Page.Template>
+        <ControlTemplate TargetType="{x:Type Page}" >
+            <Grid>
+                <GroupBox Header="{StaticResource FileSystemProcessesSettings}" >
+                    <StackPanel >
+                        <CheckBox Content="{StaticResource HideFoldersFusionExceptions}" IsChecked="{Binding HideFoldersFusionExceptions, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                        <CheckBox Content="{StaticResource DefaultActionWhenFilesFusionExceptions}" IsChecked="{Binding DefaultActionWhenFilesFusionException, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={converters:EnumToReversedBooleanConverter}, ConverterParameter={x:Static local:FilesFusionExceptionDefaultActions.None}}" Checked="CheckBox_Checked" />
+                        <StackPanel Margin="20,0,0,0" >
+                            <RadioButton Content="{StaticResource Ignore}" IsChecked="{Binding DefaultActionWhenFilesFusionException, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:FilesFusionExceptionDefaultActions.Ignore}}" GroupName="Default files fusion exception action" />
+                            <RadioButton Content="{StaticResource RenameWhenNotSameContent}" IsChecked="{Binding DefaultActionWhenFilesFusionException, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:FilesFusionExceptionDefaultActions.Rename}}" GroupName="Default files fusion exception action" />
+                            <RadioButton Content="{StaticResource ReplaceWhenNotSameContent}" IsChecked="{Binding DefaultActionWhenFilesFusionException, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:FilesFusionExceptionDefaultActions.Replace}}" GroupName="Default files fusion exception action" />
+                        </StackPanel>
+                        <CheckBox Content="{StaticResource AutomaticallyIgnoreWhenOtherFileProcessesExceptions}" IsChecked="{Binding AutomaticallyIgnoreItemWhenOtherExceptions, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                        <CheckBox Content="{StaticResource RaiseSoundWhenAllProcessesCompleted}" IsChecked="{Binding RaiseSoundWhenProcessesCompleted, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                        <CheckBox Content="{StaticResource AutomaticallyCloseWindowWhenAllProcessesCompleted}" IsChecked="{Binding AutomaticallyCloseProcessesWindowWhenProcessesAreCompleted, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+        </ControlTemplate>
+    </Page.Template>
+</Page>

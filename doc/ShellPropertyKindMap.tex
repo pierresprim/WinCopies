@@ -1,0 +1,153 @@
+\documentclass[12pt]{article}
+%\usepackage{longtable}
+%\usepackage{ltxtable}
+\usepackage{ltablex}
+\usepackage{color, colortbl}
+\definecolor{Gray}{gray}{0.9}
+\usepackage{dcolumn}
+\usepackage{titlesec}
+\usepackage{array,multirow,makecell}
+\setcellgapes{1pt}
+
+\usepackage[table]{xcolor}
+%\newcolumntype{R}[1]{>{\raggedleft\arraybackslash }b{#1}}
+%\newcolumntype{L}[1]{>{\raggedright\arraybackslash }b{#1}}
+%\newcolumntype{C}[1]{>{\centering\arraybackslash }b{#1}}
+\usepackage[top=4cm, bottom=4cm, left=2cm, right=2cm]{geometry}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+ \usepackage{enumitem}
+ \usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{chemfig}
+
+\usepackage{setspace}
+
+\usepackage{soul}
+
+\usepackage{graphicx}
+
+%\usepackage{fixltx2e}
+
+\usepackage{mhchem}
+
+
+\titleformat{\subsubsection}
+       {\normalfont\fontfamily{phv}\fontsize{12}{17}\itshape}{\normalfont\thesubsubsection}{1em}{}
+
+%\frenchbsetup{StandardLists=true}
+
+
+
+\newlist{exo}{itemize}{2}
+\setlist[exo,1]{label=--}
+\setlist[exo,2]{label=\textbullet}
+
+\renewcommand{\theparagraph}{}
+       
+       \renewcommand{\thesubparagraph}{\arabic{subparagraph}}
+       
+       \usepackage{multicol}
+       
+       \usepackage{varwidth}
+       
+%       \usepackage{tabulary}
+
+\usepackage{arydshln}
+       
+       \newcommand{\textwidthMoinsparindent}[1]{\textwidth - #1\parindent}
+       
+       %\newcommand{\textwidthMoinsparindentAvecCoefficient}[1]{\textwidth - \parindent / #1}
+       
+       %\newcolumntype{$}{>{\global\let\currentrowstyle\relax}}
+%\newcolumntype{^}{>{\currentrowstyle}}
+%\newcommand{\rowstyle}[1]{\gdef\currentrowstyle{#1}%
+%  #1\ignorespaces
+%}
+
+%\usepackage{wrapfig}
+
+%\usepackage{hhline}
+
+%\usepackage{booktabs}
+
+%\usepackage{tabulary}
+
+\usepackage{tabu}
+
+%\usepackage{amsmath}
+
+\usepackage{slashbox}
+
+\begin{document}
+
+\begin{center}
+
+\Huge
+
+\textbf{Shell property kind map}
+
+\end{center}
+
+\renewcommand{\tabularxcolumn}[1]{>{\arraybackslash}m{#1}}
+
+\keepXColumns 
+
+\begin{tabularx}{\linewidth}{ | X | X | }
+
+\hline
+
+\rowcolor{Gray} \multicolumn{1}{|c|}{Kind} & Property groups \\
+
+\hline
+
+\endhead % all the lines above this will be repeated on every page
+
+Calendar & Calendar \\
+
+Communication & Communication \\
+
+Contact & Contact \\
+
+Document & Document \\
+
+E-mail & Message \\
+
+Feed & ? \\
+
+Folder & ? \\
+
+Game & ? \\
+
+Instant message & ? \\
+
+Journal & Journal \\
+
+Link & Link \\
+
+Movie & Audio ; Media ; Music (?) ; Video ; DRM (?) \\
+
+Music & Audio ; Media ; Music \\
+
+Note & Note \\
+
+Picture & Image ; Media (?) ; Photo \\
+
+Program & Software \\
+
+Recorded TV & Audio ; Media ; Music (?) ; Video ; DRM (?) \\
+
+Search folder & Search (?) \\
+
+Task & Task \\
+
+Video & Audio ; Media ; Music (?) ; Video ; DRM (?) \\
+
+Web history & ? \\
+
+\hline
+
+\end{tabularx}
+
+\end{document}

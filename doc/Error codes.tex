@@ -1,0 +1,197 @@
+\documentclass[12pt]{article}
+%\usepackage{longtable}
+%\usepackage{ltxtable}
+\usepackage{ltablex}
+\usepackage{color, colortbl}
+\definecolor{Gray}{gray}{0.9}
+\usepackage{dcolumn}
+\usepackage{titlesec}
+\usepackage{array,multirow,makecell}
+\setcellgapes{1pt}
+
+\usepackage[table]{xcolor}
+%\newcolumntype{R}[1]{>{\raggedleft\arraybackslash }b{#1}}
+%\newcolumntype{L}[1]{>{\raggedright\arraybackslash }b{#1}}
+%\newcolumntype{C}[1]{>{\centering\arraybackslash }b{#1}}
+\usepackage[top=4cm, bottom=4cm, left=2cm, right=2cm]{geometry}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+ \usepackage{enumitem}
+ \usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{chemfig}
+
+\usepackage{setspace}
+
+\usepackage{soul}
+
+\usepackage{graphicx}
+
+%\usepackage{fixltx2e}
+
+\usepackage{mhchem}
+
+
+\titleformat{\subsubsection}
+       {\normalfont\fontfamily{phv}\fontsize{12}{17}\itshape}{\normalfont\thesubsubsection}{1em}{}
+
+%\frenchbsetup{StandardLists=true}
+
+
+
+\newlist{exo}{itemize}{2}
+\setlist[exo,1]{label=--}
+\setlist[exo,2]{label=\textbullet}
+
+\renewcommand{\theparagraph}{}
+       
+       \renewcommand{\thesubparagraph}{\arabic{subparagraph}}
+       
+       \usepackage{multicol}
+       
+       \usepackage{varwidth}
+       
+%       \usepackage{tabulary}
+
+\usepackage{arydshln}
+       
+       \newcommand{\textwidthMoinsparindent}[1]{\textwidth - #1\parindent}
+       
+       %\newcommand{\textwidthMoinsparindentAvecCoefficient}[1]{\textwidth - \parindent / #1}
+       
+       %\newcolumntype{$}{>{\global\let\currentrowstyle\relax}}
+%\newcolumntype{^}{>{\currentrowstyle}}
+%\newcommand{\rowstyle}[1]{\gdef\currentrowstyle{#1}%
+%  #1\ignorespaces
+%}
+
+%\usepackage{wrapfig}
+
+%\usepackage{hhline}
+
+%\usepackage{booktabs}
+
+%\usepackage{tabulary}
+
+\usepackage{tabu}
+
+%\usepackage{amsmath}
+
+\usepackage{slashbox}
+
+\begin{document}
+
+\begin{center}
+
+\Huge
+
+\textbf{Codes d'erreurs pouvant apparaître sous Windows}
+
+\end{center}
+
+\renewcommand{\tabularxcolumn}[1]{>{\arraybackslash}m{#1}}
+
+\keepXColumns 
+
+\begin{tabularx}{\linewidth}{ | m{5cm} | m{3cm} | X | X | }
+
+\hline
+
+\rowcolor{Gray} \multicolumn{1}{|c|}{Nom} & Code & Description & Implémenté via \\
+
+\hline
+
+\endhead % all the lines above this will be repeated on every page
+
+ERROR\_FILE\par\_NOT\_FOUND & 0x2 (2) & The system cannot find the file specified. & FileNotFound \\
+
+\hline
+
+ERROR\_PATH\par\_NOT\_FOUND & 0x3 (3) & The system cannot find the path specified. & PathNotFound \\
+
+\hline
+
+ERROR\par\_ACCESS\_DENIED & 0x5 (5) & Access is denied. & AccessDenied \\
+
+\hline
+
+ERROR\_CURRENT\par\_DIRECTORY & 0x10 (16) & The directory cannot be removed. & DirectoryCannotBeRemoved \\
+
+\hline
+
+ERROR\_WRITE\par\_PROTECT & 0x13 (19) & The media is write protected. & WriteProtect \\
+
+\hline
+
+ERROR\par\_INVALID\_DRIVE & 0xF (15) & The system cannot find the drive specified. & \multirow{15}{*}{ExceptionOnDeviceUnit} \\
+
+ERROR\_BAD\_UNIT & 0x14 (20) & The system cannot find the device specified. \\
+
+ERROR\_SEEK & 0x19 (25) & The drive cannot locate a specific area or track on the disk. \\
+
+ERROR\_NOT\_DOS\_DISK & 0x1A (26) & The specified disk or diskette cannot be accessed. \\
+
+ERROR\_SECTOR\_NOT\_FOUND & 0x1B (27) & The drive cannot find the sector requested. \\
+
+ERROR\_WRITE\_FAULT & 0x1D (29) & The system cannot write to the specified device. \\
+
+ERROR\_READ\_FAULT & 0x1E (30) & The system cannot read from the specified device. \\
+
+ERROR\_WRONG\_DISK & 0x22 (34) & The wrong diskette is in the drive. Insert \%2 (Volume Serial Number: \%3) into drive \%1. \\
+
+\hline
+
+ERROR\_NOT\_READY & 0x15 (21) & The device is not ready. & DiskNotReady \\
+
+\hline
+
+ERROR\_FILE\_EXISTS & 0x50 (80) & The file exists. & FileAlreadyExists \\
+
+\hline
+
+ERROR\_BUFFER\par\_OVERFLOW & 0x6F (111) & The file name is too long. & \multirow{3}{*}{FileNameTooLong} \\
+
+ERROR\_FILENAME\par\_EXCED\_RANGE & 0xCE (206) & The filename or extension is too long. & \\
+
+\hline
+
+ERROR\_DISK\_FULL & 0x70 (112) & There is not enough space on the disk. & \multirow{3}{*}{DiskFull} \\
+
+ERROR\_HANDLE\par\_DISK\_FULL & 0x27 (39) & The disk is full. & \\
+
+\hline
+
+ERROR\_INVALID\par\_NAME & 0x7B (123) & The filename, directory name, or volume label syntax is incorrect. & \multirow{3}{*}{InvalidName} \\
+
+ERROR\_DIRECTORY & 0x10B (267) & The directory name is invalid. & \\
+
+\hline
+
+ERROR\_FILE\par\_CHECKED\_OUT & 0xDC (220) & This file is checked out or locked for editing by another user. & FileCheckedOut \\
+
+ERROR\_SHARING\_VIOLATION & 0x20 (32) & The process cannot access the file because it is being used by another process \\
+
+ERROR\_LOCK\_VIOLATION & 0x21 (33) & The process cannot access the file because another process has locked a portion of the file. \\
+
+\hline
+
+ERROR\_FILE\par\_TOO\_LARGE & 0xDF (223) & The file size exceeds the limit allowed and cannot be saved. & FileTooLarge \\
+
+\hline
+
+ERROR\_DISK\par\_TOO\_FRAGMENTED & 0x12E (302) & The volume is too fragmented to complete this operation. & DiskTooFragmented \\
+
+\hline
+
+ERROR\_DELETE\par\_PENDING & 0x12F (303) & The file cannot be opened because it is in the process of being deleted. & DeletePending \\
+
+\hline
+
+ERROR\_NOT\par\_ALLOWED\_ON\par\_SYSTEM\_FILE & 0x139 (313) & Operation is not allowed on a file system internal file. & NotAllowedOnSystem\par{}File \\
+
+\hline
+
+\end{tabularx}
+
+\end{document}

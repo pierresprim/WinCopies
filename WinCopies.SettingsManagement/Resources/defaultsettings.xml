@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<settings>
+  <common>
+    <startDirectory>%userprofile%\desktop</startDirectory>
+    <viewStyle>2</viewStyle>
+    <showItemsCheckBox>false</showItemsCheckBox>
+    <showHiddenItems>false</showHiddenItems>
+    <showSystemItems>false</showSystemItems>
+    <knownExtensionsToOpenDirectly>
+      <zip>true</zip>
+      <sevenZip>true</sevenZip>
+      <arj>true</arj>
+      <bz2>true</bz2>
+      <cab>true</cab>
+      <chm>true</chm>
+      <cfb>true</cfb>
+      <cpio>true</cpio>
+      <deb>true</deb>
+      <udeb>true</udeb>
+      <gz>true</gz>
+      <iso>true</iso>
+    </knownExtensionsToOpenDirectly>
+  </common>
+  <ergonomics>
+    <openFolderMode>0</openFolderMode>
+    <clicksToOpen>1</clicksToOpen>
+    <underliningMode>0</underliningMode>
+  </ergonomics>
+  <history>
+    <showFileHistory>true</showFileHistory>
+    <showFolderHistory>true</showFolderHistory>
+  </history>
+  <iooperations>
+    <hideFoldersFusionExceptions>true</hideFoldersFusionExceptions>
+    <defaultActionWhenFilesFusionException>0</defaultActionWhenFilesFusionException>
+    <automaticallyIgnoreItemWhenOtherExceptions>false</automaticallyIgnoreItemWhenOtherExceptions>
+    <raiseSoundWhenProcessesCompleted>false</raiseSoundWhenProcessesCompleted>
+    <automaticallyCloseProcessesWindowWhenProcessesAreCompleted>false</automaticallyCloseProcessesWindowWhenProcessesAreCompleted>
+  </iooperations>
+</settings>

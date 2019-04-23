@@ -1,0 +1,128 @@
+﻿<Control x:Class="WinCopiesProcessesManager.CopyProcess"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WinCopiesProcessesManager"
+         xmlns:windows="clr-namespace:System.Windows;assembly=PresentationCore"
+         xmlns:fileProcesses="clr-namespace:WinCopies.IO.FileProcesses;assembly=WinCopies.IO.FileProcesses"
+         xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
+         xmlns:utils="clr-namespace:WinCopies.Util.DataConverters;assembly=WinCopies.Util"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" DataContextChanged="Control_DataContextChanged">
+    <Control.Resources>
+        <utils:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
+        <local:CanReplaceFileConverter x:Key="CanReplaceFileConverter" />
+    </Control.Resources>
+    <Control.Style>
+        <Style TargetType="Control">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Grid >
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <!--Visibility="{Binding ExceptionsOccurred, Converter={utils:ReversedBooleanToVisibilityConverter}, ConverterParameter={x:Static windows:Visibility.Collapsed}}"-->
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Label Content="{StaticResource Name}" />
+                                <controls:Label Grid.Column="1" RecognizesAccessKey="False">
+                                    <Label.Content>
+                                        <MultiBinding Converter="{local:ShowCurrentCopiedFileInfoConverter}">
+                                            <Binding Path="CurrentCopiedFile" />
+                                            <Binding Path="CurrentFileCopiedSize" />
+                                        </MultiBinding>
+                                    </Label.Content>
+                                </controls:Label>
+                                <Label Content="{StaticResource ProcessStatus}" Grid.Row="1" />
+                                <Label Grid.Column="1" Grid.Row="1">
+                                    <Label.Content>
+                                        <MultiBinding Converter="{local:ProcessStatusMultiConverter}" ConverterParameter="DisplayProgressStatus" >
+                                            <Binding Path="IsBusy" />
+                                            <Binding Path="IsPaused" />
+                                            <Binding Path="ExceptionsOccurred" />
+                                        </MultiBinding>
+                                    </Label.Content>
+                                </Label>
+                                <Label Content="{StaticResource SizeLeft}" Grid.Row="2" />
+                                <Label Grid.Column="1" Grid.Row="2">
+                                    <Label.Content>
+                                        <MultiBinding Converter="{local:IntegerOperationsOnSizesConverter}">
+                                            <Binding Path="FilesInfoLoader.TotalSize" />
+                                            <Binding Path="CurrentCopiedSize" />
+                                        </MultiBinding>
+                                    </Label.Content>
+                                </Label>
+                                <Label Content="{StaticResource TotalSize}" Grid.Row="3" />
+                                <Label Grid.Column="1" Grid.Row="3" Content="{Binding FilesInfoLoader.TotalSize}" ></Label>
+                                <Label Content="{StaticResource Speed}" Grid.Row="4" />
+                                <Label Grid.Column="1" Grid.Row="4" Content="{Binding Speed, RelativeSource={RelativeSource TemplatedParent}}"></Label>
+                                <Label Content="{StaticResource EstimatedTimeRemaining}" Grid.Row="5" />
+                                <Label Grid.Column="1" Grid.Row="5" Content="{Binding EstimatedTimeRemaining, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                            </Grid>
+                            <StackPanel Grid.Row="1" Visibility="{Binding ExceptionsOccurred, Converter={utils:BooleanToVisibilityConverter}, ConverterParameter={x:Static windows:Visibility.Collapsed}}">
+                                <Label Content="{Binding Exceptions[0].FileSystemInfoProperties.FullName}" />
+                                <Label Content="{Binding Exceptions[0].Exception}" />
+                                <ListBox    >
+                                    <RadioButton Content="{StaticResource Ignore}" IsChecked="{Binding ActionOnException, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:HowToRetry.Ignore}}" />
+                                    <RadioButton Content="{StaticResource Retry}" IsChecked="{Binding ActionOnException, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:HowToRetry.Retry}}" />
+                                    <RadioButton Content="{StaticResource Rename}" IsChecked="{Binding ActionOnException, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:HowToRetry.Rename}}" Visibility="{Binding Exception[0].Exception, Converter={StaticResource CanReplaceFileConverter}}" />
+                                    <RadioButton Content="{StaticResource Replace}" IsChecked="{Binding ActionOnException, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:HowToRetry.Replace}}" Visibility="{Binding Exception[0].Exception, Converter={StaticResource CanReplaceFileConverter}}" />
+                                    <!--<RadioButton Content="{StaticResource ReplaceWhenSameContent}" IsChecked="{Binding ActionOnException, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:HowToRetry.ReplaceWhenSameContent}}" Visibility="{Binding Exception[0].Exception, Converter={StaticResource CanReplaceFileConverter}}" />-->
+                                    <RadioButton Content="{StaticResource CheckFiles}" IsChecked="{Binding ActionOnException, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:HowToRetry.CheckFiles}}" Visibility="{Binding Exception[0].Exception, Converter={StaticResource CanReplaceFileConverter}}" />
+                                    <RadioButton x:Name="CancelRadioButton" Content="{StaticResource Cancel}" IsChecked="{Binding ActionOnException, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:HowToRetry.Cancel}}" />
+                                </ListBox>
+                                <CheckBox Content="{StaticResource ForAll}" IsChecked="{Binding DoActionForAllExceptions, RelativeSource={RelativeSource Mode=TemplatedParent}}" IsEnabled="{Binding IsChecked, ElementName=CancelRadioButton, Converter={utils:ReverseBooleanConverter}}" />
+                                <Button HorizontalAlignment="Right" IsEnabled="{Binding ActionOnException, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={utils:EnumToReversedBooleanConverter}, ConverterParameter={x:Static local:HowToRetry.None}}" Click="Button_Click" >Ok</Button>
+                            </StackPanel>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <!--<Style.Triggers>
+                <MultiDataTrigger >
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsBusy}" Value="False" />
+                        <Condition Binding="{Binding ExceptionsOccurred}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="Control">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="{Binding Exceptions[0].Exception, Converter={local:ExceptionToDisplayValueConverter}}" >
+                                    </TextBlock>
+                                    <Label Content="{Binding Exceptions[0].FileSystemInfoProperties.FullName}" ></Label>
+                                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" >
+                                        <Button Content="Renommer" Visibility="{Binding ValidatesOnExceptions[0].Exception, Converter={utils:EnumToBooleanConverter}, ConverterParameter={x:Static fileProcesses:Exceptions.FileAlreadyExists}}" ></Button>
+                                        <Button Content="Réessayer" ></Button>
+                                        <Button Content="Ignorer" ></Button>
+                                        <Button Content="Annuler" ></Button>
+                                    </StackPanel>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </MultiDataTrigger>
+            </Style.Triggers>-->
+        </Style>
+    </Control.Style>
+</Control>
