@@ -6,8 +6,12 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows;
 using WinCopies.IO;
+using WinCopies.IO.FileProcesses;
+using static WinCopies.Util.Util;
 
 namespace WinCopiesProcessesManager
 {
@@ -16,8 +20,6 @@ namespace WinCopiesProcessesManager
     /// </summary>
     public partial class App : Application, INotifyPropertyChanged, ISingleInstanceApp
     {
-
-        private const string Unique = "b35e3300-b2fb-48e3-ac2e-e18719757994";
 
 #if DEBUG 
         private ObservableCollection<string> _args = null;
@@ -38,7 +40,7 @@ namespace WinCopiesProcessesManager
 
         {
 
-            if (SingleInstance<App>.InitializeAsFirstInstance(Unique))
+            if (SingleInstance<App>.InitializeAsFirstInstance(((GuidAttribute)System.Reflection.Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(GuidAttribute), true)[0]).Value))
 
             {
 
@@ -86,9 +88,9 @@ namespace WinCopiesProcessesManager
 
             if (new_args.Count < 3) return;
 
-            var pathsInfo = new List<WinCopies.IO.FileProcesses.FileSystemInfo>();
+            List<WinCopies.IO.FileProcesses.FileSystemInfo> pathsInfo = new List<WinCopies.IO.FileProcesses.FileSystemInfo>();
 
-            var new_arg = "";
+            string new_arg = "";
 
             void AddNewPath()
 
@@ -96,11 +98,11 @@ namespace WinCopiesProcessesManager
 
                 if (Directory.Exists(new_arg))
 
-                    pathsInfo.Add(new WinCopies.IO.FileProcesses.FileSystemInfo(new_arg, WinCopies.IO.FileTypes.Folder));
+                    pathsInfo.Add(new WinCopies.IO.FileProcesses.FileSystemInfo(new_arg, FileType.Folder));
 
                 else if (File.Exists(new_arg))
 
-                    pathsInfo.Add(new WinCopies.IO.FileProcesses.FileSystemInfo(new_arg, WinCopies.IO.FileTypes.File));
+                    pathsInfo.Add(new WinCopies.IO.FileProcesses.FileSystemInfo(new_arg, FileType.File));
 
             }
 
@@ -111,9 +113,9 @@ namespace WinCopiesProcessesManager
                 case "Copy":
                 case "FileMoving":
 
-                    var destPath = "";
+                    string destPath = "";
 
-                    var isAFileMoving = false;
+                    bool isAFileMoving = false;
 
                     for (int i = 1; i < new_args.Count - 1; i++)
 
@@ -137,11 +139,11 @@ namespace WinCopiesProcessesManager
 
                     isAFileMoving = new_args[0] == "FileMoving" ? true : false;
 
-                    var cpi = new WinCopies.IO.FileProcesses.CopyProcessInfo(destPath, isAFileMoving)
+                    CopyProcessInfo cpi = new CopyProcessInfo(destPath, isAFileMoving)
 
                     {
 
-                        FilesInfoLoader = new WinCopies.IO.FileProcesses.LoadFilesInfo(pathsInfo, WinCopies.IO.FileProcesses.ActionType.Copy)
+                        FilesInfoLoader = new FilesInfoLoader(pathsInfo, ActionType.Copy)
 
                     };
 
@@ -167,27 +169,30 @@ namespace WinCopiesProcessesManager
 
                     if (!Enum.TryParse(new_args[1], out archiveFormat)) { MessageBox.Show("Error in parsing arguments."); return; }
 
-                    var compressionLevel = SevenZip.CompressionLevel.None;
+                    SevenZip.CompressionLevel compressionLevel = SevenZip.CompressionLevel.None;
 
                     if (!Enum.TryParse(new_args[2], out compressionLevel)) { MessageBox.Show("Error in parsing arguments."); return; }
 
-                    var compressionMethod = SevenZip.CompressionMethod.Copy;
+                    SevenZip.CompressionMethod compressionMethod = SevenZip.CompressionMethod.Copy;
 
                     if (!Enum.TryParse(new_args[3], out compressionMethod)) { MessageBox.Show("Error in parsing arguments."); return; }
 
-                    var compressionMode = SevenZip.CompressionMode.Create;
+                    SevenZip.CompressionMode compressionMode = SevenZip.CompressionMode.Create;
 
                     if (!Enum.TryParse(new_args[4], out compressionMode)) { MessageBox.Show("Error in parsing arguments."); return; }
 
-                    var directoryStructure = true;
+                    bool directoryStructure = true;
 
                     if (!bool.TryParse(new_args[5], out directoryStructure)) { MessageBox.Show("Error in parsing arguments."); return; }
 
-                    var includeEmptyDirectories = true;
+                    bool includeEmptyDirectories = true;
 
                     if (!bool.TryParse(new_args[6], out includeEmptyDirectories)) { MessageBox.Show("Error in parsing arguments."); return; }
 
-                    var archiveName = new_args[7];
+                    string archiveName = new_args[7];
+
+                    try
+                    {
 
                     SevenZip.SevenZipCompressor sevenZipCompressor = new SevenZip.SevenZipCompressor
                     {
@@ -201,19 +206,18 @@ namespace WinCopiesProcessesManager
 
                         DirectoryStructure = directoryStructure,
 
-                        IncludeEmptyDirectories = includeEmptyDirectories
+                        IncludeEmptyDirectories = includeEmptyDirectories,
+
+                        // VolumeSize = 64*1024*1024
                     };
 
-                    SevenZipCompressor sevenZipCompressorWrapper = new SevenZipCompressor(sevenZipCompressor);
+                        SevenZipCompressor sevenZipCompressorWrapper = new SevenZipCompressor(sevenZipCompressor);
 
-                    Processes.Add(sevenZipCompressorWrapper);
+                        Processes.Add(sevenZipCompressorWrapper);
 
-                    if ((Directory.Exists(archiveName) || File.Exists(archiveName)) && MessageBox.Show("File already exists. Do you want to overwrite it?", System.Reflection.Assembly.GetEntryAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                        if ((Directory.Exists(archiveName) || File.Exists(archiveName)) && MessageBox.Show("File already exists. Do you want to overwrite it?", Assembly.GetEntryAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
 
-                        break;
-
-                    try
-                    {
+                            break;
 
                         List<string> files = new List<string>();
 
@@ -223,9 +227,9 @@ namespace WinCopiesProcessesManager
 
                             using (path = new ShellObjectInfo(ShellObject.FromParsingName(new_args[i]), new_args[i]))
 
-                                if (WinCopies.Util.Util.If(WinCopies.Util.Util.ComparisonType.Or, WinCopies.Util.Util.Comparison.Equals, path.FileType, FileTypes.Folder, FileTypes.Drive, FileTypes.SpecialFolder))
+                                if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, path.FileType, FileType.Folder, FileType.Drive, FileType.SpecialFolder))
 
-                                    sevenZipCompressorWrapper.BeginCompressDirectory(path.Path, archiveName);
+                                    sevenZipCompressorWrapper.BeginCompressDirectory(new_args[i], archiveName);
 
                                 else
 
@@ -233,7 +237,37 @@ namespace WinCopiesProcessesManager
 
                         path = null;
 
+                        if (files.Count>0)
+
                         sevenZipCompressorWrapper.BeginCompressFiles(files.ToArray(), archiveName);
+
+                    }
+
+                    catch (Exception ex) when (ex is IOException || ex is SevenZip.SevenZipException)
+
+                    {
+
+                        MessageBox.Show("Error: " + ex.Message); }
+
+                    break;
+
+                case "Extraction":
+
+                    string archiveFileName = new_args[1];
+
+                    string _destPath = new_args[2];
+
+                    try
+
+                    {
+
+                        SevenZip.SevenZipExtractor sevenZipExtractor = new SevenZip.SevenZipExtractor(archiveFileName);
+
+                        SevenZipExtractor sevenZipExtractorWrapper = new SevenZipExtractor(sevenZipExtractor);
+                        
+                        Processes.Add(sevenZipExtractorWrapper);
+
+                        sevenZipExtractorWrapper.BeginExtractArchive(_destPath);
 
                     }
 
@@ -273,7 +307,7 @@ namespace WinCopiesProcessesManager
 
             foreach (WinCopies.IO.FileProcesses.FileSystemInfo fileSystemInfo in p.FilesInfoLoader.PathsLoaded)
 
-                if (fileSystemInfo.FileType == WinCopies.IO.FileTypes.Folder || fileSystemInfo.FileType == WinCopies.IO.FileTypes.Drive)
+                if (fileSystemInfo.FileType == FileType.Folder || fileSystemInfo.FileType == FileType.Drive)
 
                     Debug.WriteLine(fileSystemInfo.FileSystemInfoProperties.FullName + " " + fileSystemInfo.FileType.ToString());
 #else 

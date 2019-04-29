@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using WinCopies.Util;
 
 namespace WinCopiesProcessesManager
 {
-    public class SevenZipCompressor : INotifyPropertyChanged
+    public class SevenZipCompressor : INotifyPropertyChanged, ISevenZipProcessInternal
     {
 
         /// <summary>
@@ -19,7 +20,7 @@ namespace WinCopiesProcessesManager
 
         {
 
-            var (propertyChanged, oldValue) = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
+            (bool propertyChanged, object oldValue) = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
 
             if (propertyChanged) OnPropertyChanged(propertyName, oldValue, newValue);
 
@@ -27,7 +28,9 @@ namespace WinCopiesProcessesManager
 
         protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 
-        private SevenZip.SevenZipCompressor Compressor { get; } = null;
+        private SevenZip.SevenZipCompressor InnerProcess { get; } = null;
+
+        SevenZip.SevenZipBase ISevenZipProcessInternal.InnerProcess => InnerProcess;
 
         private readonly bool _filesLoaded = false;
 
@@ -51,19 +54,19 @@ namespace WinCopiesProcessesManager
 
         private readonly byte _filePercentDone = 0;
 
-        public byte FilePercentDone { get => _filePercentDone; set => OnPropertyChanged(nameof(FilePercentDone), nameof(_filePercentDone), value, typeof(SevenZipCompressor)); }
+        public byte FilePercentDone { get => _filePercentDone; private set => OnPropertyChanged(nameof(FilePercentDone), nameof(_filePercentDone), value, typeof(SevenZipCompressor)); }
 
         private readonly string _sourcePath = null;
 
-        public string SourcePath { get => _sourcePath; set => OnPropertyChanged(nameof(SourcePath), nameof(_sourcePath), value, typeof(SevenZipCompressor)); }
+        public string SourcePath { get => _sourcePath; private set => OnPropertyChanged(nameof(SourcePath), nameof(_sourcePath), value, typeof(SevenZipCompressor)); }
 
         private readonly string _destPath = null;
 
-        public string DestPath { get => _destPath; set => OnPropertyChanged(nameof(DestPath), nameof(_destPath), value, typeof(SevenZipCompressor)); }
+        public string DestPath { get => _destPath; private set => OnPropertyChanged(nameof(DestPath), nameof(_destPath), value, typeof(SevenZipCompressor)); }
 
         private readonly bool _isBusy = false;
 
-        public bool IsBusy { get => _isBusy; set => OnPropertyChanged(nameof(IsBusy), nameof(_isBusy), value, typeof(SevenZipCompressor)); }
+        public bool IsBusy { get => _isBusy; private set => OnPropertyChanged(nameof(IsBusy), nameof(_isBusy), value, typeof(SevenZipCompressor)); }
 
         public bool ExceptionOccurred { get; } = false;
 
@@ -73,8 +76,8 @@ namespace WinCopiesProcessesManager
 
         {
 
-            Compressor = compressor;
-
+            InnerProcess = compressor;
+            
             compressor.FilesFound += Compressor_FilesFound;
 
             compressor.Compressing += Compressor_Compressing;
@@ -87,17 +90,25 @@ namespace WinCopiesProcessesManager
 
         private void Compressor_CompressionFinished(object sender, EventArgs e) => IsBusy = false;
 
+        private void OnCompressionStarting(string archiveName)
+
+        {
+
+            DestPath = archiveName;
+
+            IsBusy = true;
+
+        }
+
         public void BeginCompressDirectory(string directory, string archiveName)
 
         {
 
             SourcePath = directory;
 
-            DestPath = archiveName;
+            OnCompressionStarting(archiveName);
 
-            IsBusy = true;
-
-            Compressor.BeginCompressDirectory(directory, archiveName);
+            InnerProcess.BeginCompressDirectory(directory, archiveName);
 
         }
 
@@ -107,11 +118,9 @@ namespace WinCopiesProcessesManager
 
             SourcePath = System.IO.Path.GetDirectoryName(files[0]);
 
-            DestPath = archiveName;
+            OnCompressionStarting(archiveName);
 
-            IsBusy = true;
-
-            Compressor.BeginCompressFiles(archiveName, files);
+            InnerProcess.BeginCompressFiles(archiveName, files);
 
         }
 
@@ -119,18 +128,27 @@ namespace WinCopiesProcessesManager
         {
 
             FileName = e.FileName;
-
+            
             FilePercentDone = e.PercentDone;
 
         }
 
         private void Compressor_FilesFound(object sender, SevenZip.IntEventArgs e)
         {
+
             FilesLoaded = true;
 
             FilesFound = e.Value;
+
         }
 
-        private void Compressor_Compressing(object sender, SevenZip.ProgressEventArgs e) => PercentDone = e.PercentDone;
+        private void Compressor_Compressing(object sender, SevenZip.ProgressEventArgs e)
+        {
+            PercentDone = e.PercentDone;
+
+            Debug.WriteLine("PercentDone: " + e.PercentDone.ToString());
+
+            Debug.WriteLine("PercentDelta: " + e.PercentDelta.ToString());
+        }
     }
 }

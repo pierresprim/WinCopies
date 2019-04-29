@@ -65,6 +65,7 @@
     <Reference Include="Microsoft.Expression.Interactions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Blend.Interactivity.Wpf.1.0.1340.0\lib\net\Microsoft.Expression.Interactions.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="SevenZipSharp, Version=1.1.144.0, Culture=neutral, PublicKeyToken=c8ff6ba0184838bb, processorArchitecture=MSIL">
       <HintPath>..\packages\Squid-Box.SevenZipSharp.1.1.144\lib\net45\SevenZipSharp.dll</HintPath>
     </Reference>
@@ -83,6 +84,10 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="WinCopies.GUI, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\WinCopies-framework\bin\x64\Debug\WinCopies.GUI.dll</HintPath>
+    </Reference>
     <Reference Include="WinCopies.GUI.Controls, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\WinCopies framework\bin\x64\Debug\WinCopies.GUI.Controls.dll</HintPath>
@@ -99,13 +104,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\x64\Debug\WinCopies.IO.dll</HintPath>
     </Reference>
-    <Reference Include="WinCopies.IO.FileProcesses, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\x64\Debug\WinCopies.IO.FileProcesses.dll</HintPath>
+    <Reference Include="WinCopies.IO.FileProcesses">
+      <HintPath>..\..\WinCopies-framework\bin\x64\Debug\WinCopies.IO.FileProcesses.dll</HintPath>
     </Reference>
     <Reference Include="WinCopies.Util, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\x64\Debug\WinCopies.Util.dll</HintPath>
+      <HintPath>..\..\WinCopies-framework\bin\x64\Debug\WinCopies.Util.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -130,12 +134,14 @@
     <Compile Include="FileSystemInfo.cs" />
     <Compile Include="FileSystemInfoCollection.cs" />
     <Compile Include="HowToRetry.cs" />
+    <Compile Include="ISevenZipProcess.cs" />
     <Compile Include="Process.xaml.cs">
       <DependentUpon>Process.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataConverters\ProcessStatusConverter.cs" />
     <Compile Include="SevenZipCompressor.cs" />
     <Compile Include="DataConverters\ShowCurrentCopiedFileInfoConverter.cs" />
+    <Compile Include="SevenZipExtractor.cs" />
     <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

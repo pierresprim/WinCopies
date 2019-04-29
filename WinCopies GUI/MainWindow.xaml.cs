@@ -117,13 +117,8 @@ namespace WinCopies.GUI
         {
             // var explorerControl = SelectedItem.PART_ExplorerControl;
 
-            var shellObjectInfo = SelectedItem.Value as ShellObjectInfo;
+            if (SelectedItem.Value is ShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject is ShellFolder) e.CanExecute = true;
 
-            if (shellObjectInfo == null)
-
-                return;
-
-            if (shellObjectInfo.ShellObject is ShellFolder) e.CanExecute = true;
         }
 
         private void InputBox_Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -142,8 +137,15 @@ namespace WinCopies.GUI
 
             // todo: to add other characters ...
 
-            else if (((InputBox)sender).Text.Contains('\\') || ((InputBox)sender).Text.Contains('/') || ((InputBox)sender).Text.Contains(':') || ((InputBox)sender).Text.Contains('*') || ((InputBox)sender).Text.Contains('?') || ((InputBox)sender).Text.Contains('"')
-           || ((InputBox)sender).Text.Contains('<') || ((InputBox)sender).Text.Contains('>') || ((InputBox)sender).Text.Contains('|'))
+            else if (((InputBox)sender).Text.Contains('\\')
+                     || ((InputBox)sender).Text.Contains('/')
+                     || ((InputBox)sender).Text.Contains(':')
+                     || ((InputBox)sender).Text.Contains('*')
+                     || ((InputBox)sender).Text.Contains('?')
+                     || ((InputBox)sender).Text.Contains('"')
+                     || ((InputBox)sender).Text.Contains('<')
+                     || ((InputBox)sender).Text.Contains('>')
+                     || ((InputBox)sender).Text.Contains('|'))
 
             {
 
@@ -165,51 +167,55 @@ namespace WinCopies.GUI
 
         }
 
-        private InputBox GetInputBox(string prefix)
-
-        {
-
-            InputBox inputBox = new InputBox
-            {
-
-                Command = Util.Commands.FileSystemCommands.NewFolder,
-
-                // inputBox.CommandBindings.Add(new CommandBinding(WinCopies.Util.Commands.FileSystemCommands.NewFolder, (object _sender, ExecutedRoutedEventArgs _e) => { }, InputBox_Command_CanExecute));
-
-                Label = (string)Application.Current.Resources[$"{prefix}WindowLabel"],
-
-                // inputBox.Text = "azerty";
-
-                Placeholder = new Controls.PlaceholderProperties((string)Application.Current.Resources[$"{prefix}WindowPlaceholder"], false, false, new System.Windows.Media.FontFamily(), 12, FontStretches.Normal, FontStyles.Italic, FontWeights.Normal, System.Windows.Media.Brushes.DimGray, TextAlignment.Left, null, TextWrapping.NoWrap),
-
-                // inputBox.Orientation = Orientation.Vertical;
-
-                ButtonAlignment = Windows.Dialogs.HorizontalAlignment.Right,
-
-                DialogButton = DialogButton.OKCancel
-            };
-
-            return inputBox;
-
-        }
-
         private void NewFolder_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            InputBox inputBox = GetInputBox("NewFolder");
 
-            inputBox.
+            InputBox GetInputBox(string prefix, out InputBox inputBox)
 
-                CommandBindings.Add(new CommandBinding(Util.Commands.FileSystemCommands.NewFolder, null, InputBox_Command_CanExecute));
+            {
+
+                /*InputBox */
+
+                inputBox = new InputBox
+                {
+
+                    Command = Util.Commands.FileSystemCommands.NewFolder,
+
+                    // inputBox.CommandBindings.Add(new CommandBinding(WinCopies.Util.Commands.FileSystemCommands.NewFolder, (object _sender, ExecutedRoutedEventArgs _e) => { }, InputBox_Command_CanExecute));
+
+                    Label = (string)Application.Current.Resources[$"{prefix}WindowLabel"],
+
+                    // inputBox.Text = "azerty";
+
+                    Placeholder = new Controls.PlaceholderProperties((string)Application.Current.Resources[$"{prefix}WindowPlaceholder"], false, false, new System.Windows.Media.FontFamily(), 12, FontStretches.Normal, FontStyles.Italic, FontWeights.Normal, System.Windows.Media.Brushes.DimGray, TextAlignment.Left, null, TextWrapping.NoWrap),
+
+                    // inputBox.Orientation = Orientation.Vertical;
+
+                    ButtonAlignment = Windows.Dialogs.HorizontalAlignment.Right,
+
+                    DialogButton = DialogButton.OKCancel
+
+                };
+
+                inputBox.
+
+                    CommandBindings.Add(new CommandBinding(Util.Commands.FileSystemCommands.NewFolder, null, InputBox_Command_CanExecute));
+
+                return inputBox;
+
+            }
+
+            InputBox _inputBox = GetInputBox("NewFolder", out _inputBox);
 
 #if DEBUG
 
-            bool? result = inputBox.ShowDialog();
+            bool? result = _inputBox.ShowDialog();
 
             Debug.WriteLine(result == null ? "null" : result.ToString());
 
-            Debug.WriteLine(inputBox.MessageBoxResult.ToString());
+            Debug.WriteLine(_inputBox.MessageBoxResult.ToString());
 
-            Debug.WriteLine(inputBox.Text);
+            Debug.WriteLine(_inputBox.Text);
 
             if (result == true)
 
@@ -222,7 +228,7 @@ namespace WinCopies.GUI
                 try
                 {
 
-                    Directory.CreateDirectory(SelectedItem.Value.Path + "\\\\" + inputBox.Text);
+                    Directory.CreateDirectory(SelectedItem.Value.Path + "\\\\" + _inputBox.Text);
 
                 }
 
@@ -377,7 +383,16 @@ namespace WinCopies.GUI
 
         private void ExtractArchive_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            // todo
+            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
+
+            folderBrowserDialog.Mode = FolderBrowserDialogMode.OpenFolder;
+
+            if (folderBrowserDialog.ShowDialog() == true)
+
+            {
+                
+            }
+
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
@@ -473,7 +488,7 @@ namespace WinCopies.GUI
 
         private void RestoreTab_Executed(object sender, ExecutedRoutedEventArgs e) => Restore_Tab((ValueObject<IBrowsableObjectInfo>)e.Parameter);
 
-        private void FileProperties_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = (SelectedItem.Value.SelectedItem is IO.ShellObjectInfo && SelectedItem.Value.SelectedItems.Count == 1) || (SelectedItem.Value is IO.ShellObjectInfo && SelectedItem.Value.SelectedItems.Count==0);
+        private void FileProperties_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = (SelectedItem.Value.SelectedItem is IO.ShellObjectInfo && SelectedItem.Value.SelectedItems.Count == 1) || (SelectedItem.Value is IO.ShellObjectInfo && SelectedItem.Value.SelectedItems.Count == 0);
 
         private void FileProperties_Executed(object sender, ExecutedRoutedEventArgs e) => new FilePropertiesDialog((IO.ShellObjectInfo)SelectedItem.Value.SelectedItem ?? (IO.ShellObjectInfo)SelectedItem.Value).ShowDialog();
 
@@ -528,17 +543,11 @@ namespace WinCopies.GUI
 
         // private void Window_Loaded(object sender, RoutedEventArgs e) => New_Tab();
 
-        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
-        {
-
-            var aboutWindow = new About();
-
-            aboutWindow.ShowDialog();
-
-        }
+        private void MenuItem_Click_1(object sender, RoutedEventArgs e) => new About().ShowDialog();
 
         protected override void OnClosing(CancelEventArgs e)
         {
+
             base.OnClosing(e);
 
             foreach (ValueObject<IBrowsableObjectInfo> item in Items)

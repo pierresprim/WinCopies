@@ -11,9 +11,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Control.Resources>
-        <local:ObjectToTypeConverter x:Key="ObjectToTypeConverter" />
+        <utils:ObjectToTypeConverter x:Key="ObjectToTypeConverter" />
         <local:ProcessStatusConverter x:Key="ProcessStatusConverter" />
-        <local:ProcessStatusMultiConverter x:Key="ProgressStatusMultiConverter" />
+        <local:ProcessStatusMultiConverter x:Key="ProcessStatusMultiConverter" />
     </Control.Resources>
     <Control.CommandBindings>
         <CommandBinding Command="{x:Static local:Commands.Resume}" CanExecute="Resume_CanExecute" Executed="Resume_Executed" />
@@ -64,7 +64,7 @@
                                             <DataTrigger Binding="{Binding Converter={StaticResource ObjectToTypeConverter}}" Value="{x:Type fileProcesses:CopyProcessInfo}" >
                                                 <Setter Property="ProcessStatus" >
                                                     <Setter.Value>
-                                                        <MultiBinding Converter="{StaticResource ProgressStatusMultiConverter}" ConverterParameter="ProgressStatus" >
+                                                        <MultiBinding Converter="{StaticResource ProcessStatusMultiConverter}" ConverterParameter="ProgressStatus" >
                                                             <Binding Path="IsBusy" />
                                                             <Binding Path="ExceptionsOccurred" />
                                                         </MultiBinding>
@@ -72,7 +72,7 @@
                                                 </Setter>
                                                 <Setter Property="Value" >
                                                     <Setter.Value>
-                                                        <MultiBinding Converter="{StaticResource ProgressStatusMultiConverter}" ConverterParameter="ProgressStatusPercent" >
+                                                        <MultiBinding Converter="{StaticResource ProcessStatusMultiConverter}" ConverterParameter="ProgressStatusPercent" >
                                                             <Binding Path="CurrentCopiedSize" />
                                                             <Binding Path="FilesInfoLoader.TotalSize" />
                                                         </MultiBinding>

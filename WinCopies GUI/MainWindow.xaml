@@ -13,7 +13,7 @@
         xmlns:util="clr-namespace:WinCopies.Util;assembly=WinCopies.Util"
         xmlns:commands="clr-namespace:WinCopies.Util.Commands;assembly=WinCopies.Util"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" Closing="Window_Closing" >
+        Title="{Binding SelectedItem.Value.Name, RelativeSource={RelativeSource Mode=Self}, StringFormat={}{0} - WinCopies, Converter={dataConverters:CoalesceConverter}, ConverterParameter=WinCopies}" Icon="{Binding SelectedItem.Value, RelativeSource={RelativeSource Mode=Self}, Converter={local:IBrowsableObjectInfoToImageSourceConverter}}" Height="350" Width="525" Closing="Window_Closing" >
 
     <!--<Window.Resources>
         <sys:String x:Key="s" >{a}

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WinCopiesProcessesManager"
         xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="WinCopies processes manager window" Height="450" Width="800">
     <Grid>
         <ItemsControl ItemsSource="{Binding Processes, Source={x:Static local:App.Current}}">
             <ItemsControl.ItemTemplate>

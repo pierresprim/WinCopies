@@ -50,7 +50,7 @@
                                 </Label.Content>
                             </Label>
                             <Label Content="{StaticResource ProcessStatus}" Grid.Row="1" />
-                            <Label Grid.Column="1" Grid.Row="1" Content="{Binding Converter={local:ProcessStatusConverter}, ConverterParameter=Display}" /> 
+                            <Label Grid.Column="1" Grid.Row="1" Content="{Binding IsBusy, Converter={local:ProcessStatusConverter}, ConverterParameter=DisplayProgressStatus}" /> 
                             <!--<Label Grid.Row="4">Taille restante :</Label>
                             <Label Grid.Column="1" Grid.Row="4">
                             <Label.Content>

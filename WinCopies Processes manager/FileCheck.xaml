@@ -1,14 +1,16 @@
-﻿<windows:DialogWindow x:Class="WinCopiesProcessesManager.FileCheck"
+﻿<dialogs:DialogWindow x:Class="WinCopiesProcessesManager.FileCheck"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WinCopiesProcessesManager"
+                  xmlns:gui="clr-namespace:WinCopies.GUI;assembly=WinCopies.GUI"
+                      xmlns:dialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI"
         xmlns:windows="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI.Windows"
                       xmlns:converters="clr-namespace:WinCopies.Util.DataConverters;assembly=WinCopies.Util"
         mc:Ignorable="d"
         Title="FileCheck" Height="450" Width="800">
-    <windows:DialogWindow.Resources>
+    <dialogs:DialogWindow.Resources>
         <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
         <Style x:Key="DataGridStyle" TargetType="{x:Type DataGrid}">
             <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
@@ -72,7 +74,7 @@
                 </MultiTrigger>
             </Style.Triggers>
         </Style>
-    </windows:DialogWindow.Resources>
+    </dialogs:DialogWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -112,7 +114,7 @@
             <DataGrid.CellStyle>
                 <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}" >
                     <Setter Property="Background" Value="{x:Null}" />
-                    <Setter Property="Foreground" Value="{x:Static SystemColors.ControlTextBrush}" /> 
+                    <Setter Property="Foreground" Value="{x:Static SystemColors.ControlTextBrush}" />
 
                     <Style.Triggers>
                         <Trigger Property="IsSelected" Value="true" >
@@ -125,11 +127,11 @@
 
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource {x:Type DataGridRow}}" >
-                    <Setter Property="Background" Value="{x:Null}" /> 
-                    
+                    <Setter Property="Background" Value="{x:Null}" />
+
                     <Style.Triggers>
                         <Trigger Property="IsSelected" Value="true" >
-                            <Setter Property="Background" Value="{x:Null}" /> 
+                            <Setter Property="Background" Value="{x:Null}" />
                         </Trigger>
                     </Style.Triggers>
                 </Style>
@@ -141,4 +143,4 @@
             <RadioButton Content="{StaticResource ReplaceWhenNotSameContent}" IsChecked="{Binding HowToRetry, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:HowToRetry.ReplaceWhenNotSameContent}}" />
         </StackPanel>
     </Grid>
-</windows:DialogWindow>
+</dialogs:DialogWindow>

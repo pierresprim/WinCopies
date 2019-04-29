@@ -68,6 +68,10 @@
     </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="IconExtractor, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\WinCopies-framework\Third parties\IconExtractor-1.0\IconExtractor\bin\x64\Debug\IconExtractor.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Blend.Interactivity.Wpf.1.0.1340.0\lib\net\Microsoft.Expression.Interactions.dll</HintPath>
     </Reference>
@@ -174,6 +178,7 @@
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
     <Compile Include="Behavior.cs" />
+    <Compile Include="DataConverters\IBrowsableObjectInfoToImageSourceConverter.cs" />
     <Compile Include="DataConverters\StatusBarConverter.cs" />
     <Compile Include="DataConverters\TabItemIsSelectedConverter.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -291,9 +296,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\folder.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="TextTemplate.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

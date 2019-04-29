@@ -3,6 +3,8 @@ using System.Globalization;
 using System.Windows;
 using WinCopies.IO.FileProcesses;
 
+using IOProcess = WinCopies.IO.FileProcesses.Process;
+
 namespace WinCopiesProcessesManager
 {
 
@@ -13,89 +15,85 @@ namespace WinCopiesProcessesManager
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
 
-            if (value is WinCopies.IO.FileProcesses.Process p) 
+            IOProcess p = null;
 
-                if ((string)parameter == "ActionType")
+            switch ((string)parameter)
+            {
 
-                    switch (p.ActionType)
+                case "ActionType":
 
-                    {
+                    if ((p = value as IOProcess) != null)
 
-                        case ActionType.Unknown:
+                        switch (p.ActionType)
 
-                            return null;
+                        {
 
-                        case ActionType.Copy:
+                            case ActionType.Unknown:
 
-                            return Application.Current.Resources["Copy"];
+                                return null;
 
-                        case ActionType.Move:
+                            case ActionType.Copy:
+                                return Application.Current.Resources["Copy"];
+                            case ActionType.Move:
+                                return Application.Current.Resources["Move"];
+                            case ActionType.MoveToRecycleBin:
+                                return Application.Current.Resources["MoveToRecycleBin"];
+                            case ActionType.Deletion:
+                                return Application.Current.Resources["Deletion"];
+                            //case ActionType.Search:
+                            //return Application.Current.Resources["Search"];
 
-                            return Application.Current.Resources["Move"];
+                            default:
 
-                        case ActionType.MoveToRecycleBin:
+                                return null;
 
-                            return Application.Current.Resources["MoveToRecycleBin"];
+                        }
 
-                        case ActionType.Deletion:
+                    else if (value is SevenZipCompressor)
 
-                            return Application.Current.Resources["Deletion"];
+                        return Application.Current.Resources["Compression"];
 
-                        case ActionType.Search:
+                    else if (value is SevenZipExtractor)
 
-                            return Application.Current.Resources["Search"];
+                        // todo
 
-                        default:
+                        return null;
 
-                            return null;
+                    else
 
-                    }
+                        return null;
 
-                else if ((string)parameter == "From")
+                case "From":
 
-                    return p.FilesInfoLoader.SourcePath;
+                    return (p = value as IOProcess) != null ? p.FilesInfoLoader.SourcePath : value is SevenZipCompressor c ? c.SourcePath : value is SevenZipExtractor e ? e.FileInfo.HasValue ? e.FileInfo.Value.FileName
+: null
+: null;
 
-                else if ((string)parameter == "To")
+                case "To":
 
-                    return ((CopyProcessInfo) p).DestPath; 
+                    return value is CopyProcessInfo copyProcessInfo ? copyProcessInfo.DestPath : value is ISevenZipProcess sevenZipProcess ? sevenZipProcess.DestPath : null;
 
-                else return null;
+                case "ProgressStatus":
 
-            else if (value is SevenZipCompressor c)
+                    return (bool)value ? WinCopies.GUI.Controls.ProcessStatus.Normal
+: WinCopies.GUI.Controls.ProcessStatus.None;
 
-                if ((string)parameter == "ActionType")
-
-                    return Application.Current.Resources["Compression"];
-
-                else if ((string)parameter == "From")
-
-                    return c.SourcePath;
-
-                else if ((string)parameter == "To")
-
-                    return c.DestPath;
-
-            else if ((string)parameter == "ProgressStatus")
-
-                return (bool)value ? WinCopies.GUI.Controls.ProcessStatus.Normal : WinCopies.GUI.Controls.ProcessStatus.None;
-
-            else if ((string)parameter == "ProgressStatusPercent")
-
-                return (byte)value;
-
-                else if ((string)parameter == "DisplayProgressStatus")
+                case "DisplayProgressStatus":
 
                     return (bool)value ? Application.Current.Resources["ProcessIsRunning"] : Application.Current.Resources["ProcessCompletedSuccessfully"];
 
-                else return null;
+                case "ProgressStatusPercent":
 
-            else return null; 
+                    return (byte)value;
+
+                default:
+
+                    return null;
+
+            }
 
         }
 
-        public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 }
