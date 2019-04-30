@@ -83,6 +83,10 @@
                                                 <Setter Property="ProcessStatus" Value="{Binding IsBusy, Converter={StaticResource ProcessStatusConverter}, ConverterParameter=ProgressStatus}" />
                                                 <Setter Property="Value" Value="{Binding PercentDone, Converter={StaticResource ProcessStatusConverter}, ConverterParameter=ProgressStatusPercent}" />
                                             </DataTrigger>
+                                            <DataTrigger Binding="{Binding Converter={StaticResource ObjectToTypeConverter}}" Value="{x:Type local:SevenZipExtractor}" >
+                                                <Setter Property="ProcessStatus" Value="{Binding IsBusy, Converter={StaticResource ProcessStatusConverter}, ConverterParameter=ProgressStatus}" />
+                                                <Setter Property="Value" Value="{Binding PercentDone, Converter={StaticResource ProcessStatusConverter}, ConverterParameter=ProgressStatusPercent}" />
+                                            </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </controls:ProgressBar.Style>
@@ -102,6 +106,18 @@
                                             </DataTrigger>
 
                                             <DataTrigger Binding="{Binding Converter={StaticResource ObjectToTypeConverter}}" Value="{x:Type local:SevenZipCompressor}" >
+                                                <Setter Property="Template" >
+                                                    <Setter.Value >
+                                                        <ControlTemplate TargetType="{x:Type Control}">
+                                                            <local:ArchiveCompressionExtractionProcess >
+
+                                                            </local:ArchiveCompressionExtractionProcess>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+
+                                            <DataTrigger Binding="{Binding Converter={StaticResource ObjectToTypeConverter}}" Value="{x:Type local:SevenZipExtractor}" >
                                                 <Setter Property="Template" >
                                                     <Setter.Value >
                                                         <ControlTemplate TargetType="{x:Type Control}">

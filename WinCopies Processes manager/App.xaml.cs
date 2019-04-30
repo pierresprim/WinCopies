@@ -318,6 +318,8 @@ namespace WinCopiesProcessesManager
 
                         SevenZipExtractor sevenZipExtractorWrapper = new SevenZipExtractor(sevenZipExtractor);
 
+                        sevenZipExtractorWrapper.FileExists += SevenZipExtractorWrapper_FileExists;
+
                         Processes.Add(sevenZipExtractorWrapper);
 
                         sevenZipExtractorWrapper.BeginExtractArchive(_destPath);
@@ -345,6 +347,16 @@ namespace WinCopiesProcessesManager
                     break;
 
             }
+
+        }
+
+        private void SevenZipExtractorWrapper_FileExists(object sender, SevenZip.FileOverwriteEventArgs e)
+
+        {
+
+            e.Cancel = true;
+
+            MessageBox.Show("One or more files already exist with the same names ; the extraction has been cancelled.");
 
         }
 

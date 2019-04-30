@@ -69,6 +69,8 @@ namespace WinCopiesProcessesManager
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public event EventHandler<FileOverwriteEventArgs> FileExists;
+
         public SevenZipExtractor(SevenZip.SevenZipExtractor extractor)
         {
 
@@ -150,8 +152,19 @@ namespace WinCopiesProcessesManager
 
         }
 
-        private void Extractor_FileExists(object sender, FileOverwriteEventArgs e) => throw new NotImplementedException();
+        private void Extractor_FileExists(object sender, FileOverwriteEventArgs e)
+
+        {
+
+            /* while (true) { } */
+            // e.Cancel = false; // throw new NotImplementedException();
+
+            FileExists?.Invoke(this, e);
+
+        }
+
         private void Extractor_ExtractionFinished(object sender, EventArgs e) => IsBusy = false;
+
         private void Extractor_FileExtractionStarted(object sender, FileInfoEventArgs e)
 
         {
