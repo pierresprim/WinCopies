@@ -38,7 +38,7 @@
                     <Run Text="{StaticResource to}" /> 
                     <Run Text="{Binding Mode=OneWay, Converter={StaticResource ProcessStatusConverter}, ConverterParameter=To}" />
                             </TextBlock>
-                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" >
+                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Visibility="{Binding Converter={local:TypeToVisibilityConverter}, Mode=OneTime}" >
                                 <Button >
                                     <Button.Style>
                                         <Style TargetType="{x:Type Button}" >
@@ -48,14 +48,14 @@
 
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsPaused}" Value="true" >
-                                                    <Setter Property="Content" Value="Reprendre" />
+                                                    <Setter Property="Content" Value="Resume" />
                                                     <Setter Property="Command" Value="{x:Static local:Commands.Resume}" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Button.Style>
                                 </Button>
-                                <Button Command="{x:Static local:Commands.Cancel}" CommandParameter="{Binding }" >Annuler</Button>
+                                <Button Command="{x:Static local:Commands.Cancel}" CommandParameter="{Binding }" >Cancel</Button>
                             </StackPanel>
                             <controls:ProgressBar    x:Name="PART_ProgressBar" Grid.Row="1" Height="100" Maximum="100" >
                                 <controls:ProgressBar.Style>

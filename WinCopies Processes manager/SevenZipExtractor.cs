@@ -61,6 +61,10 @@ namespace WinCopiesProcessesManager
 
         public bool IsBusy { get => _isBusy; private set => OnPropertyChanged(nameof(IsBusy), nameof(_isBusy), value, typeof(SevenZipExtractor)); }
 
+        private bool _cancellationPending = false;
+
+        public bool CancellationPending { get => _cancellationPending; set { if (!_isBusy) throw new InvalidOperationException("The process is not busy."); _cancellationPending = value; } }
+
         public bool ExceptionOccurred { get; } = false;
 
         public event PropertyChangedEventHandler PropertyChanged;

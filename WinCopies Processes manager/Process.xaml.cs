@@ -16,7 +16,7 @@ namespace WinCopiesProcessesManager
 
             e.CanExecute = e.Parameter is WinCopies.IO.FileProcesses.Process p ? /* !p.IsPaused && */ p.IsBusy :
 
-            e.Parameter is SevenZipCompressor ? false : false;
+            /*e.Parameter is ISevenZipProcess szp ? szp.IsBusy :*/ false;
 
         private void Pause_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
@@ -25,18 +25,23 @@ namespace WinCopiesProcessesManager
 
                 p.Suspend();
 
+            //else if (e.Parameter is ISevenZipProcess szp)
+
+            //    szp.CancellationPending = true;
+
         }
 
-        private void Cancel_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = e.Parameter is WinCopies.IO.FileProcesses.Process p ? !p.IsCancelled && p.IsBusy : false;    
-        }
+        private void Cancel_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) => e.CanExecute = e.Parameter is WinCopies.IO.FileProcesses.Process p ? !p.IsCancelled && p.IsBusy : false;
 
-        private void Cancel_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e) 
+        private void Cancel_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
             if (e.Parameter is WinCopies.IO.FileProcesses.Process p)
 
-                p.CancelAsync() ;    
+                p.CancelAsync();
+
+            //else if (e.Parameter is ISevenZipProcess szp)
+
+            //    szp.CancellationPending = true;
         }
 
         private void Resume_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) =>
@@ -45,11 +50,23 @@ namespace WinCopiesProcessesManager
 
             e.CanExecute = true;
 
-        private void Resume_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e) 
+        private void Resume_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
             if (e.Parameter is WinCopies.IO.FileProcesses.Process p)
 
-                p.Resume();    
+                p.Resume();
+
+            //else if (e.Parameter is SevenZipCompressor c)
+
+            //{
+
+            //    SevenZip.SevenZipCompressor _c = (SevenZip.SevenZipCompressor)((ISevenZipProcessInternal)c).InnerProcess;
+
+            //    _c.CompressionMode = SevenZip.CompressionMode.Append;
+
+            //    App.BeginSevenZipProcess(c);
+
+            //}
         }
     }
 }

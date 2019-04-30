@@ -58,17 +58,27 @@ namespace WinCopiesProcessesManager
 
         private readonly string _sourcePath = null;
 
+        // todo: really needed?
+
         public string SourcePath { get => _sourcePath; private set => OnPropertyChanged(nameof(SourcePath), nameof(_sourcePath), value, typeof(SevenZipCompressor)); }
+
+        private string[] _sourcePaths = null;
+
+        public string[] SourcePaths { get => _sourcePaths; set { if (_isBusy) throw new InvalidOperationException("The process is busy."); _sourcePaths = value; } }
 
         private readonly string _destPath = null;
 
-        public string DestPath { get => _destPath; private set => OnPropertyChanged(nameof(DestPath), nameof(_destPath), value, typeof(SevenZipCompressor)); }
+        public string DestPath { get => _destPath; set { if (_isBusy) throw new InvalidOperationException("The process is busy."); OnPropertyChanged(nameof(DestPath), nameof(_destPath), value, typeof(SevenZipCompressor)); } }
 
         private readonly bool _isBusy = false;
 
         public bool IsBusy { get => _isBusy; private set => OnPropertyChanged(nameof(IsBusy), nameof(_isBusy), value, typeof(SevenZipCompressor)); }
 
-        public bool ExceptionOccurred { get; } = false;
+        private bool _cancellationPending = false;
+
+        public bool CancellationPending { get => _cancellationPending; set { if (!_isBusy) throw new InvalidOperationException("The process is not busy."); _cancellationPending = value; } }
+
+        public bool ExceptionOccurred { get; internal set; } = false;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -77,7 +87,7 @@ namespace WinCopiesProcessesManager
         {
 
             InnerProcess = compressor;
-            
+
             compressor.FilesFound += Compressor_FilesFound;
 
             compressor.Compressing += Compressor_Compressing;
@@ -100,35 +110,35 @@ namespace WinCopiesProcessesManager
 
         }
 
-        public void BeginCompressDirectory(string directory, string archiveName)
+        public void BeginCompressDirectory(string directory)
 
         {
 
             SourcePath = directory;
 
-            OnCompressionStarting(archiveName);
+            OnCompressionStarting(_destPath);
 
-            InnerProcess.BeginCompressDirectory(directory, archiveName);
+            InnerProcess.BeginCompressDirectory(directory, _destPath);
 
         }
 
-        public void BeginCompressFiles(string[] files, string archiveName)
+        public void BeginCompressFiles(string[] files)
 
         {
 
             SourcePath = System.IO.Path.GetDirectoryName(files[0]);
 
-            OnCompressionStarting(archiveName);
+            OnCompressionStarting(_destPath);
 
-            InnerProcess.BeginCompressFiles(archiveName, files);
+            InnerProcess.BeginCompressFiles(_destPath, files);
 
         }
 
         private void Compressor_FileCompressionStarted(object sender, SevenZip.FileNameEventArgs e)
         {
-
+            e.Cancel = CancellationPending;
             FileName = e.FileName;
-            
+
             FilePercentDone = e.PercentDone;
 
         }

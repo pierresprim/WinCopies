@@ -26,6 +26,8 @@ namespace WinCopiesProcessesManager
 
         bool IsBusy { get; }
 
+        bool CancellationPending { get; set; } 
+
         bool ExceptionOccurred { get; }
 
     }

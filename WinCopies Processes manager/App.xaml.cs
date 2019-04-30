@@ -6,12 +6,16 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using WinCopies.IO;
 using WinCopies.IO.FileProcesses;
+using WinCopies.Util;
 using static WinCopies.Util.Util;
+using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
 
 namespace WinCopiesProcessesManager
 {
@@ -22,14 +26,14 @@ namespace WinCopiesProcessesManager
     {
 
 #if DEBUG 
-        private ObservableCollection<string> _args = null;
+        private System.Collections.ObjectModel.ObservableCollection<string> _args = null;
 
-        public ObservableCollection<string> Args { get => _args; set { _args = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Args")); } }
+        public System.Collections.ObjectModel.ObservableCollection<string> Args { get => _args; set { _args = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Args))); } }
 #endif 
 
-        private ObservableCollection<object> _processes = null;
+        private System.Collections.ObjectModel.ObservableCollection<object> _processes = null;
 
-        public ObservableCollection<object> Processes { get => _processes; set { _processes = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Processes")); } }
+        public System.Collections.ObjectModel.ObservableCollection<object> Processes { get => _processes; set { _processes = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Processes))); } }
 
         static App application = null;
 
@@ -50,12 +54,12 @@ namespace WinCopiesProcessesManager
                 application.InitializeComponent();
 
 #if DEBUG 
-                application.Args = new ObservableCollection<string>();
+                application.Args = new System.Collections.ObjectModel.ObservableCollection<string>();
                 application.Args.CollectionChanged += Args_CollectionChanged;
 #endif 
                 application.
 
-            Processes = new ObservableCollection<object>();
+            Processes = new System.Collections.ObjectModel.ObservableCollection<object>();
                 application.Run();
 
                 SingleInstance<App>.Cleanup();
@@ -79,6 +83,84 @@ namespace WinCopiesProcessesManager
 #endif 
 
             OnNewArgsAdded(new_args);
+
+        }
+
+        internal static void BeginSevenZipProcess(SevenZipCompressor sevenZipCompressorWrapper)
+
+        {
+
+            try
+            {
+
+                if ((Directory.Exists(sevenZipCompressorWrapper.DestPath) || File.Exists(sevenZipCompressorWrapper.DestPath)) && MessageBox.Show("File already exists. Do you want to overwrite it?", Assembly.GetEntryAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+
+                    return;
+
+                List<string> files = new List<string>();
+
+                ShellObjectInfo path = null;
+
+                bool error = false;
+
+                for (int i = 0; i < sevenZipCompressorWrapper.SourcePaths.Length; i++)
+
+                    try
+
+                    {
+
+                        if (!Directory.Exists(sevenZipCompressorWrapper.SourcePaths[i]))
+
+                            using (path = new ShellObjectInfo(ShellObject.FromParsingName(sevenZipCompressorWrapper.SourcePaths[i]), sevenZipCompressorWrapper.SourcePaths[i]))
+
+                                if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, path.FileType, FileType.Folder, FileType.Drive, FileType.SpecialFolder))
+
+                                    sevenZipCompressorWrapper.BeginCompressDirectory(sevenZipCompressorWrapper.SourcePaths[i]);
+
+                                else
+
+                                    files.Add(path.Path);
+
+                    }
+
+                    catch (ShellException ex)
+
+                    {
+
+                        error = true;
+
+                    }
+
+                path = null;
+
+                if (files.Count > 0)
+
+                    sevenZipCompressorWrapper.BeginCompressFiles(files.ToArray());
+
+                if (error)
+
+                {
+
+                    Thread t = new Thread(() =>
+
+                    MessageBox.Show("One or more paths couldn't be added to the paths to compress."));
+
+                    t.Start();
+
+                }
+
+            }
+
+            catch (Exception ex) when (ex is IOException || ex is SevenZip.SevenZipException)
+
+            {
+
+                if (ex is SevenZip.SevenZipException)
+
+                    sevenZipCompressorWrapper.ExceptionOccurred = true;
+
+                MessageBox.Show("Error: " + ex.Message);
+            }
 
         }
 
@@ -191,8 +273,7 @@ namespace WinCopiesProcessesManager
 
                     string archiveName = new_args[7];
 
-                    try
-                    {
+                    SevenZipCompressor sevenZipCompressorWrapper = null;
 
                     SevenZip.SevenZipCompressor sevenZipCompressor = new SevenZip.SevenZipCompressor
                     {
@@ -211,43 +292,15 @@ namespace WinCopiesProcessesManager
                         // VolumeSize = 64*1024*1024
                     };
 
-                        SevenZipCompressor sevenZipCompressorWrapper = new SevenZipCompressor(sevenZipCompressor);
+                    sevenZipCompressorWrapper = new SevenZipCompressor(sevenZipCompressor);
 
-                        Processes.Add(sevenZipCompressorWrapper);
+                    sevenZipCompressorWrapper.SourcePaths = new_args.ToArray(8, new_args.Count - 8);
 
-                        if ((Directory.Exists(archiveName) || File.Exists(archiveName)) && MessageBox.Show("File already exists. Do you want to overwrite it?", Assembly.GetEntryAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                    sevenZipCompressorWrapper.DestPath = archiveName;
 
-                            break;
+                    Processes.Add(sevenZipCompressorWrapper);
 
-                        List<string> files = new List<string>();
-
-                        ShellObjectInfo path = null;
-
-                        for (int i = 8; i < new_args.Count; i++)
-
-                            using (path = new ShellObjectInfo(ShellObject.FromParsingName(new_args[i]), new_args[i]))
-
-                                if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, path.FileType, FileType.Folder, FileType.Drive, FileType.SpecialFolder))
-
-                                    sevenZipCompressorWrapper.BeginCompressDirectory(new_args[i], archiveName);
-
-                                else
-
-                                    files.Add(path.Path);
-
-                        path = null;
-
-                        if (files.Count>0)
-
-                        sevenZipCompressorWrapper.BeginCompressFiles(files.ToArray(), archiveName);
-
-                    }
-
-                    catch (Exception ex) when (ex is IOException || ex is SevenZip.SevenZipException)
-
-                    {
-
-                        MessageBox.Show("Error: " + ex.Message); }
+                    BeginSevenZipProcess(sevenZipCompressorWrapper);
 
                     break;
 
@@ -264,7 +317,7 @@ namespace WinCopiesProcessesManager
                         SevenZip.SevenZipExtractor sevenZipExtractor = new SevenZip.SevenZipExtractor(archiveFileName);
 
                         SevenZipExtractor sevenZipExtractorWrapper = new SevenZipExtractor(sevenZipExtractor);
-                        
+
                         Processes.Add(sevenZipExtractorWrapper);
 
                         sevenZipExtractorWrapper.BeginExtractArchive(_destPath);
