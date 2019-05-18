@@ -44,6 +44,8 @@
         <sys:String x:Key="RenameStatusBarLabel" >Renomme le fichier sélectionné.</sys:String>
         <sys:String x:Key="Delete" >Supprimer</sys:String>
         <sys:String x:Key="DeleteStatusBarLabel" >Si le dispositif de stockage du fichier supporte la mise à la Corbeille, le fichier est déplacé vers celle-ci ; sinon, le fichier est directement supprimé.</sys:String>
+        <sys:String x:Key="DeletePermanently" >Supprimer de façon définitive</sys:String>
+        <sys:String x:Key="DeletePermanentlyStatusBarLabel" >Supprime directement l'élément sélectionné, sans le placer dans la Corbeille au préalable.</sys:String>
         <sys:String x:Key="ExtractArchive" >Extraire l'archive</sys:String>
         <sys:String x:Key="ExtractArchiveStatusBarLabel" >Extrait les fichiers et dossiers contenus dans l'archive dans le répertoire actif.</sys:String>
         <sys:String x:Key="ViewMenu" >_Affichage</sys:String>
@@ -71,5 +73,6 @@
         <sys:String x:Key="SubmitABugStatusBarLabel" >Ouvre le site Web de WinCopies à la page de génération de rapports d'erreur.</sys:String>
         <sys:String x:Key="About" >À propos de...</sys:String>
         <sys:String x:Key="AboutStatusBarLabel" >Ouvre la boîte de dialogue « À propos de ».</sys:String>
+        <sys:String x:Key="WinCopiesProcessesManagerPath" >WinCopiesProcessesManager.exe</sys:String>
     </Application.Resources>
 </Application>

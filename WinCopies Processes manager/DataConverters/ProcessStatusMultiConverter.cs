@@ -15,7 +15,7 @@ namespace WinCopiesProcessesManager
                     : WinCopies.GUI.Controls.ProcessStatus.None
                 : (string)parameter == "ProgressStatusPercent"
                 ? (WinCopies.IO.Size)values[1] > 0 ? ((WinCopies.IO.Size)values[0] / (WinCopies.IO.Size)values[1] * 100).Value : 0d
-                : (string)parameter == "DisplayProgressStatus"
+                : (string)parameter == "ProgressStatusDisplay"
                 ? (bool)values[0]
                     ? !(bool)values[1]
                     ? Application.Current.Resources["ProcessIsRunning"]
@@ -25,9 +25,6 @@ namespace WinCopiesProcessesManager
                     : Application.Current.Resources["ProcessCompletedWithExceptions"]
                 : null;
 
-        public override object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        public override object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 }

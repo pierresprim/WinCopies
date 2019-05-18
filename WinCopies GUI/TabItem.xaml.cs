@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -22,6 +25,29 @@ namespace WinCopies.GUI
             var b = new Binding("Header") { Source = PART_ExplorerControl };
 
             SetBinding(HeaderProperty, b);
+
+            PART_ExplorerControl.PasteAction = new Action<bool, StringCollection, string>((bool isAFileMoving, System.Collections.Specialized.StringCollection sc, string destPath) =>
+         {
+#if DEBUG
+             Debug.WriteLine("Is a file moving: " + isAFileMoving.ToString());
+#endif
+
+             string args = null;
+
+             args += isAFileMoving ? "\"FileMove\" " : "\"Copy\" ";
+
+             foreach (string s in sc)
+
+                 args += "\"" + s + "\" ";
+
+             args += "\"" + destPath + "\"";
+
+#if DEBUG
+             Debug.WriteLine(args);
+#endif
+
+             Process.Start(new ProcessStartInfo((string)Resources["WinCopiesProcessesManager"], args));
+         });
 
             // PART_ExplorerControl = (ExplorerControl)Content;
 

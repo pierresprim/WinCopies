@@ -249,11 +249,18 @@ namespace WinCopies.GUI
 
         }
 
-        private void Copy_Executed(object sender, ExecutedRoutedEventArgs e) => GetVisualTabItem(SelectedItem).PART_ExplorerControl.Copy((ActionsFromObjects)e.Parameter);
+        private void Copy_Executed(object sender, ExecutedRoutedEventArgs e) => GetVisualTabItem(SelectedItem).PART_ExplorerControl.Copy(ActionsFromObjects.ListView);
 
         private void Cut_Executed(object sender, ExecutedRoutedEventArgs e) => GetVisualTabItem(SelectedItem).PART_ExplorerControl.Cut((ActionsFromObjects)e.Parameter);
 
         private void Paste_Executed(object sender, ExecutedRoutedEventArgs e) => GetVisualTabItem(SelectedItem).PART_ExplorerControl.Paste(ActionsFromObjects.ListView);
+
+        private void Delete_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+
+
+        }
 
         // todo: better gesture by checking directly for which comment is running.
 
@@ -390,7 +397,7 @@ namespace WinCopies.GUI
             if (folderBrowserDialog.ShowDialog() == true)
 
             {
-                
+
             }
 
         }
@@ -552,15 +559,13 @@ namespace WinCopies.GUI
 
             foreach (ValueObject<IBrowsableObjectInfo> item in Items)
 
-            {
-
                 item.Value.ItemsLoader.Cancel();
 
-                if (((System.Collections.IEnumerable)((App)Application.Current).Windows).OfType<MainWindow>().Count() > 1)
+            if (((System.Collections.IEnumerable)((App)Application.Current).Windows).OfType<MainWindow>().Count() > 1)
+
+                foreach (ValueObject<IBrowsableObjectInfo> item in Items)
 
                     item.Value.Dispose();
-
-            }
 
         }
 

@@ -36,8 +36,8 @@ namespace WinCopiesProcessesManager
                                 return Application.Current.Resources["Copy"];
                             case ActionType.Move:
                                 return Application.Current.Resources["Move"];
-                            case ActionType.MoveToRecycleBin:
-                                return Application.Current.Resources["MoveToRecycleBin"];
+                            case ActionType.Recycling:
+                                return Application.Current.Resources["Recycling"];
                             case ActionType.Deletion:
                                 return Application.Current.Resources["Deletion"];
                             //case ActionType.Search:
@@ -78,7 +78,7 @@ namespace WinCopiesProcessesManager
                     return (bool)value ? WinCopies.GUI.Controls.ProcessStatus.Normal
 : WinCopies.GUI.Controls.ProcessStatus.None;
 
-                case "DisplayProgressStatus":
+                case "ProgressStatusDisplay":
 
                     return (bool)value ? Application.Current.Resources["ProcessIsRunning"] : Application.Current.Resources["ProcessCompletedSuccessfully"];
 

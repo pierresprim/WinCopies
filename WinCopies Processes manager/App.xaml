@@ -8,7 +8,7 @@
         <ResourceDictionary>
             <sys:String x:Key="Copy" >Copie</sys:String>
             <sys:String x:Key="Move" >Déplacement</sys:String>
-            <sys:String x:Key="MoveToRecycleBin" >Déplacement vers la corbeille</sys:String>
+            <sys:String x:Key="Recycling" >Déplacement vers la Corbeille</sys:String>
             <sys:String x:Key="Deletion" >Suppression</sys:String>
             <sys:String x:Key="Search" >Recherche</sys:String>
             <sys:String x:Key="Compression" >Compression</sys:String>
@@ -26,7 +26,7 @@
             <sys:String x:Key="Retry" >Ré-essayer</sys:String>
             <sys:String x:Key="Replace" >Remplacer</sys:String>
             <sys:String x:Key="ReplaceWhenNotSameContent" >Remplacer quand non identique</sys:String>
-            <sys:String x:Key="Rename" >Rename</sys:String>
+            <sys:String x:Key="Rename" >Renommer</sys:String>
             <sys:String x:Key="RenameWhenNotSameContent" >Renommer quand non identique</sys:String>
             <sys:String x:Key="CheckFiles" >Vérifier les fichiers</sys:String>
             <sys:String x:Key="ShowAll" >Afficher tout</sys:String>

@@ -13,7 +13,8 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
+            <RowDefinition />
+            <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Margin="5">
@@ -29,8 +30,9 @@
         </StackPanel>
         <Label Grid.Row="1" Content="{Binding Version}"></Label>
         <TextBlock Grid.Row="2" TextWrapping="Wrap">WinCopies est un logiciel libre et open-source créé par Pierre Sprimont et distribué sous licence GNU GPL (version 3 ou supérieure, à la convenance de l'utilisateur).</TextBlock>
-        <TextBlock Grid.Row="3" TextWrapping="Wrap" >
-            <Run Text="Copyright (C) 2020 Pierre Sprimont" /> 
+        <ScrollViewer Grid.Row="3">
+        <TextBlock TextWrapping="Wrap" >
+            <Run Text="Copyright (C) 2020 Pierre Sprimont" />
             
             <LineBreak />
 
@@ -42,11 +44,11 @@
             
             <LineBreak />
 
-    <Run Text="You should have received a copy of the GNU General Public License along with this program. If not, see" /> <controls:LinkRun Text="&lt;https://www.gnu.org/licenses/&gt;" Url="https://www.gnu.org/licenses/" /><Run Text="." />
+    <Run Text="You should have received a copy of the GNU General Public License along with this program. If not, see" /> <controls:LinkRun Text="&lt;https://www.gnu.org/licenses/&gt;" Uri="https://www.gnu.org/licenses/" /><Run Text="." />
             
             <LineBreak />
             
-            <Run Text="You can visit the WinCopies website at" /> <controls:LinkRun Text="&lt;http://www.wincopies.com&gt;" Url="http://www.wincopies.com" /> <Run Text="for more details." />
+            <Run Text="You can visit the WinCopies website at" /> <controls:LinkRun Text="&lt;http://www.wincopies.com&gt;" Uri="http://www.wincopies.com" /> <Run Text="for more details." />
             
             <LineBreak />
             
@@ -58,8 +60,16 @@
             
             <LineBreak /> 
             
-            <Run Text="We hope you'll have a good work with WinCopies!" /> 
-        </TextBlock>
+            <Run Text="We hope you'll have a good work with WinCopies!" />
+            </TextBlock>
+        </ScrollViewer>
         <RichTextBox x:Name="RTB" Grid.Row="4" IsReadOnly="True" />
+        <TextBlock Grid.Row="5">
+            WinCopies utilise le composant tiers suivants :
+            <LineBreak />
+            <controls:LinkRun Text="famfamfam Silk icon set" Uri="http://www.famfamfam.com/lab/icons/silk/" />
+            <LineBreak />
+            Pour connaître les packages utilisés par le WinCopies framework, veuillez vous référer au site Web de WinCopies.
+        </TextBlock>
     </Grid>
 </dialogs:DialogWindow>

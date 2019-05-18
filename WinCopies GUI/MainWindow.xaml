@@ -37,6 +37,7 @@
         <CommandBinding Command="Cut" CanExecute="FileSystemOperation_CanExecute" Executed="Cut_Executed" />
         <CommandBinding Command="Paste" CanExecute="FileSystemOperation_CanExecute" Executed="Paste_Executed" />
         <CommandBinding Command="{x:Static commands:FileSystemCommands.Rename}" CanExecute="FileSystemOperation_CanExecute" Executed="Rename_Executed" />
+        <CommandBinding Command="Delete" CanExecute="FileSystemOperation_CanExecute" Executed="Delete_Executed" />
         <CommandBinding Command="{x:Static local:Commands.ExtractArchive}" CanExecute="ExtractArchive_CanExecute" Executed="ExtractArchive_Executed" />
 
         <CommandBinding Command="{x:Static local:Commands.SizeOne}" CanExecute="Command_CanExecute" Executed="ViewStyleCommand_Executed" />
@@ -111,7 +112,7 @@
                                     </MenuItem>
                                 </MenuItem>
                                 <MenuItem Header="{StaticResource EditMenu}" >
-                                    <MenuItem x:Name="CopyMenuItem" Header="{StaticResource Copy}" Command="Copy" CommandParameter="{x:Static guiExplorer:ActionsFromObjects.ListView}" >
+                                    <MenuItem x:Name="CopyMenuItem" Header="{StaticResource Copy}" Command="Copy" >
                                         <MenuItem.Icon>
                                             <Image Source="Resources/page_copy.png" />
                                         </MenuItem.Icon>
@@ -131,10 +132,13 @@
                                             <Image Source="Resources/textfield_rename.png" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem x:Name="DeleteMenuItem" Header="Delete" Command="Delete" CommandParameter="{x:Static guiExplorer:ActionsFromObjects.ListView}" >
-                                        <MenuItem.Icon>
-                                            <Image Source="Resources/page_white_delete.png" />
-                                        </MenuItem.Icon>
+                                    <MenuItem Header="{StaticResource Delete}" >
+                                        <MenuItem x:Name="DeleteMenuItem" Header="{StaticResource Delete}" Command="Delete" CommandParameter="{x:Static guiExplorer:ActionsFromObjects.ListView}" >
+                                            <MenuItem.Icon>
+                                                <Image Source="Resources/page_white_delete.png" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem x:Name="DeletePermanentlyMenuItem" Header="{StaticResource DeletePermanently}" Command="{x:Static commands:FileSystemCommands.DeletePermanently}" CommandParameter="{x:Static guiExplorer:ActionsFromObjects.ListView}" />
                                     </MenuItem>
                                     <Separator />
                                     <MenuItem x:Name="ExtractArchiveMenuItem" Header="{StaticResource ExtractArchive}" Command="{x:Static local:Commands.ExtractArchive}" />
@@ -256,6 +260,9 @@
                             </Trigger>
                             <Trigger SourceName="DeleteMenuItem" Property="IsMouseOver" Value="true" >
                                 <Setter TargetName="StatusBarLabel" Property="Content" Value="{StaticResource DeleteStatusBarLabel}" />
+                            </Trigger>
+                            <Trigger SourceName="DeletePermanentlyMenuItem" Property="IsMouseOver" Value="true" >
+                                <Setter TargetName="StatusBarLabel" Property="Content" Value="{StaticResource DeletePermanentlyStatusBarLabel}" />
                             </Trigger>
                             <Trigger SourceName="ExtractArchiveMenuItem" Property="IsMouseOver" Value="true" >
                                 <Setter TargetName="StatusBarLabel" Property="Content" Value="{StaticResource ExtractArchiveStatusBarLabel}" />

@@ -18,6 +18,7 @@ using Windows.System;
 using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
 using static WinCopies.SettingsManagement.SettingsManagement;
 using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
+using System.Runtime.InteropServices;
 
 namespace WinCopies.GUI
 {
@@ -38,6 +39,8 @@ namespace WinCopies.GUI
         }
 
         // protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+            // todo:
 
         private const string Unique = "08248566-c8c4-4b19-96b7-489fe3b1049b";
 
@@ -142,6 +145,8 @@ namespace WinCopies.GUI
         public static void Main()
 
         {
+
+            Debug.WriteLine("System.Security.Principal.WindowsIdentity.GetCurrent().User.AccountDomainSid: " + System.Security.Principal.WindowsIdentity.GetCurrent().User.Value);
 
             // Process.Start("ms-windows-store://navigatetopage/?Id=Games");
 

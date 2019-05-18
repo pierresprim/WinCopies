@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>WinCopiesProcessesManager</RootNamespace>
     <AssemblyName>WinCopiesProcessesManager</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -84,6 +84,7 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="Win32Native, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="WinCopies.GUI, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\WinCopies-framework\bin\x64\Debug\WinCopies.GUI.dll</HintPath>
@@ -120,12 +121,16 @@
       <DependentUpon>ArchiveCompressionExtractionProcess.xaml</DependentUpon>
     </Compile>
     <Compile Include="Commands.cs" />
+    <Compile Include="DataConverters\ActionTypeToVisibilityConverter.cs" />
     <Compile Include="DataConverters\CanReplaceFileConverter.cs" />
     <Compile Include="DataConverters\ExceptionToDisplayValueConverter.cs" />
     <Compile Include="DataConverters\FileCheckFileContentConverter.cs" />
     <Compile Include="DataConverters\IntegerOperationsOnSizesConverter.cs" />
     <Compile Include="DataConverters\ProcessStatusMultiConverter.cs" />
     <Compile Include="DataConverters\TypeToVisibilityConverter.cs" />
+    <Compile Include="DeleteProcess.xaml.cs">
+      <DependentUpon>DeleteProcess.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FileCheck.xaml.cs">
       <DependentUpon>FileCheck.xaml</DependentUpon>
     </Compile>
@@ -151,6 +156,10 @@
       <DependentUpon>CopyProcess.xaml</DependentUpon>
     </Compile>
     <Page Include="ArchiveCompressionExtractionProcess.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DeleteProcess.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

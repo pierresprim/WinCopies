@@ -193,11 +193,11 @@ namespace WinCopiesProcessesManager
             {
 
                 case "Copy":
-                case "FileMoving":
+                case "FileMove":
 
                     string destPath = "";
 
-                    bool isAFileMoving = false;
+                    bool isAFileMove = new_args[0] == "FileMove";
 
                     for (int i = 1; i < new_args.Count - 1; i++)
 
@@ -219,13 +219,10 @@ namespace WinCopiesProcessesManager
                     Debug.WriteLine(destPath);
 #endif
 
-                    isAFileMoving = new_args[0] == "FileMoving" ? true : false;
-
-                    CopyProcessInfo cpi = new CopyProcessInfo(destPath, isAFileMoving)
-
+                    CopyProcessInfo cpi = new CopyProcessInfo(destPath, isAFileMove)
                     {
 
-                        FilesInfoLoader = new FilesInfoLoader(pathsInfo, ActionType.Copy)
+                        FilesInfoLoader = new FilesInfoLoader(pathsInfo, isAFileMove ? ActionType.Move : ActionType.Copy)
 
                     };
 
@@ -330,7 +327,10 @@ namespace WinCopiesProcessesManager
 
                     break;
 
+                case "Recycling":
                 case "Deletion":
+
+                    bool recycle = new_args[0] == "Recycling";
 
                     for (int i = 1; i < new_args.Count; i++)
 
@@ -340,9 +340,34 @@ namespace WinCopiesProcessesManager
 
                         AddNewPath();
 
+#if DEBUG 
+                        Debug.WriteLine(new_arg);
+#endif 
+
                     }
 
-                    // Processes.Add(new WinCopies.IO.FilesProcesses.);
+                    // destPath = new_args[new_args.Count - 1];
+
+                    //#if DEBUG
+                    //                    Debug.WriteLine(destPath);
+                    //#endif
+
+                    DeleteProcessInfo dpi = new DeleteProcessInfo(recycle)
+                    {
+
+                        FilesInfoLoader = new FilesInfoLoader(pathsInfo, recycle ? ActionType.Recycling : ActionType.Deletion)
+
+                    };
+
+                    dpi.FilesInfoLoader.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) => Process_FilesInfoLoaded(dpi);
+
+                    Processes.Add(dpi);
+
+                    dpi.FilesInfoLoader.LoadAsync();
+
+#if DEBUG 
+                    Debug.WriteLine("Process started.");
+#endif 
 
                     break;
 
