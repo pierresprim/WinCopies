@@ -31,13 +31,7 @@
                                 <RowDefinition Height="auto" />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <TextBlock HorizontalAlignment="Left">
-                    <Run Text="{Binding Mode=OneTime, Converter={StaticResource ProcessStatusConverter}, ConverterParameter=ActionType}" /> 
-                    <Run Text="{StaticResource from}" />
-                    <Run Text="{Binding Mode=OneWay, Converter={StaticResource ProcessStatusConverter}, ConverterParameter=From}" /> 
-                    <Run Text="{StaticResource to}" /> 
-                    <Run Text="{Binding Mode=OneWay, Converter={StaticResource ProcessStatusConverter}, ConverterParameter=To}" />
-                            </TextBlock>
+                            <TextBlock HorizontalAlignment="Left" Text="{Binding Mode=OneTime, Converter={StaticResource ProcessStatusConverter}, ConverterParameter=ActionType}" />
                             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Visibility="{Binding Converter={local:TypeToVisibilityConverter}, Mode=OneTime}" >
                                 <Button >
                                     <Button.Style>

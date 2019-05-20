@@ -16,6 +16,8 @@ using WinCopies.IO.FileProcesses;
 using WinCopies.Util;
 using static WinCopies.Util.Util;
 using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
+using NotifyCollectionChangedEventArgs = System.Collections.Specialized.NotifyCollectionChangedEventArgs;
+using System.Collections.Specialized;
 
 namespace WinCopiesProcessesManager
 {
@@ -33,7 +35,20 @@ namespace WinCopiesProcessesManager
 
         private System.Collections.ObjectModel.ObservableCollection<object> _processes = null;
 
-        public System.Collections.ObjectModel.ObservableCollection<object> Processes { get => _processes; set { _processes = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Processes))); } }
+        public System.Collections.ObjectModel.ObservableCollection<object> Processes { get => _processes; set { _processes = value; _processes.CollectionChanged += Processes_CollectionChanged; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Processes))); } }
+
+        private void Processes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+
+            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, e.Action, NotifyCollectionChangedAction.Remove, NotifyCollectionChangedAction.Replace, NotifyCollectionChangedAction.Reset))
+
+                foreach (object item in e.OldItems)
+
+                    if (item is WinCopies.IO.FileProcesses.Process p)
+
+                        p.Dispose();
+
+        }
 
         static App application = null;
 
@@ -44,7 +59,7 @@ namespace WinCopiesProcessesManager
 
         {
 
-            if (SingleInstance<App>.InitializeAsFirstInstance(((GuidAttribute)System.Reflection.Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(GuidAttribute), true)[0]).Value))
+            if (SingleInstance<App>.InitializeAsFirstInstance(((GuidAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(GuidAttribute), true)[0]).Value))
 
             {
 
@@ -69,7 +84,7 @@ namespace WinCopiesProcessesManager
         }
 
 #if DEBUG
-        private static void Args_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => Debug.WriteLine(e.NewItems[0].ToString());
+        private static void Args_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => Debug.WriteLine(e.NewItems[0].ToString());
 #endif
 
         private void AddNewArgs(IList<string> new_args)
@@ -123,7 +138,7 @@ namespace WinCopiesProcessesManager
 
                     }
 
-                    catch (ShellException ex)
+                    catch (ShellException)
 
                     {
 
@@ -167,8 +182,6 @@ namespace WinCopiesProcessesManager
         private void OnNewArgsAdded(IList<string> new_args)
 
         {
-
-            if (new_args.Count < 3) return;
 
             List<WinCopies.IO.FileProcesses.FileSystemInfo> pathsInfo = new List<WinCopies.IO.FileProcesses.FileSystemInfo>();
 
@@ -236,7 +249,7 @@ namespace WinCopiesProcessesManager
                     Debug.WriteLine("Process started.");
 #endif 
 
-                    break;
+                    return;
 
                 case "Compression":
 
@@ -299,7 +312,7 @@ namespace WinCopiesProcessesManager
 
                     BeginSevenZipProcess(sevenZipCompressorWrapper);
 
-                    break;
+                    return;
 
                 case "Extraction":
 
@@ -325,7 +338,7 @@ namespace WinCopiesProcessesManager
 
                     catch (Exception ex) when (ex is IOException || ex is SevenZip.SevenZipException) { MessageBox.Show("Error: " + ex.Message); }
 
-                    break;
+                    return;
 
                 case "Recycling":
                 case "Deletion":
@@ -359,7 +372,13 @@ namespace WinCopiesProcessesManager
 
                     };
 
-                    dpi.FilesInfoLoader.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) => Process_FilesInfoLoaded(dpi);
+                    dpi.FilesInfoLoader.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) =>
+
+                 {
+
+                     Process_FilesInfoLoaded(dpi);
+
+                 };
 
                     Processes.Add(dpi);
 
@@ -369,9 +388,15 @@ namespace WinCopiesProcessesManager
                     Debug.WriteLine("Process started.");
 #endif 
 
-                    break;
+                    return;
+
+
 
             }
+
+            MessageBox.Show("Error in parsing arguments.");
+
+            if (Processes.Count == 0) Environment.Exit(0);
 
         }
 
@@ -388,20 +413,16 @@ namespace WinCopiesProcessesManager
         private void Process_FilesInfoLoaded(WinCopies.IO.FileProcesses.Process p)
         {
 
-#if DEBUG 
-            // var p = (WinCopies.Util.BackgroundWorker)sender;    
+            p.StartProcess();
 
-            if (p is CopyProcessInfo)
-
-                ((CopyProcessInfo)p).StartCopy();
+#if DEBUG
+            // var p = (WinCopies.Util.BackgroundWorker)sender;
 
             foreach (WinCopies.IO.FileProcesses.FileSystemInfo fileSystemInfo in p.FilesInfoLoader.PathsLoaded)
 
                 if (fileSystemInfo.FileType == FileType.Folder || fileSystemInfo.FileType == FileType.Drive)
 
                     Debug.WriteLine(fileSystemInfo.FileSystemInfoProperties.FullName + " " + fileSystemInfo.FileType.ToString());
-#else 
-            ((WinCopies.IO.FilesProcesses.CopyProcessInfo)sender).startCopy();
 #endif 
 
 

@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Windows;
 using WinCopies.IO.FileProcesses;
+using static WinCopies.Util.Util;
 
 using IOProcess = WinCopies.IO.FileProcesses.Process;
 
@@ -33,13 +34,18 @@ namespace WinCopiesProcessesManager
                                 return null;
 
                             case ActionType.Copy:
-                                return Application.Current.Resources["Copy"];
                             case ActionType.Move:
-                                return Application.Current.Resources["Move"];
                             case ActionType.Recycling:
-                                return Application.Current.Resources["Recycling"];
                             case ActionType.Deletion:
-                                return Application.Current.Resources["Deletion"];
+
+                                string result = $"{Application.Current.Resources[p.ActionType.ToString()]} {Application.Current.Resources["from"]} {p.FilesInfoLoader.SourcePath}";
+
+                                if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, p.ActionType, ActionType.Copy, ActionType.Move))
+
+                                    result += $" {Application.Current.Resources["to"]} { ((CopyProcessInfo)p).DestPath}";
+
+                                return result;
+
                             //case ActionType.Search:
                             //return Application.Current.Resources["Search"];
 
@@ -49,29 +55,45 @@ namespace WinCopiesProcessesManager
 
                         }
 
-                    else if (value is SevenZipCompressor)
+                    else if (value is ISevenZipProcess sevenZipProcess)
 
-                        return Application.Current.Resources["Compression"];
+                    {
 
-                    else if (value is SevenZipExtractor)
+                        string action = null;
 
-                        // todo
+                        string sourcePath = null;
 
-                        return null;
+                        if (value is SevenZipCompressor c)
+
+                        {
+
+                            action = (string)Application.Current.Resources["Compression"];
+
+                            sourcePath = c.SourcePath;
+
+                        }
+
+                        else if (value is SevenZipExtractor e)
+
+                        {
+
+                            action = (string)Application.Current.Resources["Extraction"];
+
+                            sourcePath = e.FileInfo.HasValue ? e.FileInfo.Value.FileName : null;
+
+                        }
+
+                        else
+
+                            throw new ArgumentException("'value' is not a supported type.");
+
+                        return $"{action} {Application.Current.Resources["from"]} {sourcePath} {Application.Current.Resources["to"]} {sevenZipProcess.DestPath}";
+
+                    }
 
                     else
 
-                        return null;
-
-                case "From":
-
-                    return (p = value as IOProcess) != null ? p.FilesInfoLoader.SourcePath : value is SevenZipCompressor c ? c.SourcePath : value is SevenZipExtractor e ? e.FileInfo.HasValue ? e.FileInfo.Value.FileName
-: null
-: null;
-
-                case "To":
-
-                    return value is CopyProcessInfo copyProcessInfo ? copyProcessInfo.DestPath : value is ISevenZipProcess sevenZipProcess ? sevenZipProcess.DestPath : null;
+                        throw new ArgumentException("'value' is not a supported type.");
 
                 case "ProgressStatus":
 

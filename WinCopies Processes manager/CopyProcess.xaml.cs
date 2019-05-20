@@ -136,15 +136,15 @@ namespace WinCopiesProcessesManager
         private void Button_Click(object sender, RoutedEventArgs e)
         {
 
-            var cpi = (WinCopies.IO.FileProcesses.CopyProcessInfo)DataContext;
+            WinCopies.IO.FileProcesses.CopyProcessInfo cpi = (WinCopies.IO.FileProcesses.CopyProcessInfo)DataContext;
 
-            var actionOnException = ActionOnException;
+            HowToRetry actionOnException = ActionOnException;
 
             if (actionOnException == HowToRetry.CheckFiles)
 
             {
 
-                FileCheck fileCheckWindow = new FileCheck(cpi);    
+                FileCheck fileCheckWindow = new FileCheck(cpi);
 
                 // cpi.Exceptions
 
@@ -162,7 +162,7 @@ namespace WinCopiesProcessesManager
 
                 cpi.HowToRetryWhenExceptionOccured = (WinCopies.IO.FileProcesses.HowToRetry)actionOnException;
 
-                cpi.StartCopy();
+                cpi.StartProcess();
 
             }
 
@@ -174,7 +174,7 @@ namespace WinCopiesProcessesManager
 
                 cpi.Exceptions[0].HowToRetryToProcess = (WinCopies.IO.FileProcesses.HowToRetry)actionOnException;
 
-                cpi.StartCopy(true);
+                cpi.StartProcess(true);
 
             }
 

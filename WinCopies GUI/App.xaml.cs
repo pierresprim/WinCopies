@@ -40,7 +40,7 @@ namespace WinCopies.GUI
 
         // protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-            // todo:
+        // todo:
 
         private const string Unique = "08248566-c8c4-4b19-96b7-489fe3b1049b";
 
@@ -198,7 +198,7 @@ namespace WinCopies.GUI
 
                 app.InitializeComponent();
 
-                var mainWindow = new MainWindow();
+                MainWindow mainWindow = new MainWindow();
                 app.MainWindow = mainWindow;
                 // mainWindow.Show();
 
@@ -243,9 +243,9 @@ namespace WinCopies.GUI
 
                         new_args[i] = new_args[i].Replace("/", "\\");
 
-                    var path = new_args[1];
+                    string path = new_args[1];
 
-                    var mainWindow = (MainWindow)application.MainWindow;
+                    MainWindow mainWindow = (MainWindow)application.MainWindow;
 
                     bool alreadyPathOpen = false;
 
@@ -285,7 +285,7 @@ namespace WinCopies.GUI
 
             {
 
-                var mainWindow = (MainWindow)application.MainWindow;
+                MainWindow mainWindow = (MainWindow)application.MainWindow;
 
                 foreach (string arg in new_args)
 
@@ -299,7 +299,7 @@ namespace WinCopies.GUI
                         mainWindow.New_Tab(new ValueObject<IBrowsableObjectInfo>(new ShellObjectInfo(ShellObject.FromParsingName(_arg), _arg)));
 
                     }
-                    catch (ShellException ex)
+                    catch (ShellException)
                     {
 
                         MessageBox.Show("This file does not exists.");
