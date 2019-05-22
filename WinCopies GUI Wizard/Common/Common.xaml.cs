@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Shell;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
@@ -13,7 +14,7 @@ namespace WinCopiesGUIWizard.Common
     /// </summary>
     public partial class Common : Page
     {
-        public static readonly string[] EnvironmentPathVariables = { "AllUserProfile", "AppData", "CommonProgramFiles", "CommonProgramFiles(x86)", "HomeDrive", "LocalAppData", "ProgramData", "ProgramFiles", "ProgramFiles(x86)", "Public", "SystemDrive", "SystemRoot", "Temp", "UserProfile" };
+
         public static string[] ViewStyles { get; } = { (string) Application.Current.Resources["SizeOne"], (string)Application.Current.Resources["SizeTwo"], (string)Application.Current.Resources["SizeThree"], (string)Application.Current.Resources["SizeFour"],
         (string) Application.Current.Resources["List"], (string) Application.Current.Resources["Details"], (string) Application.Current.Resources["Tiles"], (string) Application.Current.Resources["Content"]};
 
@@ -84,70 +85,36 @@ namespace WinCopiesGUIWizard.Common
 
         private void CheckableString_PropertyChanged(object sender, PropertyChangedEventArgs e) =>
 
-        ((App)Application.Current).IsSaved = false;    
+        ((App)Application.Current).IsSaved = false;
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
 
-            Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog commonOpenFileDialog = new Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog();
+            WinCopies.GUI.Windows.Dialogs.FolderBrowserDialog commonOpenFileDialog = new WinCopies.GUI.Windows.Dialogs.FolderBrowserDialog();
 
-            commonOpenFileDialog.IsFolderPicker = true;
+            commonOpenFileDialog.Mode = WinCopies.GUI.Windows.Dialogs.FolderBrowserDialogMode.OpenFolder;
 
-            string directory = StartDirectory.Contains("%") ? Environment.GetEnvironmentVariable(StartDirectory.Replace("%", null)) : StartDirectory;
+            string directory = StartDirectory;
 
-            commonOpenFileDialog.InitialDirectory = directory;
+            if (directory.Contains("%"))
 
-            commonOpenFileDialog.DefaultDirectory = directory;
+                directory = WinCopies.IO.Path.GetRealPathFromEnvironmentVariables(directory);
 
-            if (commonOpenFileDialog.ShowDialog(Window.GetWindow(this)) == Microsoft.WindowsAPICodePack.Dialogs.CommonFileDialogResult.Ok)
+            commonOpenFileDialog.ExplorerControl.Navigate(new ShellObjectInfo(ShellObject.FromParsingName(directory), directory), true);
 
-                StartDirectory = GetShortcutPath(commonOpenFileDialog.FileName);
+            // commonOpenFileDialog.DefaultDirectory = directory;
 
-        }
+            commonOpenFileDialog.Owner = Window.GetWindow(this);
 
-        public static string GetShortcutPath(string path)
+            if (commonOpenFileDialog.ShowDialog() == true)
 
-        {
-
-            List<KeyValuePair<string, string>> paths = new List<KeyValuePair<string, string>>();
-
-            foreach (var environmentPathVariable in EnvironmentPathVariables)
-
-            {
-
-                string _path = Environment.GetEnvironmentVariable(environmentPathVariable);
-
-                if (_path != null)
-
-                    paths.Add(new KeyValuePair<string, string>(environmentPathVariable, _path));
-
-            }
-
-
-
-            paths.Sort((KeyValuePair<string, string> x, KeyValuePair<string, string> y) => x.Value.Length < y.Value.Length ? 1 : x.Value.Length == y.Value.Length ? 0 : -1);
-
-
-
-            foreach (KeyValuePair<string, string> _path in paths)
-
-                if (path.StartsWith(_path.Value))
-
-                {
-
-                    path = "%" + _path.Key + "%" + path.Substring(_path.Value.Length);
-
-                    break;
-
-                }
-
-            return path;
+                StartDirectory = WinCopies.IO.Path.GetShortcutPath(commonOpenFileDialog.ExplorerControl.Path.Path);
 
         }
 
         // todo: to do this action only if the start directory has changed in the meantime.
 
-        private void TextBox_LostFocus(object sender, RoutedEventArgs e) => StartDirectory = GetShortcutPath(StartDirectory);
+        private void TextBox_LostFocus(object sender, RoutedEventArgs e) => StartDirectory = WinCopies.IO.Path.GetShortcutPath(StartDirectory);
 
     }
 }

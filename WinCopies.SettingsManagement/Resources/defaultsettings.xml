@@ -26,12 +26,7 @@
     <clicksToOpen>1</clicksToOpen>
     <underliningMode>0</underliningMode>
   </ergonomics>
-  <history>
-    <showFileHistory>true</showFileHistory>
-    <showFolderHistory>true</showFolderHistory>
-  </history>
   <iooperations>
-    <hideFoldersFusionExceptions>true</hideFoldersFusionExceptions>
     <defaultActionWhenFilesFusionException>0</defaultActionWhenFilesFusionException>
     <automaticallyIgnoreItemWhenOtherExceptions>false</automaticallyIgnoreItemWhenOtherExceptions>
     <raiseSoundWhenProcessesCompleted>false</raiseSoundWhenProcessesCompleted>

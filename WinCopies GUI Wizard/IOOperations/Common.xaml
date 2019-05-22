@@ -16,7 +16,7 @@
             <Grid>
                 <GroupBox Header="{StaticResource FileSystemProcessesSettings}" >
                     <StackPanel >
-                        <CheckBox Content="{StaticResource HideFoldersFusionExceptions}" IsChecked="{Binding HideFoldersFusionExceptions, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                        <!--<CheckBox Content="{StaticResource HideFoldersFusionExceptions}" IsChecked="{Binding HideFoldersFusionExceptions, RelativeSource={RelativeSource Mode=TemplatedParent}}" />-->
                         <CheckBox Content="{StaticResource DefaultActionWhenFilesFusionExceptions}" IsChecked="{Binding DefaultActionWhenFilesFusionException, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={converters:EnumToReversedBooleanConverter}, ConverterParameter={x:Static local:FilesFusionExceptionDefaultActions.None}}" Checked="CheckBox_Checked" />
                         <StackPanel Margin="20,0,0,0" >
                             <RadioButton Content="{StaticResource Ignore}" IsChecked="{Binding DefaultActionWhenFilesFusionException, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:FilesFusionExceptionDefaultActions.Ignore}}" GroupName="Default files fusion exception action" />

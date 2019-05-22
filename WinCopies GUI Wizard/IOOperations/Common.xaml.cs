@@ -10,10 +10,10 @@ namespace WinCopiesGUIWizard.IOOperations
     public partial class Common : Page
     {
 
-        public static readonly DependencyProperty HideFoldersFusionExceptionsProperty = DependencyProperty.Register(nameof(HideFoldersFusionExceptions), typeof(bool), typeof(Common), new PropertyMetadata(true, App.PropertyChangedCallback));
+        //public static readonly DependencyProperty HideFoldersFusionExceptionsProperty = DependencyProperty.Register(nameof(HideFoldersFusionExceptions), typeof(bool), typeof(Common), new PropertyMetadata(true, App.PropertyChangedCallback));
 
-        [SerializableProperty()]
-        public bool HideFoldersFusionExceptions { get => (bool)GetValue(HideFoldersFusionExceptionsProperty); set => SetValue(HideFoldersFusionExceptionsProperty, value); }
+        //[SerializableProperty()]
+        //public bool HideFoldersFusionExceptions { get => (bool)GetValue(HideFoldersFusionExceptionsProperty); set => SetValue(HideFoldersFusionExceptionsProperty, value); }
 
         public static readonly DependencyProperty DefaultActionWhenFilesFusionExceptionProperty = DependencyProperty.Register(nameof(DefaultActionWhenFilesFusionException), typeof(FilesFusionExceptionDefaultActions), typeof(Common), new PropertyMetadata(FilesFusionExceptionDefaultActions.None, App.PropertyChangedCallback));
 
@@ -43,7 +43,7 @@ namespace WinCopiesGUIWizard.IOOperations
 
             SettingsManagement.LoadSettings(this);
 
-            ((App)Application.Current).IsSaved = true; 
+            ((App)Application.Current).IsSaved = true;
 
         }
 

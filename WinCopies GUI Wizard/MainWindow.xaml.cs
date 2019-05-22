@@ -14,7 +14,7 @@ namespace WinCopiesGUIWizard
 
         public const string Ergonomics = "Ergonomics";
 
-        public const string History = "History";
+        // public const string History = "History";
 
         public const string IOOperations = "IOOperations";
 
@@ -30,19 +30,9 @@ namespace WinCopiesGUIWizard
 
         {
 
-            TreeViewItem getTreeViewItem(string headerResourceName, string pageUri, object[] items)
-
-            {
-
-                if (items != null)
-
-                    return new TreeViewItem((string)Application.Current.Resources[headerResourceName], pageUri, new TreeViewItem[] { getTreeViewItem((string)items[0], (string)items[1], (object[])items[2]) });
-
-                else
-
-                    return new TreeViewItem((string)Application.Current.Resources[headerResourceName], pageUri, null);
-
-            }
+            TreeViewItem getTreeViewItem(string headerResourceName, string pageUri, object[] items) => items != null
+                    ? new TreeViewItem((string)Application.Current.Resources[headerResourceName], pageUri, new TreeViewItem[] { getTreeViewItem((string)items[0], (string)items[1], (object[])items[2]) })
+                    : new TreeViewItem((string)Application.Current.Resources[headerResourceName], pageUri, null);
 
             TreeViewItem[] getTreeViewItems(object[][] treeViewItems)
 
@@ -64,7 +54,7 @@ namespace WinCopiesGUIWizard
 
             new object[] { Ergonomics, $"{Ergonomics}/{Common}.xaml", new object[] { Common, $"{Ergonomics}/{Common}.xaml", null } },
 
-            new object [] { History, $"{History}/{Common}.xaml", new object[] { Common, $"{History}/{Common}.xaml", null } } ,
+            // new object [] { History, $"{History}/{Common}.xaml", new object[] { Common, $"{History}/{Common}.xaml", null } } ,
 
             new object[] { IOOperations, $"{IOOperations}/{Common}.xaml", new object[] { Common, $"{IOOperations}/{Common}.xaml", null } } });
 

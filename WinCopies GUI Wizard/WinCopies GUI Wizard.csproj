@@ -82,9 +82,15 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="Win32Native, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="WinCopies.GUI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="WinCopies.GUI.Explorer, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\WinCopies framework\bin\x64\Debug\WinCopies.GUI.Explorer.dll</HintPath>
+    </Reference>
+    <Reference Include="WinCopies.IO, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\WinCopies-framework\bin\x64\Debug\WinCopies.IO.dll</HintPath>
     </Reference>
     <Reference Include="WinCopies.SettingsManagement">
       <HintPath>..\bin\x64\Debug\WinCopies.SettingsManagement.dll</HintPath>
@@ -122,10 +128,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="History\Common.xaml">
+    <None Include="History\Common.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
+    </None>
     <Page Include="IOOperations\Common.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
