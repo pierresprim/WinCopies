@@ -26,7 +26,7 @@ namespace WinCopies.GUI
 
             SetBinding(HeaderProperty, b);
 
-            PART_ExplorerControl.PasteAction = new Action<bool, StringCollection, string>((bool isAFileMoving, System.Collections.Specialized.StringCollection sc, string destPath) =>
+            PART_ExplorerControl.PasteAction = new PasteHandler((bool isAFileMoving, System.Collections.Specialized.StringCollection sc, string destPath) =>
          {
 #if DEBUG
              Debug.WriteLine("Is a file moving: " + isAFileMoving.ToString());

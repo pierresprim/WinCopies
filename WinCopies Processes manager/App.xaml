@@ -48,7 +48,7 @@
             <sys:String x:Key="PathNotFoundExceptionMessage" >Le dossier parent n'a pas pu être trouvé.</sys:String>
             <sys:String x:Key="AccessDeniedExceptionMessage" >L'accès à la ressource a été refusé par votre système d'exploitation.</sys:String>
             <sys:String x:Key="DirectoryCannotBeRemovedExceptionMessage" >Le dossier parent n'a pas pu être supprimé.</sys:String>
-            <sys:String x:Key="WriteProtectExceptionMessage" >Le périphérique est protégé en écriture.</sys:String>
+            <sys:String x:Key="WriteProtectedExceptionMessage" >Le périphérique est protégé en écriture.</sys:String>
             <sys:String x:Key="ExceptionOnDeviceUnitExceptionMessage" >Une exception en rapport au périphérique est survenue.</sys:String>
             <sys:String x:Key="DiskNotReadyExceptionMessage" >Le disque n'est pas prêt.</sys:String>
             <sys:String x:Key="FileAlreadyExistsExceptionMessage" >Le fichier existe déjà.</sys:String>

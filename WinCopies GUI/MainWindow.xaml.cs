@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using WinCopies.GUI.Explorer;
 using WinCopies.GUI.Windows.Dialogs;
@@ -113,12 +114,26 @@ namespace WinCopies.GUI
             Process.Start(System.Reflection.Assembly.GetExecutingAssembly().Location);
         }
 
+        //private bool GetFileSystemOperation_CanExecute(string parameter)
+        //{
+
+        //    bool openDirectoryIsShellFolder = SelectedItem.Value is ShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject is ShellFolder;
+
+        //    return true; //  parameter == openDirectoryIsShellFolder && : parameter == "FileSystemOpenDirectoryCommand" ? openDirectoryIsShellFolder : false;
+
+        //}
+
         private void FileSystemOperation_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // var explorerControl = SelectedItem.PART_ExplorerControl;
 
-            if (SelectedItem.Value is ShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject is ShellFolder) e.CanExecute = true;
+            //if (GetFileSystemOperation_CanExecute((string)e.Parameter)) e.CanExecute = true;
 
+            // e.CanExecute = e.Command.CanExecute(e.Parameter, GetVisualTabItem(SelectedItem).PART_ExplorerControl);
+
+            //e.Handled = true;
+
+            //e.ContinueRouting = false;
         }
 
         private void InputBox_Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -628,6 +643,20 @@ namespace WinCopies.GUI
         }
 
         private void CloseWindow_Executed(object sender, ExecutedRoutedEventArgs e) => Close();
+
+        //private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        //{
+
+        //    if (!(SelectedItem.Value.SelectedItems.Count > 1 && FileOperation.QueryRecycleBinInfo(System.IO.Path.GetPathRoot(SelectedItem.Value.Path), out RecycleBinInfo recycleBinInfo)) && GetFileSystemOperation_CanExecute("FileSystemItemCommand") && SelectedItem.Value.SelectedItem.FileType != IO.FileType.Drive) e.CanExecute = true;
+
+        //}
+
+        //private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        //{
+
+        //}
+
+        private void FileSystemOperationMenuItem_Loaded(object sender, RoutedEventArgs e) => ((System.Windows.Controls.MenuItem)sender).CommandTarget = GetVisualTabItem(SelectedItem)?.PART_ExplorerControl;
 
 
 

@@ -34,9 +34,9 @@ namespace WinCopiesProcessesManager
 
                     return Application.Current.Resources["DirectoryCannotBeRemovedExceptionMessage"];
 
-                case WinCopies.IO.FileProcesses.Exceptions.WriteProtect:
+                case WinCopies.IO.FileProcesses.Exceptions.WriteProtected:
 
-                    return Application.Current.Resources["WriteProtectExceptionMessage"];
+                    return Application.Current.Resources["WriteProtectedExceptionMessage"];
 
                 case WinCopies.IO.FileProcesses.Exceptions.ExceptionOnDeviceUnit:
 

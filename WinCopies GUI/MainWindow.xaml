@@ -33,11 +33,12 @@
         <CommandBinding Command="{x:Static commands:NavigationAndWindowCommands.CloseWindow}" CanExecute="Command_CanExecute" Executed="CloseWindow_Executed" />
         <CommandBinding Command="{x:Static local:Commands.Quit}" CanExecute="Command_CanExecute" Executed="QuitCommand_Executed" />
 
-        <CommandBinding Command="Copy" CanExecute="FileSystemOperation_CanExecute" Executed="Copy_Executed" />
+        <!--<CommandBinding Command="Copy" CanExecute="FileSystemOperation_CanExecute" Executed="Copy_Executed" />
         <CommandBinding Command="Cut" CanExecute="FileSystemOperation_CanExecute" Executed="Cut_Executed" />
         <CommandBinding Command="Paste" CanExecute="FileSystemOperation_CanExecute" Executed="Paste_Executed" />
-        <CommandBinding Command="{x:Static commands:FileSystemCommands.Rename}" CanExecute="FileSystemOperation_CanExecute" Executed="Rename_Executed" />
+        <CommandBinding Command="{x:Static commands:FileSystemCommands.Rename}" Executed="Rename_Executed" />
         <CommandBinding Command="Delete" CanExecute="FileSystemOperation_CanExecute" Executed="Delete_Executed" />
+        <CommandBinding Command="{x:Static commands:FileSystemCommands.DeletePermanently}" CanExecute="FileSystemOperation_CanExecute" Executed="CommandBinding_Executed" />-->
         <CommandBinding Command="{x:Static local:Commands.ExtractArchive}" CanExecute="ExtractArchive_CanExecute" Executed="ExtractArchive_Executed" />
 
         <CommandBinding Command="{x:Static local:Commands.SizeOne}" CanExecute="Command_CanExecute" Executed="ViewStyleCommand_Executed" />
@@ -112,33 +113,33 @@
                                     </MenuItem>
                                 </MenuItem>
                                 <MenuItem Header="{StaticResource EditMenu}" >
-                                    <MenuItem x:Name="CopyMenuItem" Header="{StaticResource Copy}" Command="Copy" >
+                                    <MenuItem x:Name="CopyMenuItem" Header="{StaticResource Copy}" Command="Copy" CommandParameter="FileSystemItemCommand" Loaded="FileSystemOperationMenuItem_Loaded" >
                                         <MenuItem.Icon>
                                             <Image Source="Resources/page_copy.png" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem x:Name="CutMenuItem" Header="{StaticResource Cut}" Command="Cut" CommandParameter="{x:Static guiExplorer:ActionsFromObjects.ListView}" >
+                                    <MenuItem x:Name="CutMenuItem" Header="{StaticResource Cut}" Command="Cut" CommandParameter="FileSystemItemCommand" Loaded="FileSystemOperationMenuItem_Loaded" >
                                         <MenuItem.Icon>
                                             <Image Source="Resources/cut.png" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem x:Name="PasteMenuItem" Header="{StaticResource Paste}" Command="Paste" CommandParameter="{x:Static guiExplorer:ActionsFromObjects.ListView}" >
+                                    <MenuItem x:Name="PasteMenuItem" Header="{StaticResource Paste}" Command="Paste" CommandParameter="FileSystemOpenDirectoryCommand" Loaded="FileSystemOperationMenuItem_Loaded" >
                                         <MenuItem.Icon>
                                             <Image Source="Resources/page_paste.png" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem x:Name="RenameMenuItem" Header="{StaticResource Rename}" Command="{x:Static commands:FileSystemCommands.Rename}" CommandParameter="{x:Static guiExplorer:ActionsFromObjects.ListView}" >
+                                    <MenuItem x:Name="RenameMenuItem" Header="{StaticResource Rename}" Command="{x:Static commands:FileSystemCommands.Rename}" CommandParameter="FileSystemItemCommand" Loaded="FileSystemOperationMenuItem_Loaded" >
                                         <MenuItem.Icon>
                                             <Image Source="Resources/textfield_rename.png" />
                                         </MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem Header="{StaticResource Delete}" >
-                                        <MenuItem x:Name="DeleteMenuItem" Header="{StaticResource Delete}" Command="Delete" CommandParameter="{x:Static guiExplorer:ActionsFromObjects.ListView}" >
+                                        <MenuItem x:Name="DeleteMenuItem" Header="{StaticResource Delete}" Command="Delete" Loaded="FileSystemOperationMenuItem_Loaded" >
                                             <MenuItem.Icon>
                                                 <Image Source="Resources/page_white_delete.png" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem x:Name="DeletePermanentlyMenuItem" Header="{StaticResource DeletePermanently}" Command="{x:Static commands:FileSystemCommands.DeletePermanently}" CommandParameter="{x:Static guiExplorer:ActionsFromObjects.ListView}" />
+                                        <MenuItem x:Name="DeletePermanentlyMenuItem" Header="{StaticResource DeletePermanently}" Command="{x:Static commands:FileSystemCommands.DeletePermanently}" Loaded="FileSystemOperationMenuItem_Loaded" />
                                     </MenuItem>
                                     <Separator />
                                     <MenuItem x:Name="ExtractArchiveMenuItem" Header="{StaticResource ExtractArchive}" Command="{x:Static local:Commands.ExtractArchive}" />
