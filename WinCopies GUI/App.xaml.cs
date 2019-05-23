@@ -62,7 +62,7 @@ namespace WinCopies.GUI
             get => _viewStyle; set => OnPropertyChanged(nameof(ViewStyle), nameof(_viewStyle), value, typeof(App));
         }
 
-        private bool _showItemsCheckBox = Common.ShowItemsCheckBox;
+        private bool _showItemsCheckBox = false;
 
         [SerializableProperty(new string[] { "common", "showItemsCheckBox" })]
         public bool ShowItemsCheckBox
@@ -86,11 +86,50 @@ namespace WinCopies.GUI
             get => _showSystemItems; set => OnPropertyChanged(nameof(ShowSystemItems), nameof(_showSystemItems), value, typeof(App));
         }
 
+        [SerializableProperty(new string[] { "common", "knownExtensionsToOpenDirectly" })]
+        public CheckableObject[] KnownExtensionsToOpenDirectly { get; } = null;
+
         public bool _IsClosing { get; set; } = false;
 
         static App application = null;
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public App()
+
+        {
+
+            LoadSettings(this);
+
+            // todo: to use a function in the Common class of the SettingsManagement dll to update this property
+
+            CheckableObject[] knownExtensions = new CheckableObject[12];
+
+            // todo: to add other extensions and offer to the user the possibility to select archive formats in addition to archive extensions
+
+            string[] knownExtensionsString = { ".zip", ".7z", ".arj", ".bz2", ".cab", ".chm", ".cfb", ".cpio", ".deb", ".udeb", ".gz", ".iso" };
+
+            CheckableObject checkableString = null;
+
+            string knownExtension = null;
+
+            for (int i = 0; i <= 11; i++)
+
+            {
+
+                knownExtension = knownExtensionsString[i];
+
+                checkableString = new CheckableObject(true, knownExtension);
+
+                // checkableString.PropertyChanged += CheckableString_PropertyChanged;
+
+                knownExtensions[i] = checkableString;
+
+            }
+
+            KnownExtensionsToOpenDirectly = knownExtensions;
+
+        }
 
         //static async System.Threading.Tasks.Task DefaultLaunchAsync()
         //{

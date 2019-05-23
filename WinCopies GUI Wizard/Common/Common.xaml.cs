@@ -54,6 +54,8 @@ namespace WinCopiesGUIWizard.Common
 
             WinCopies.Util.CheckableObject[] knownExtensions = new WinCopies.Util.CheckableObject[12];
 
+            // todo: to add other extensions and offer to the user the possibility to select archive formats in addition to archive extensions
+
             string[] knownExtensionsString = { ".zip", ".7z", ".arj", ".bz2", ".cab", ".chm", ".cfb", ".cpio", ".deb", ".udeb", ".gz", ".iso" };
 
             WinCopies.Util.CheckableObject checkableString = null;
@@ -100,11 +102,21 @@ namespace WinCopiesGUIWizard.Common
 
                 directory = WinCopies.IO.Path.GetRealPathFromEnvironmentVariables(directory);
 
-            commonOpenFileDialog.ExplorerControl.Navigate(new ShellObjectInfo(ShellObject.FromParsingName(directory), directory), true);
-
             // commonOpenFileDialog.DefaultDirectory = directory;
 
             commonOpenFileDialog.Owner = Window.GetWindow(this);
+
+            // todo: to make data binding
+
+            // commonOpenFileDialog.ExplorerControl.ArchiveFormatsToOpen = InArchiveFormats.Zip;
+
+            commonOpenFileDialog.ExplorerControl.ShowItemsCheckBox = WinCopies.SettingsManagement.Common.ShowItemsCheckBox;
+
+            commonOpenFileDialog.ExplorerControl.ShowHiddenItems = WinCopies.SettingsManagement.Common.ShowHiddenItems;
+
+            commonOpenFileDialog.ExplorerControl.ShowSystemItems = WinCopies.SettingsManagement.Common.ShowSystemItems;
+
+            commonOpenFileDialog.ExplorerControl.Navigate(new ShellObjectInfo(ShellObject.FromParsingName(directory), directory), true);
 
             if (commonOpenFileDialog.ShowDialog() == true)
 

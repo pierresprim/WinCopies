@@ -64,15 +64,7 @@ namespace WinCopies.SettingsManagement
 
         }
 
-        internal static bool GetBoolResult(string[] path)    
-
-        {
-
-            bool result = false;
-
-            return bool.TryParse(GetProperty(path), out result) ? result : false;
-
-        }
+        internal static bool GetBoolResult(string[] path) => bool.TryParse(GetProperty(path), out bool result) ? result : false;
 
         public static void SetProperty(string[] path, object value)
 
@@ -120,13 +112,13 @@ namespace WinCopies.SettingsManagement
 
         {
 
-            var dico = new Dictionary<string[], string>();
+            Dictionary<string[], string> dico = new Dictionary<string[], string>();
 
-            var obj_Type = obj.GetType();
+            Type obj_Type = obj.GetType();
 
-            var properties = obj_Type.GetProperties();
+            PropertyInfo[] properties = obj_Type.GetProperties();
 
-            foreach (var property in properties)
+            foreach (PropertyInfo property in properties)
 
             {
 
