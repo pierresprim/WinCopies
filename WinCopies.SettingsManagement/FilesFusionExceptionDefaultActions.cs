@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WinCopiesGUIWizard.IOOperations
+namespace WinCopies.SettingsManagement
 {
-    public enum FilesFusionExceptionDefaultActions 
-    {    
+    public enum FilesFusionExceptionDefaultActions
+    {
 
         None = 0,
 

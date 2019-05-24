@@ -148,34 +148,34 @@
                                 </MenuItem>
                                 <MenuItem Header="{StaticResource ViewMenu}" >
                                     <MenuItem Header="{StaticResource IconSizeMenu}" >
-                                        <MenuItem Header="_1" IsCheckable="True" IsChecked="{Binding ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.SizeOne}}" Command="{x:Static local:Commands.SizeOne}" />
-                                        <MenuItem Header="_2" IsCheckable="True" IsChecked="{Binding ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.SizeTwo}}" Command="{x:Static local:Commands.SizeTwo}" CommandParameter="SizeTwo" />
-                                        <MenuItem Header="_3" IsCheckable="True" IsChecked="{Binding ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.SizeThree}}" Command="{x:Static local:Commands.SizeThree}" CommandParameter="SizeThree" />
-                                        <MenuItem Header="_4" IsCheckable="True" IsChecked="{Binding ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.SizeFour}}" Command="{x:Static local:Commands.SizeFour}" CommandParameter="SizeFour" />
-                                        <MenuItem Header="{StaticResource ListViewStyle}" IsCheckable="True" IsChecked="{Binding ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.List}}" Command="{x:Static local:Commands.ListViewStyle}" CommandParameter="ListViewStyle" >
+                                        <MenuItem Header="_1" IsCheckable="True" IsChecked="{Binding CommonProperties.ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.SizeOne}}" Command="{x:Static local:Commands.SizeOne}" />
+                                        <MenuItem Header="_2" IsCheckable="True" IsChecked="{Binding CommonProperties.ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.SizeTwo}}" Command="{x:Static local:Commands.SizeTwo}" CommandParameter="SizeTwo" />
+                                        <MenuItem Header="_3" IsCheckable="True" IsChecked="{Binding CommonProperties.ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.SizeThree}}" Command="{x:Static local:Commands.SizeThree}" CommandParameter="SizeThree" />
+                                        <MenuItem Header="_4" IsCheckable="True" IsChecked="{Binding CommonProperties.ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.SizeFour}}" Command="{x:Static local:Commands.SizeFour}" CommandParameter="SizeFour" />
+                                        <MenuItem Header="{StaticResource ListViewStyle}" IsCheckable="True" IsChecked="{Binding CommonProperties.ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.List}}" Command="{x:Static local:Commands.ListViewStyle}" CommandParameter="ListViewStyle" >
                                             <MenuItem.Icon>
                                                 <Image Source="Resources/application_view_list.png" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="{StaticResource DetailsViewStyle}" IsCheckable="True" IsChecked="{Binding ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.Details}}" Command="{x:Static local:Commands.DetailsViewStyle}" CommandParameter="DetailsViewStyle" >
+                                        <MenuItem Header="{StaticResource DetailsViewStyle}" IsCheckable="True" IsChecked="{Binding CommonProperties.ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.Details}}" Command="{x:Static local:Commands.DetailsViewStyle}" CommandParameter="DetailsViewStyle" >
                                             <MenuItem.Icon>
                                                 <Image Source="Resources/application_view_detail.png" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="{StaticResource TileViewStyle}" IsCheckable="True" IsChecked="{Binding ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.Tiles}}" Command="{x:Static local:Commands.TileViewStyle}" CommandParameter="TileViewStyle" >
+                                        <MenuItem Header="{StaticResource TileViewStyle}" IsCheckable="True" IsChecked="{Binding CommonProperties.ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.Tiles}}" Command="{x:Static local:Commands.TileViewStyle}" CommandParameter="TileViewStyle" >
                                             <MenuItem.Icon>
                                                 <Image Source="Resources/application_view_tile.png" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="{StaticResource ContentViewStyle}" IsCheckable="True" IsChecked="{Binding ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.Content}}" Command="{x:Static local:Commands.ContentViewStyle}" CommandParameter="ContentViewStyle" >
+                                        <MenuItem Header="{StaticResource ContentViewStyle}" IsCheckable="True" IsChecked="{Binding CommonProperties.ViewStyle, Source={x:Static local:App.Current}, Converter={dataConverters:EnumToBooleanConverter}, ConverterParameter={x:Static guiExplorer:ViewStyles.Content}}" Command="{x:Static local:Commands.ContentViewStyle}" CommandParameter="ContentViewStyle" >
                                             <MenuItem.Icon>
                                                 <Image Source="Resources/application_view_columns.png" />
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </MenuItem>
-                                    <MenuItem x:Name="ShowItemsCheckBoxMenuItem" Header="{StaticResource ShowItemsCheckBox}" IsCheckable="True" IsChecked="{Binding ShowItemsCheckBox, Source={x:Static local:App.Current}}" />
-                                    <MenuItem x:Name="ShowHiddenItemsMenuItem" Header="{StaticResource ShowHiddenItems}" IsCheckable="True" IsChecked="{Binding ShowHiddenItems, Source={x:Static local:App.Current}}" />
-                                    <MenuItem x:Name="ShowSystemItemsMenuItem" Header="{StaticResource ShowSystemItems}" IsCheckable="True" IsChecked="{Binding ShowSystemItems, Source={x:Static local:App.Current}}" />
+                                    <MenuItem x:Name="ShowItemsCheckBoxMenuItem" Header="{StaticResource ShowItemsCheckBox}" IsCheckable="True" IsChecked="{Binding CommonProperties.ShowItemsCheckBox, Source={x:Static local:App.Current}}" />
+                                    <MenuItem x:Name="ShowHiddenItemsMenuItem" Header="{StaticResource ShowHiddenItems}" IsCheckable="True" IsChecked="{Binding CommonProperties.ShowHiddenItems, Source={x:Static local:App.Current}}" />
+                                    <MenuItem x:Name="ShowSystemItemsMenuItem" Header="{StaticResource ShowSystemItems}" IsCheckable="True" IsChecked="{Binding CommonProperties.ShowSystemItems, Source={x:Static local:App.Current}}" />
                                 </MenuItem>
                                 <MenuItem Header="_?">
                                     <MenuItem x:Name="SubmitABugMenuItem" Header="Submit a bug...">

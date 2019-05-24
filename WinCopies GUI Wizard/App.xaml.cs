@@ -50,7 +50,7 @@ namespace WinCopiesGUIWizard
 
 #endif    
 
-                PropertyChangedCallback += (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((App)Application.Current).IsSaved = false;
+                PropertyChangedCallback += (object sender, PropertyChangedEventArgs e) => ((App)Current).IsSaved = false;
 
                 // application.Startup += Application_Startup;
                 application.InitializeComponent();
@@ -78,7 +78,7 @@ namespace WinCopiesGUIWizard
 
         // FileSystemWatcher.EnableRaisingEvents = true;// Settings = xmlDoc;
 
-        public static PropertyChangedCallback PropertyChangedCallback { get; set; } = null;
+        public static PropertyChangedEventHandler PropertyChangedCallback { get; set; } = null;
 
         DateTime OptionFileLastWriteTime { get; set; } = File.GetLastWriteTime(WinCopies.SettingsManagement.SettingsManagement.SavePath);
 

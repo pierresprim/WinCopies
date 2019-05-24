@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Xml;
 using WinCopies.Util;
@@ -28,7 +29,7 @@ namespace WinCopies.SettingsManagement
 
         {
 
-            XmlNode xmlNode = Settings["settings"];    
+            XmlNode xmlNode = Settings["settings"];
 
 
 
@@ -42,7 +43,7 @@ namespace WinCopies.SettingsManagement
 
                     return null;
 
-            } 
+            }
 
 
 
@@ -78,7 +79,7 @@ namespace WinCopies.SettingsManagement
 
             xmlNode.InnerText = value?.ToString();
 
-        } 
+        }
 
         private static bool CreateSettingFile(XmlDocument xmlDoc, string savingPath, bool createDirectory)
 
@@ -302,7 +303,11 @@ namespace WinCopies.SettingsManagement
                                 item_Value = "sevenZip";
                             // foreach (XmlNode xmlNode in xmlPropertyNode)
                             // MessageBox.Show(xmlNode.Name+" 1"+((XmlNode)xmlNode).Value+" 2"+ xmlNode.FirstChild.Value);
-                            dico.Add(new SettingToLoad(typeof(CheckableObject).GetProperty(nameof(CheckableObject.IsChecked)), item),  ((SerializablePropertyAttribute) property.GetCustomAttribute(typeof(SerializablePropertyAttribute))).RefersTo ??     new string[] { /*obj_Type.Name*/ obj_Type.Namespace.Substring(obj_Type.Namespace.IndexOf('.') + 1).ToLower(), ReturnValidXmlNodeName(property.Name), ReturnValidXmlNodeName(item_Value) });
+                            string[] path = ((SerializablePropertyAttribute)property.GetCustomAttribute(typeof(SerializablePropertyAttribute))).RefersTo;
+                            if (path == null)
+                                path = new string[] { obj_Type.Namespace.Substring(obj_Type.Namespace.IndexOf('.') + 1).ToLower(), ReturnValidXmlNodeName(property.Name) };
+                            path = path.Append( /*obj_Type.Name*/ ReturnValidXmlNodeName(item_Value)).OfType<string>().ToArray();
+                            dico.Add(new SettingToLoad(typeof(CheckableObject).GetProperty(nameof(CheckableObject.IsChecked)), item), path );
 
                         }
 
@@ -310,7 +315,7 @@ namespace WinCopies.SettingsManagement
 
                         // Debug.WriteLine(property.GetValue(obj));
 
-                        dico.Add(new SettingToLoad(property, obj), ((SerializablePropertyAttribute)property.GetCustomAttribute(typeof(SerializablePropertyAttribute))).RefersTo ??     new string[] { /*obj_Type.Name == "Common" ? ReturnValidXmlNodeName(obj_Type.Namespace) : obj_Type.Name*/ obj_Type.Namespace.Substring(obj_Type.Namespace.IndexOf('.') + 1).ToLower(), ReturnValidXmlNodeName(property.Name) });
+                        dico.Add(new SettingToLoad(property, obj), ((SerializablePropertyAttribute)property.GetCustomAttribute(typeof(SerializablePropertyAttribute))).RefersTo ?? new string[] { /*obj_Type.Name == "Common" ? ReturnValidXmlNodeName(obj_Type.Namespace) : obj_Type.Name*/ obj_Type.Namespace.Substring(obj_Type.Namespace.IndexOf('.') + 1).ToLower(), ReturnValidXmlNodeName(property.Name) });
 
                 }
 

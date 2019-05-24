@@ -41,7 +41,7 @@
                                 <RowDefinition Height="auto" />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <Label Content="{Binding SelectedItem, ElementName=TreeView, Converter={local:PageHeaderConverter}}" FontFamily="Georgia" FontSize="28" ></Label>
+                            <Label Content="{Binding SelectedItem, ElementName=TreeView, Converter={local:PageHeaderConverter}}" FontFamily="Georgia" FontSize="28" />
 
                             <ContentPresenter Grid.Row="1" />
                         </Grid>

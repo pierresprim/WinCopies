@@ -273,7 +273,7 @@ namespace WinCopies.GUI
         private void Delete_Executed(object sender, ExecutedRoutedEventArgs e)
         {
 
-
+            // todo
 
         }
 
@@ -292,35 +292,35 @@ namespace WinCopies.GUI
 
             if (e.Command == Commands.SizeOne)
 
-                app.ViewStyle = ViewStyles.SizeOne;
+                app.CommonProperties. ViewStyle = ViewStyles.SizeOne;
 
             else if (e.Command == Commands.SizeTwo)
 
-                app.ViewStyle = ViewStyles.SizeTwo;
+                app.CommonProperties.ViewStyle = ViewStyles.SizeTwo;
 
             else if (e.Command == Commands.SizeThree)
 
-                app.ViewStyle = ViewStyles.SizeThree;
+                app.CommonProperties.ViewStyle = ViewStyles.SizeThree;
 
             else if (e.Command == Commands.SizeFour)
 
-                app.ViewStyle = ViewStyles.SizeFour;
+                app.CommonProperties.ViewStyle = ViewStyles.SizeFour;
 
             else if (e.Command == Commands.ListViewStyle)
 
-                app.ViewStyle = ViewStyles.List;
+                app.CommonProperties.ViewStyle = ViewStyles.List;
 
             else if (e.Command == Commands.DetailsViewStyle)
 
-                app.ViewStyle = ViewStyles.Details;
+                app.CommonProperties.ViewStyle = ViewStyles.Details;
 
             else if (e.Command == Commands.TileViewStyle)
 
-                app.ViewStyle = ViewStyles.Tiles;
+                app.CommonProperties.ViewStyle = ViewStyles.Tiles;
 
             else if (e.Command == Commands.ContentViewStyle)
 
-                app.ViewStyle = ViewStyles.Content;
+                app.CommonProperties.ViewStyle = ViewStyles.Content;
 
         }
 

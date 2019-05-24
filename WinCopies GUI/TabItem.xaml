@@ -51,7 +51,7 @@
             </Setter>
         </Style>
     </TabItem.Style>
-    <guiExplorer:ExplorerControl x:Name="PART_ExplorerControl" ShowItemsCheckBox="{Binding ShowItemsCheckBox, Source={x:Static local:App.Current}}" ShowHiddenItems="{Binding ShowHiddenItems, Source={x:Static local:App.Current}}" ShowSystemItems="{Binding ShowSystemItems, Source={x:Static local:App.Current}}" ViewStyle="{Binding ViewStyle, Source={x:Static local:App.Current}}" PathChanged="PART_ExplorerControl_PathChanged" MultiplePathsOpenRequested="PART_ExplorerControl_MultiplePathsOpenRequested" > 
+    <guiExplorer:ExplorerControl x:Name="PART_ExplorerControl" ShowItemsCheckBox="{Binding CommonProperties.ShowItemsCheckBox, Source={x:Static local:App.Current}}" ShowHiddenItems="{Binding CommonProperties.ShowHiddenItems, Source={x:Static local:App.Current}}" ShowSystemItems="{Binding CommonProperties.ShowSystemItems, Source={x:Static local:App.Current}}" ViewStyle="{Binding ViewStyle, Source={x:Static local:App.Current}}" PathChanged="PART_ExplorerControl_PathChanged" MultiplePathsOpenRequested="PART_ExplorerControl_MultiplePathsOpenRequested" > 
 
     </guiExplorer:ExplorerControl>
 </TabItem>

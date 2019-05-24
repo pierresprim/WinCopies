@@ -74,7 +74,7 @@ namespace WinCopiesGUIWizard
 
             ((App)Application.Current).IsApplyingChanges = true;
 
-            bool result = WinCopies.SettingsManagement.SettingsManagement.SaveSettings((Page)Frame.Content);
+            bool result = WinCopies.SettingsManagement.SettingsManagement.SaveSettings(((Page)Frame.Content).DataContext);
 
             if (result)
 

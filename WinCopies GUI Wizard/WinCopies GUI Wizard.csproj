@@ -110,16 +110,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Ergonomics\ClicksToOpen.cs" />
-    <Compile Include="Ergonomics\OpenFolderMode.cs" />
-    <Compile Include="Ergonomics\UnderliningMode.cs" />
     <Compile Include="History\Common.xaml.cs">
       <DependentUpon>Common.xaml</DependentUpon>
     </Compile>
     <Compile Include="IOOperations\Common.xaml.cs">
       <DependentUpon>Common.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IOOperations\FilesFusionExceptionDefaultActions.cs" />
     <Compile Include="PageHeaderConverter.cs" />
     <Compile Include="TreeViewItem.cs" />
     <Compile Include="ViewStyleConverter.cs" />

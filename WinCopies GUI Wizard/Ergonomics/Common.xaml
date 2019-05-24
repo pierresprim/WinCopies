@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WinCopiesGUIWizard.Ergonomics"
       xmlns:dataConverters="clr-namespace:WinCopies.Util.DataConverters;assembly=WinCopies.Util"
+      xmlns:settings="clr-namespace:WinCopies.SettingsManagement;assembly=WinCopies.SettingsManagement"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Ergonomics">
@@ -15,22 +16,22 @@
         <ControlTemplate TargetType="{x:Type Page}" >
             <Grid >
                 <Grid.RowDefinitions >
-                    <RowDefinition ></RowDefinition>
-                    <RowDefinition ></RowDefinition>
+                    <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
                 <GroupBox Grid.Row="0" Header="{StaticResource FolderBrowsing}">
                     <StackPanel >
-                        <RadioButton Content="{StaticResource OpenFoldersInSameTab}" GroupName="Folder browsing" IsChecked="{Binding OpenFolderMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:OpenFolderMode.OpenFoldersInSameTab}, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                        <RadioButton Content="{StaticResource OpenFoldersInMultipleTabs}" GroupName="Folder browsing" IsChecked="{Binding OpenFolderMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:OpenFolderMode.OpenFoldersInMultipleTabs}, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                        <RadioButton Content="{StaticResource OpenFoldersInMultipleWindows}" GroupName="Folder browsing" IsChecked="{Binding OpenFolderMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:OpenFolderMode.OpenFoldersInMultipleWindows}, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                        <RadioButton Content="{StaticResource OpenFoldersInSameTab}" GroupName="Folder browsing" IsChecked="{Binding OpenFolderMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static settings:OpenFolderMode.OpenFoldersInSameTab}}" />
+                        <RadioButton Content="{StaticResource OpenFoldersInMultipleTabs}" GroupName="Folder browsing" IsChecked="{Binding OpenFolderMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static settings:OpenFolderMode.OpenFoldersInMultipleTabs}}" />
+                        <RadioButton Content="{StaticResource OpenFoldersInMultipleWindows}" GroupName="Folder browsing" IsChecked="{Binding OpenFolderMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static settings:OpenFolderMode.OpenFoldersInMultipleWindows}}" />
                     </StackPanel>
                 </GroupBox>
                 <GroupBox Grid.Row="1" Header="{StaticResource ClickOnItemGesture}" >
                     <StackPanel >
-                        <RadioButton x:Name="OpenOnFirstClick" Content="{StaticResource OpenOnFirstClick}" GroupName="Click on item gesture" IsChecked="{Binding ClicksToOpen, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:ClicksToOpen.OpenOnFirstClick}, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                        <RadioButton Content="{StaticResource UnderlineWhenItemIsPointed}" GroupName="Click on item gesture when open on first click" IsChecked="{Binding UnderliningMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:UnderliningMode.UnderlineWhenItemIsPointed}, RelativeSource={RelativeSource Mode=TemplatedParent}}" Margin="20,0,0,0" IsEnabled="{Binding IsChecked, ElementName=OpenOnFirstClick}" /> 
-                        <RadioButton Content="{StaticResource UnderlineAllItems}" GroupName="Click on item gesture when open on first click" IsChecked="{Binding UnderliningMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:UnderliningMode.UnderlineAllItems}, RelativeSource={RelativeSource Mode=TemplatedParent}}" Margin="20,0,0,0" IsEnabled="{Binding IsChecked, ElementName=OpenOnFirstClick}" /> 
-                        <RadioButton Content="{StaticResource OpenOnSecondClick}" GroupName="Click on item gesture" IsChecked="{Binding ClicksToOpen, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:ClicksToOpen.OpenOnSecondClick}, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                        <RadioButton x:Name="OpenOnFirstClick" Content="{StaticResource OpenOnFirstClick}" GroupName="Click on item gesture" IsChecked="{Binding ClicksToOpen, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static settings:ClicksToOpen.OpenOnFirstClick}}" />
+                        <RadioButton Content="{StaticResource UnderlineWhenItemIsPointed}" GroupName="Click on item gesture when open on first click" IsChecked="{Binding UnderliningMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static settings:UnderliningMode.UnderlineWhenItemIsPointed}}" Margin="20,0,0,0" IsEnabled="{Binding IsChecked, ElementName=OpenOnFirstClick}" />
+                        <RadioButton Content="{StaticResource UnderlineAllItems}" GroupName="Click on item gesture when open on first click" IsChecked="{Binding UnderliningMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static settings:UnderliningMode.UnderlineAllItems}}" Margin="20,0,0,0" IsEnabled="{Binding IsChecked, ElementName=OpenOnFirstClick}" />
+                        <RadioButton Content="{StaticResource OpenOnSecondClick}" GroupName="Click on item gesture" IsChecked="{Binding ClicksToOpen, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static settings:ClicksToOpen.OpenOnSecondClick}}" />
                     </StackPanel>
                 </GroupBox>
             </Grid>

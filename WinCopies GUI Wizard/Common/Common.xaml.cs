@@ -18,67 +18,73 @@ namespace WinCopiesGUIWizard.Common
         public static string[] ViewStyles { get; } = { (string) Application.Current.Resources["SizeOne"], (string)Application.Current.Resources["SizeTwo"], (string)Application.Current.Resources["SizeThree"], (string)Application.Current.Resources["SizeFour"],
         (string) Application.Current.Resources["List"], (string) Application.Current.Resources["Details"], (string) Application.Current.Resources["Tiles"], (string) Application.Current.Resources["Content"]};
 
-        [SerializableProperty]
-        public WinCopies.Util.CheckableObject[] KnownExtensionsToOpenDirectly { get; } = null;
+        //[SerializableProperty]
+        //public WinCopies.Util.CheckableObject[] KnownExtensionsToOpenDirectly { get; } = null;
 
-        public static readonly DependencyProperty StartDirectoryProperty = DependencyProperty.Register(nameof(StartDirectory), typeof(string), typeof(Common), new PropertyMetadata(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), App.PropertyChangedCallback));
+        //public static readonly DependencyProperty StartDirectoryProperty = DependencyProperty.Register(nameof(StartDirectory), typeof(string), typeof(Common), new PropertyMetadata(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), App.PropertyChangedCallback));
 
-        [SerializableProperty]
-        public string StartDirectory { get => (string)GetValue(StartDirectoryProperty); set => SetValue(StartDirectoryProperty, value); }
+        //[SerializableProperty]
+        //public string StartDirectory { get => (string)GetValue(StartDirectoryProperty); set => SetValue(StartDirectoryProperty, value); }
 
-        // todo: value mismatch when languages are different :
+        //// todo: value mismatch when languages are different :
 
-        public static readonly DependencyProperty ViewStyleProperty = DependencyProperty.Register(nameof(ViewStyle), typeof(ViewStyles), typeof(Common), new PropertyMetadata(WinCopies.GUI.Explorer.ViewStyles.SizeThree, App.PropertyChangedCallback));
+        //public static readonly DependencyProperty ViewStyleProperty = DependencyProperty.Register(nameof(ViewStyle), typeof(ViewStyles), typeof(Common), new PropertyMetadata(WinCopies.GUI.Explorer.ViewStyles.SizeThree, App.PropertyChangedCallback));
 
-        [SerializableProperty]
-        public ViewStyles ViewStyle { get => (ViewStyles)GetValue(ViewStyleProperty); set => SetValue(ViewStyleProperty, value); }
+        //[SerializableProperty]
+        //public ViewStyles ViewStyle { get => (ViewStyles)GetValue(ViewStyleProperty); set => SetValue(ViewStyleProperty, value); }
 
-        public static readonly DependencyProperty ShowItemsCheckBoxProperty = DependencyProperty.Register(nameof(ShowItemsCheckBox), typeof(bool), typeof(Common), new PropertyMetadata(false, App.PropertyChangedCallback));
+        //public static readonly DependencyProperty ShowItemsCheckBoxProperty = DependencyProperty.Register(nameof(ShowItemsCheckBox), typeof(bool), typeof(Common), new PropertyMetadata(false, App.PropertyChangedCallback));
 
-        [SerializableProperty]
-        public bool ShowItemsCheckBox { get => (bool)GetValue(ShowItemsCheckBoxProperty); set => SetValue(ShowItemsCheckBoxProperty, value); }
+        //[SerializableProperty]
+        //public bool ShowItemsCheckBox { get => (bool)GetValue(ShowItemsCheckBoxProperty); set => SetValue(ShowItemsCheckBoxProperty, value); }
 
-        public static readonly DependencyProperty ShowHiddenItemsProperty = DependencyProperty.Register(nameof(ShowHiddenItems), typeof(bool), typeof(Common), new PropertyMetadata(false, App.PropertyChangedCallback));
+        //public static readonly DependencyProperty ShowHiddenItemsProperty = DependencyProperty.Register(nameof(ShowHiddenItems), typeof(bool), typeof(Common), new PropertyMetadata(false, App.PropertyChangedCallback));
 
-        [SerializableProperty]
-        public bool ShowHiddenItems { get => (bool)GetValue(ShowHiddenItemsProperty); set => SetValue(ShowHiddenItemsProperty, value); }
+        //[SerializableProperty]
+        //public bool ShowHiddenItems { get => (bool)GetValue(ShowHiddenItemsProperty); set => SetValue(ShowHiddenItemsProperty, value); }
 
-        public static readonly DependencyProperty ShowSystemItemsProperty = DependencyProperty.Register(nameof(ShowSystemItems), typeof(bool), typeof(Common), new PropertyMetadata(false, App.PropertyChangedCallback));
+        //public static readonly DependencyProperty ShowSystemItemsProperty = DependencyProperty.Register(nameof(ShowSystemItems), typeof(bool), typeof(Common), new PropertyMetadata(false, App.PropertyChangedCallback));
 
-        [SerializableProperty]
-        public bool ShowSystemItems { get => (bool)GetValue(ShowSystemItemsProperty); set => SetValue(ShowSystemItemsProperty, value); }
+        //[SerializableProperty]
+        //public bool ShowSystemItems { get => (bool)GetValue(ShowSystemItemsProperty); set => SetValue(ShowSystemItemsProperty, value); }
 
         public Common()
         {
             InitializeComponent();
 
-            WinCopies.Util.CheckableObject[] knownExtensions = new WinCopies.Util.CheckableObject[12];
+            WinCopies.SettingsManagement.Common dataContext = new WinCopies.SettingsManagement.Common(true);
 
-            // todo: to add other extensions and offer to the user the possibility to select archive formats in addition to archive extensions
+            dataContext.PropertyChanged += App.PropertyChangedCallback;
 
-            string[] knownExtensionsString = { ".zip", ".7z", ".arj", ".bz2", ".cab", ".chm", ".cfb", ".cpio", ".deb", ".udeb", ".gz", ".iso" };
+            DataContext = dataContext;
 
-            WinCopies.Util.CheckableObject checkableString = null;
+            //WinCopies.Util.CheckableObject[] knownExtensions = new WinCopies.Util.CheckableObject[12];
 
-            string knownExtension = null;
+            //// todo: to add other extensions and offer to the user the possibility to select archive formats in addition to archive extensions
 
-            for (int i = 0; i <= 11; i++)
+            //string[] knownExtensionsString = { ".zip", ".7z", ".arj", ".bz2", ".cab", ".chm", ".cfb", ".cpio", ".deb", ".udeb", ".gz", ".iso" };
 
-            {
+            //WinCopies.Util.CheckableObject checkableString = null;
 
-                knownExtension = knownExtensionsString[i];
+            //string knownExtension = null;
 
-                checkableString = new WinCopies.Util.CheckableObject(true, knownExtension);
+            //for (int i = 0; i <= 11; i++)
 
-                checkableString.PropertyChanged += CheckableString_PropertyChanged;
+            //{
 
-                knownExtensions[i] = checkableString;
+            //    knownExtension = knownExtensionsString[i];
 
-            }
+            //    checkableString = new WinCopies.Util.CheckableObject(true, knownExtension);
 
-            KnownExtensionsToOpenDirectly = knownExtensions;
+            //    checkableString.PropertyChanged += CheckableString_PropertyChanged;
 
-            SettingsManagement.LoadSettings(this);
+            //    knownExtensions[i] = checkableString;
+
+            //}
+
+            //KnownExtensionsToOpenDirectly = knownExtensions;
+
+            //SettingsManagement.LoadSettings(this);
 
             ((App)Application.Current).IsSaved = true;
 
@@ -96,7 +102,9 @@ namespace WinCopiesGUIWizard.Common
 
             commonOpenFileDialog.Mode = WinCopies.GUI.Windows.Dialogs.FolderBrowserDialogMode.OpenFolder;
 
-            string directory = StartDirectory;
+            WinCopies.SettingsManagement.Common common = (WinCopies.SettingsManagement.Common)DataContext;
+
+            string directory = common.StartDirectory;
 
             if (directory.Contains("%"))
 
@@ -110,23 +118,29 @@ namespace WinCopiesGUIWizard.Common
 
             // commonOpenFileDialog.ExplorerControl.ArchiveFormatsToOpen = InArchiveFormats.Zip;
 
-            commonOpenFileDialog.ExplorerControl.ShowItemsCheckBox = WinCopies.SettingsManagement.Common.ShowItemsCheckBox;
+            commonOpenFileDialog.ExplorerControl.ShowItemsCheckBox = common.ShowItemsCheckBox;
 
-            commonOpenFileDialog.ExplorerControl.ShowHiddenItems = WinCopies.SettingsManagement.Common.ShowHiddenItems;
+            commonOpenFileDialog.ExplorerControl.ShowHiddenItems = common.ShowHiddenItems;
 
-            commonOpenFileDialog.ExplorerControl.ShowSystemItems = WinCopies.SettingsManagement.Common.ShowSystemItems;
+            commonOpenFileDialog.ExplorerControl.ShowSystemItems = common.ShowSystemItems;
 
             commonOpenFileDialog.ExplorerControl.Navigate(new ShellObjectInfo(ShellObject.FromParsingName(directory), directory), true);
 
             if (commonOpenFileDialog.ShowDialog() == true)
 
-                StartDirectory = WinCopies.IO.Path.GetShortcutPath(commonOpenFileDialog.ExplorerControl.Path.Path);
+                common.StartDirectory = WinCopies.IO.Path.GetShortcutPath(commonOpenFileDialog.ExplorerControl.Path.Path);
 
         }
 
         // todo: to do this action only if the start directory has changed in the meantime.
 
-        private void TextBox_LostFocus(object sender, RoutedEventArgs e) => StartDirectory = WinCopies.IO.Path.GetShortcutPath(StartDirectory);
+        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
 
+            WinCopies.SettingsManagement.Common common = (WinCopies.SettingsManagement.Common)DataContext;
+
+            common.StartDirectory = WinCopies.IO.Path.GetShortcutPath(common.StartDirectory);
+
+        }
     }
 }

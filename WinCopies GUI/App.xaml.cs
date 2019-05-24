@@ -32,9 +32,9 @@ namespace WinCopies.GUI
 
         {
 
-            var result = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
+            (bool propertyChanged, object oldValue) = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
 
-            if (result.propertyChanged) PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)); // OnPropertyChanged(propertyName, result.oldValue, newValue);
+            if (propertyChanged) PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)); // OnPropertyChanged(propertyName, result.oldValue, newValue);
 
         }
 
@@ -54,40 +54,11 @@ namespace WinCopies.GUI
         public System.Collections.ObjectModel.ObservableCollection<string> Args { get => _args; set { _args = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Args))); } }
 #endif
 
-        private ViewStyles _viewStyle = ViewStyles.SizeThree;
+        public Common CommonProperties { get; } = new Common(true);
 
-        [SerializableProperty(new string[] { "common", "viewStyle" })]
-        public ViewStyles ViewStyle
-        {
-            get => _viewStyle; set => OnPropertyChanged(nameof(ViewStyle), nameof(_viewStyle), value, typeof(App));
-        }
+        private OpenFolderMode _openFolderMode = OpenFolderMode.OpenFoldersInSameTab;
 
-        private bool _showItemsCheckBox = false;
-
-        [SerializableProperty(new string[] { "common", "showItemsCheckBox" })]
-        public bool ShowItemsCheckBox
-        {
-            get => _showItemsCheckBox; set => OnPropertyChanged(nameof(ShowItemsCheckBox), nameof(_showItemsCheckBox), value, typeof(App));
-        }
-
-        private bool _showHiddenItems = false;
-
-        [SerializableProperty(new string[] { "common", "showHiddenItems" })]
-        public bool ShowHiddenItems
-        {
-            get => _showHiddenItems; set => OnPropertyChanged(nameof(ShowHiddenItems), nameof(_showHiddenItems), value, typeof(App));
-        }
-
-        private bool _showSystemItems = false;
-
-        [SerializableProperty(new string[] { "common", "showSystemItems" })]
-        public bool ShowSystemItems
-        {
-            get => _showSystemItems; set => OnPropertyChanged(nameof(ShowSystemItems), nameof(_showSystemItems), value, typeof(App));
-        }
-
-        [SerializableProperty(new string[] { "common", "knownExtensionsToOpenDirectly" })]
-        public CheckableObject[] KnownExtensionsToOpenDirectly { get; } = null;
+        public OpenFolderMode OpenFolderMode { get => _openFolderMode; set => OnPropertyChanged(nameof(OpenFolderMode), nameof(_openFolderMode), value, typeof(App)); }
 
         public bool _IsClosing { get; set; } = false;
 
@@ -99,35 +70,16 @@ namespace WinCopies.GUI
 
         {
 
-            LoadSettings(this);
+            foreach (CheckableObject item in CommonProperties.KnownExtensionsToOpenDirectly)
 
-            // todo: to use a function in the Common class of the SettingsManagement dll to update this property
+                item.PropertyChanged += Item_PropertyChanged;
 
-            CheckableObject[] knownExtensions = new CheckableObject[12];
+        }
 
-            // todo: to add other extensions and offer to the user the possibility to select archive formats in addition to archive extensions
+        private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
 
-            string[] knownExtensionsString = { ".zip", ".7z", ".arj", ".bz2", ".cab", ".chm", ".cfb", ".cpio", ".deb", ".udeb", ".gz", ".iso" };
-
-            CheckableObject checkableString = null;
-
-            string knownExtension = null;
-
-            for (int i = 0; i <= 11; i++)
-
-            {
-
-                knownExtension = knownExtensionsString[i];
-
-                checkableString = new CheckableObject(true, knownExtension);
-
-                // checkableString.PropertyChanged += CheckableString_PropertyChanged;
-
-                knownExtensions[i] = checkableString;
-
-            }
-
-            KnownExtensionsToOpenDirectly = knownExtensions;
+            // todo
 
         }
 

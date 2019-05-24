@@ -1,4 +1,4 @@
-﻿namespace WinCopiesGUIWizard.Ergonomics
+﻿namespace WinCopies.SettingsManagement
 {
     public enum OpenFolderMode
     {

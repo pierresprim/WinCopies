@@ -53,12 +53,12 @@ namespace WinCopies.GUI
 
         }
 
-        private void PART_ExplorerControl_PathChanged(object sender, Util.ValueChangedEventArgs e)
+        private void PART_ExplorerControl_PathChanged(object sender, Util.ValueChangedEventArgs<IBrowsableObjectInfo> e)
         {
 
-            var shellObject = (Util.ValueObject<IBrowsableObjectInfo>)DataContext;
+            Util.ValueObject<IBrowsableObjectInfo> shellObject = (Util.ValueObject<IBrowsableObjectInfo>)DataContext;
 
-            var newPath = (IBrowsableObjectInfo)e.NewValue;
+            IBrowsableObjectInfo newPath = e.NewValue;
 
             newPath.IsSelected = shellObject.Value.IsSelected;
 
