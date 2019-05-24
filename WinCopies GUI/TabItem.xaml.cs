@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using WinCopies.GUI.Explorer;
+using WinCopies.SettingsManagement;
 
 namespace WinCopies.GUI
 {
@@ -69,13 +70,60 @@ namespace WinCopies.GUI
         private void PART_ExplorerControl_MultiplePathsOpenRequested(object sender, MultiplePathsOpenRequestedEventArgs e)
         {
 
-            MainWindow mainWindow = (MainWindow)Window.GetWindow(this);
-
             System.Collections.Generic.List<IBrowsableObjectInfo> paths = e.Paths.ToList();
 
-            for (int i = 1; i < paths.Count; i++)
+            if (((App)App.Current).ErgonomicsProperties.OpenFolderMode == SettingsManagement.OpenFolderMode.OpenFoldersInMultipleWindows)
 
-                mainWindow.New_Tab(new Util.ValueObject<IBrowsableObjectInfo>(paths[i]));
+                for (int i = 1; i < paths.Count; i++)
+
+                {
+
+                    MainWindow mainWindow = new MainWindow();
+
+                    mainWindow.New_Tab(new Util.ValueObject<IBrowsableObjectInfo>(e.Paths[i]));
+
+                    mainWindow.Show();
+
+                }
+
+            else
+
+            {
+
+                MainWindow mainWindow = (MainWindow)Window.GetWindow(this);
+
+                for (int i = 1; i < paths.Count; i++)
+
+                    mainWindow.New_Tab(new Util.ValueObject<IBrowsableObjectInfo>(paths[i]));
+
+            }
+
+        }
+
+        private void PART_ExplorerControl_NavigationRequested(object sender, Util.EventArgs<IBrowsableObjectInfo> e)
+        {
+
+            MainWindow mainWindow = null;
+
+            if (((App)App.Current).ErgonomicsProperties.OpenFolderMode == SettingsManagement.OpenFolderMode.OpenFoldersInMultipleWindows)
+
+            {
+
+                mainWindow = new MainWindow();
+
+                mainWindow.New_Tab(new Util.ValueObject<IBrowsableObjectInfo>(e.Value));
+
+            }
+
+            else
+
+            {
+
+                mainWindow = (MainWindow)Window.GetWindow(this);
+
+                mainWindow.New_Tab(new Util.ValueObject<IBrowsableObjectInfo>(e.Value));
+
+            }
 
         }
 

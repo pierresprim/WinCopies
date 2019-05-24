@@ -6,6 +6,8 @@
              xmlns:local="clr-namespace:WinCopies.GUI"
         xmlns:guiExplorer="clr-namespace:WinCopies.GUI.Explorer;assembly=WinCopies.GUI.Explorer"
          xmlns:commands="clr-namespace:WinCopies.Util.Commands;assembly=WinCopies.Util"
+         xmlns:converters="clr-namespace:WinCopies.Util.DataConverters;assembly=WinCopies.Util"
+         xmlns:settings="clr-namespace:WinCopies.SettingsManagement;assembly=WinCopies.SettingsManagement"
          xmlns:pushBindings="clr-namespace:PushBindingExtension;assembly=PushBinding"
              mc:Ignorable="d" 
              d:DesignHeight="50">
@@ -45,13 +47,13 @@
                 <Setter.Value>
                     <MultiBinding Converter="{local:TabItemIsSelectedConverter}" >
                         <Binding Path="DataContext.Value" Mode="OneWay" RelativeSource="{RelativeSource Mode=Self}" />
-                        <Binding Path="DataContext.Value.IsSelected" Mode="TwoWay" RelativeSource="{RelativeSource Mode=Self}" />    
+                        <Binding Path="DataContext.Value.IsSelected" Mode="TwoWay" RelativeSource="{RelativeSource Mode=Self}" />
                     </MultiBinding>
                 </Setter.Value>
             </Setter>
         </Style>
     </TabItem.Style>
-    <guiExplorer:ExplorerControl x:Name="PART_ExplorerControl" ShowItemsCheckBox="{Binding CommonProperties.ShowItemsCheckBox, Source={x:Static local:App.Current}}" ShowHiddenItems="{Binding CommonProperties.ShowHiddenItems, Source={x:Static local:App.Current}}" ShowSystemItems="{Binding CommonProperties.ShowSystemItems, Source={x:Static local:App.Current}}" ViewStyle="{Binding ViewStyle, Source={x:Static local:App.Current}}" PathChanged="PART_ExplorerControl_PathChanged" MultiplePathsOpenRequested="PART_ExplorerControl_MultiplePathsOpenRequested" > 
+    <guiExplorer:ExplorerControl x:Name="PART_ExplorerControl" ShowItemsCheckBox="{Binding CommonProperties.ShowItemsCheckBox, Source={x:Static local:App.Current}}" ShowHiddenItems="{Binding CommonProperties.ShowHiddenItems, Source={x:Static local:App.Current}}" ShowSystemItems="{Binding CommonProperties.ShowSystemItems, Source={x:Static local:App.Current}}" ViewStyle="{Binding CommonProperties.ViewStyle, Source={x:Static local:App.Current}}" OpenDirectoriesDirectly="{Binding ErgonomicsProperties, Source={x:Static local:App.Current}, Converter={converters:EnumToBooleanConverter}, ConverterParameter={x:Static settings:OpenFolderMode.OpenFoldersInSameTab}}" PathChanged="PART_ExplorerControl_PathChanged" NavigationRequested="PART_ExplorerControl_NavigationRequested" MultiplePathsOpenRequested="PART_ExplorerControl_MultiplePathsOpenRequested" >
 
     </guiExplorer:ExplorerControl>
 </TabItem>

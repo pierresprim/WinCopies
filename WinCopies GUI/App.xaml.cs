@@ -56,9 +56,9 @@ namespace WinCopies.GUI
 
         public Common CommonProperties { get; } = new Common(true);
 
-        private OpenFolderMode _openFolderMode = OpenFolderMode.OpenFoldersInSameTab;
+        public Ergonomics ErgonomicsProperties { get; } = new Ergonomics(true);
 
-        public OpenFolderMode OpenFolderMode { get => _openFolderMode; set => OnPropertyChanged(nameof(OpenFolderMode), nameof(_openFolderMode), value, typeof(App)); }
+        public IOOperations IOOperationsProperties { get; } = new IOOperations(true);
 
         public bool _IsClosing { get; set; } = false;
 
@@ -398,7 +398,16 @@ namespace WinCopies.GUI
 
             // {
 
-            void reloadSettings() => LoadSettings(this);
+            void reloadSettings()
+            {
+
+                LoadSettings(CommonProperties);
+
+                LoadSettings(ErgonomicsProperties);
+
+                LoadSettings(IOOperationsProperties);
+
+            }
 
             Reload();
 
