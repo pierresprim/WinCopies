@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WinCopiesGUIWizard.Ergonomics"
       xmlns:dataConverters="clr-namespace:WinCopies.Util.DataConverters;assembly=WinCopies.Util"
+      xmlns:explorer="clr-namespace:WinCopies.GUI.Explorer;assembly=WinCopies.GUI.Explorer"
       xmlns:settings="clr-namespace:WinCopies.SettingsManagement;assembly=WinCopies.SettingsManagement"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
@@ -28,10 +29,10 @@
                 </GroupBox>
                 <GroupBox Grid.Row="1" Header="{StaticResource ClickOnItemGesture}" >
                     <StackPanel >
-                        <RadioButton x:Name="OpenOnFirstClick" Content="{StaticResource OpenOnFirstClick}" GroupName="Click on item gesture" IsChecked="{Binding ClicksToOpen, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static settings:ClicksToOpen.OpenOnFirstClick}}" />
+                        <RadioButton x:Name="OpenOnFirstClick" Content="{StaticResource OpenOnFirstClick}" GroupName="Click on item gesture" IsChecked="{Binding ClicksToOpen, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static explorer:OpenMode.OnDoubleClick}}" />
                         <RadioButton Content="{StaticResource UnderlineWhenItemIsPointed}" GroupName="Click on item gesture when open on first click" IsChecked="{Binding UnderliningMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static settings:UnderliningMode.UnderlineWhenItemIsPointed}}" Margin="20,0,0,0" IsEnabled="{Binding IsChecked, ElementName=OpenOnFirstClick}" />
                         <RadioButton Content="{StaticResource UnderlineAllItems}" GroupName="Click on item gesture when open on first click" IsChecked="{Binding UnderliningMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static settings:UnderliningMode.UnderlineAllItems}}" Margin="20,0,0,0" IsEnabled="{Binding IsChecked, ElementName=OpenOnFirstClick}" />
-                        <RadioButton Content="{StaticResource OpenOnSecondClick}" GroupName="Click on item gesture" IsChecked="{Binding ClicksToOpen, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static settings:ClicksToOpen.OpenOnSecondClick}}" />
+                        <RadioButton Content="{StaticResource OpenOnSecondClick}" GroupName="Click on item gesture" IsChecked="{Binding ClicksToOpen, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static explorer:OpenMode.OnDoubleClick}}" />
                     </StackPanel>
                 </GroupBox>
             </Grid>

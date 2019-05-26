@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WinCopies.GUI.Explorer;
 using WinCopies.Util;
 
 namespace WinCopies.SettingsManagement
@@ -21,17 +22,17 @@ namespace WinCopies.SettingsManagement
 
         }
 
-        private OpenFolderMode _openFolderMode = OpenFolderMode.OpenFoldersInSameTab;
+        private readonly OpenFolderMode _openFolderMode = OpenFolderMode.OpenFoldersInSameTab;
 
         [SerializableProperty(new string[] { "ergonomics", "openFolderMode" })]
         public OpenFolderMode OpenFolderMode { get => _openFolderMode; set => OnPropertyChanged(nameof(OpenFolderMode), nameof(_openFolderMode), value, typeof(Ergonomics)); }
 
-        private ClicksToOpen _clicksToOpen = ClicksToOpen.OpenOnSecondClick;
+        private readonly OpenMode _clicksToOpen = OpenMode.OnDoubleClick;
 
         [SerializableProperty(new string[] { "ergonomics", "clicksToOpen" })]
-        public ClicksToOpen ClicksToOpen { get => _clicksToOpen; set => OnPropertyChanged(nameof(ClicksToOpen), nameof(_clicksToOpen), value, typeof(Ergonomics)); }
+        public OpenMode ClicksToOpen { get => _clicksToOpen; set => OnPropertyChanged(nameof(ClicksToOpen), nameof(_clicksToOpen), value, typeof(Ergonomics)); }
 
-        private UnderliningMode _underliningMode = UnderliningMode.UnderlineWhenItemIsPointed;
+        private readonly UnderliningMode _underliningMode = UnderliningMode.UnderlineWhenItemIsPointed;
 
         [SerializableProperty(new string[] { "ergonomics", "underliningMode" })]
         public UnderliningMode UnderliningMode { get => _underliningMode; set => OnPropertyChanged(nameof(UnderliningMode), nameof(_underliningMode), value, typeof(Ergonomics)); }

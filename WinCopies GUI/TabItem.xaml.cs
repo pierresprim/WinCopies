@@ -67,8 +67,10 @@ namespace WinCopies.GUI
 
         }
 
-        private void PART_ExplorerControl_MultiplePathsOpenRequested(object sender, MultiplePathsOpenRequestedEventArgs e)
+        private void PART_ExplorerControl_MultiplePathsOpeningRequested(object sender, MultiplePathsOpenRequestedEventArgs e)
         {
+
+            // todo: copy items in memory to avoid reference errors
 
             System.Collections.Generic.List<IBrowsableObjectInfo> paths = e.Paths.ToList();
 
@@ -76,15 +78,7 @@ namespace WinCopies.GUI
 
                 for (int i = 1; i < paths.Count; i++)
 
-                {
-
-                    MainWindow mainWindow = new MainWindow();
-
-                    mainWindow.New_Tab(new Util.ValueObject<IBrowsableObjectInfo>(e.Paths[i]));
-
-                    mainWindow.Show();
-
-                }
+                    new MainWindow().New_Tab(new Util.ValueObject<IBrowsableObjectInfo>((IBrowsableObjectInfo)e.Paths[i].Clone()));
 
             else
 
@@ -94,38 +88,15 @@ namespace WinCopies.GUI
 
                 for (int i = 1; i < paths.Count; i++)
 
-                    mainWindow.New_Tab(new Util.ValueObject<IBrowsableObjectInfo>(paths[i]));
+                    mainWindow.New_Tab(new Util.ValueObject<IBrowsableObjectInfo>((IBrowsableObjectInfo)e.Paths[i].Clone()));
 
             }
 
         }
 
-        private void PART_ExplorerControl_NavigationRequested(object sender, Util.EventArgs<IBrowsableObjectInfo> e)
-        {
+        private void PART_ExplorerControl_NavigationRequested(object sender, Util.EventArgs<IBrowsableObjectInfo> e) =>
 
-            MainWindow mainWindow = null;
-
-            if (((App)App.Current).ErgonomicsProperties.OpenFolderMode == SettingsManagement.OpenFolderMode.OpenFoldersInMultipleWindows)
-
-            {
-
-                mainWindow = new MainWindow();
-
-                mainWindow.New_Tab(new Util.ValueObject<IBrowsableObjectInfo>(e.Value));
-
-            }
-
-            else
-
-            {
-
-                mainWindow = (MainWindow)Window.GetWindow(this);
-
-                mainWindow.New_Tab(new Util.ValueObject<IBrowsableObjectInfo>(e.Value));
-
-            }
-
-        }
+            (((App)Application.Current).ErgonomicsProperties.OpenFolderMode == OpenFolderMode.OpenFoldersInMultipleWindows ? new MainWindow() : ((MainWindow)Window.GetWindow(this))).New_Tab(new Util.ValueObject<IBrowsableObjectInfo>((IBrowsableObjectInfo)e.Value.Clone()));
 
 
 

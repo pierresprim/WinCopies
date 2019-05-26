@@ -19,6 +19,7 @@ using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
 using static WinCopies.SettingsManagement.SettingsManagement;
 using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 using System.Runtime.InteropServices;
+using System.Windows.Input;
 
 namespace WinCopies.GUI
 {

@@ -21,22 +21,22 @@ namespace WinCopies.SettingsManagement
 
         }
 
-        private FilesFusionExceptionDefaultActions _defaultActionWhenFilesFusionException = FilesFusionExceptionDefaultActions.None;
+        private readonly FilesFusionExceptionDefaultActions _defaultActionWhenFilesFusionException = FilesFusionExceptionDefaultActions.None;
 
         [SerializableProperty(new string[] { "iooperations", "defaultActionWhenFilesFusionException" })]
         public FilesFusionExceptionDefaultActions DefaultActionWhenFilesFusionException { get => _defaultActionWhenFilesFusionException; set => OnPropertyChanged(nameof(DefaultActionWhenFilesFusionException), nameof(_defaultActionWhenFilesFusionException), value, typeof(IOOperations)); }
 
-        private bool _automaticallyIgnoreItemWhenOtherExceptions = false;
+        private readonly bool _automaticallyIgnoreItemWhenOtherExceptions = false;
 
         [SerializableProperty(new string[] { "iooperations", "automaticallyIgnoreItemWhenOtherExceptions" })]
         public bool AutomaticallyIgnoreItemWhenOtherExceptions { get => _automaticallyIgnoreItemWhenOtherExceptions; set => OnPropertyChanged(nameof(AutomaticallyIgnoreItemWhenOtherExceptions), nameof(_automaticallyIgnoreItemWhenOtherExceptions), value, typeof(IOOperations)); }
 
-        private bool _raiseSoundWhenProcessesCompleted = false;
+        private readonly bool _raiseSoundWhenProcessesCompleted = false;
 
         [SerializableProperty(new string[] { "iooperations", "raiseSoundWhenProcessesCompleted" })]
         public bool RaiseSoundWhenProcessesCompleted { get => _raiseSoundWhenProcessesCompleted; set => OnPropertyChanged(nameof(RaiseSoundWhenProcessesCompleted), nameof(_raiseSoundWhenProcessesCompleted), value, typeof(IOOperations)); }
 
-        private bool _automaticallyCloseProcessesWindowWhenProcessesAreCompleted = false;
+        private readonly bool _automaticallyCloseProcessesWindowWhenProcessesAreCompleted = false;
 
         [SerializableProperty(new string[] { "iooperations", "automaticallyCloseProcessesWindowWhenProcessesAreCompleted" })]
         public bool AutomaticallyCloseProcessesWindowWhenProcessesAreCompleted { get => _automaticallyCloseProcessesWindowWhenProcessesAreCompleted; set => OnPropertyChanged(nameof(AutomaticallyCloseProcessesWindowWhenProcessesAreCompleted), nameof(_automaticallyCloseProcessesWindowWhenProcessesAreCompleted), value, typeof(IOOperations)); }

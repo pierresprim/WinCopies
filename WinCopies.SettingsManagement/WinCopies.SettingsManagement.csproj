@@ -52,7 +52,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClicksToOpen.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="Ergonomics.cs" />
     <Compile Include="FilesFusionExceptionDefaultActions.cs" />
