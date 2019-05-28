@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel;
 using WinCopies.GUI.Explorer;
 using WinCopies.Util;
+using WinCopies.Util.Data;
 using static WinCopies.SettingsManagement.SettingsManagement;
 using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
 

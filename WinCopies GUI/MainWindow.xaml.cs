@@ -1,5 +1,6 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell;
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -10,6 +11,7 @@ using System.Windows.Input;
 using WinCopies.GUI.Explorer;
 using WinCopies.GUI.Windows.Dialogs;
 using WinCopies.Util;
+using WinCopies.Util.Data;
 
 namespace WinCopies.GUI
 {
@@ -621,7 +623,7 @@ namespace WinCopies.GUI
 
         }
 
-        private void PART_ExplorerControl_VisibleItemsCountChanged(object sender, ValueChangedEventArgs e) => SetValue(SelectedItemVisibleItemsCountPropertyKey, e.NewValue);
+        private void PART_ExplorerControl_VisibleItemsCountChanged(object sender, RoutedEventArgs< ValueChangedEventArgs<int>> e) => SetValue(SelectedItemVisibleItemsCountPropertyKey, e.OriginalEventArgs.NewValue);
 
         private void Rename_Executed(object sender, ExecutedRoutedEventArgs e)
         {

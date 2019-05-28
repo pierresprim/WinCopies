@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:WinCopies.GUI"
         xmlns:guiExplorer="clr-namespace:WinCopies.GUI.Explorer;assembly=WinCopies.GUI.Explorer"
          xmlns:commands="clr-namespace:WinCopies.Util.Commands;assembly=WinCopies.Util"
-         xmlns:converters="clr-namespace:WinCopies.Util.DataConverters;assembly=WinCopies.Util"
+         xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util"
          xmlns:settings="clr-namespace:WinCopies.SettingsManagement;assembly=WinCopies.SettingsManagement"
          xmlns:pushBindings="clr-namespace:PushBindingExtension;assembly=PushBinding"
              mc:Ignorable="d" 

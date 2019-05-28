@@ -20,6 +20,7 @@ using static WinCopies.SettingsManagement.SettingsManagement;
 using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
+using WinCopies.Util.Data;
 
 namespace WinCopies.GUI
 {
@@ -50,9 +51,9 @@ namespace WinCopies.GUI
         public bool IsFirstInstance { get; private set; } = false;
 
 #if DEBUG
-        private System.Collections.ObjectModel.ObservableCollection<string> _args = null;
+        private ObservableCollection<string> _args = null;
 
-        public System.Collections.ObjectModel.ObservableCollection<string> Args { get => _args; set { _args = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Args))); } }
+        public ObservableCollection<string> Args { get => _args; set { _args = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Args))); } }
 #endif
 
         public Common CommonProperties { get; } = new Common(true);

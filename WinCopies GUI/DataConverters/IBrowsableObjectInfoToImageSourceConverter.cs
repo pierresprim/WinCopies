@@ -7,7 +7,7 @@ using WinCopies.IO;
 namespace WinCopies.GUI
 {
     [ValueConversion(typeof(IBrowsableObjectInfo), typeof(ImageSource))]
-    public class IBrowsableObjectInfoToImageSourceConverter : Util.DataConverters.ConverterBase
+    public class IBrowsableObjectInfoToImageSourceConverter : Util.Data.ConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture) => ((IBrowsableObjectInfo)value).SmallBitmapSource;
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using WinCopies.Util;
+using WinCopies.Util.Data;
 
 namespace WinCopies.SettingsManagement
 {

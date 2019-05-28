@@ -7,6 +7,8 @@ using System.Windows.Data;
 using System.Windows.Input;
 using WinCopies.GUI.Explorer;
 using WinCopies.SettingsManagement;
+using WinCopies.Util;
+using WinCopies.Util.Data;
 
 namespace WinCopies.GUI
 {
@@ -54,12 +56,12 @@ namespace WinCopies.GUI
 
         }
 
-        private void PART_ExplorerControl_PathChanged(object sender, Util.ValueChangedEventArgs<IBrowsableObjectInfo> e)
+        private void PART_ExplorerControl_PathChanged(object sender, RoutedEventArgs<ValueChangedEventArgs<IBrowsableObjectInfo>> e)
         {
 
-            Util.ValueObject<IBrowsableObjectInfo> shellObject = (Util.ValueObject<IBrowsableObjectInfo>)DataContext;
+            ValueObject<IBrowsableObjectInfo> shellObject = (ValueObject<IBrowsableObjectInfo>)DataContext;
 
-            IBrowsableObjectInfo newPath = e.NewValue;
+            IBrowsableObjectInfo newPath = e.OriginalEventArgs.NewValue;
 
             newPath.IsSelected = shellObject.Value.IsSelected;
 
@@ -67,18 +69,18 @@ namespace WinCopies.GUI
 
         }
 
-        private void PART_ExplorerControl_MultiplePathsOpeningRequested(object sender, MultiplePathsOpenRequestedEventArgs e)
+        private void PART_ExplorerControl_MultiplePathsOpeningRequested(object sender, RoutedEventArgs<EventArgs<IBrowsableObjectInfo[]>> e)
         {
 
             // todo: copy items in memory to avoid reference errors
 
-            System.Collections.Generic.List<IBrowsableObjectInfo> paths = e.Paths.ToList();
+            System.Collections.Generic.List<IBrowsableObjectInfo> paths = e.OriginalEventArgs.Value.ToList();
 
-            if (((App)App.Current).ErgonomicsProperties.OpenFolderMode == SettingsManagement.OpenFolderMode.OpenFoldersInMultipleWindows)
+            if (((App)Application.Current).ErgonomicsProperties.OpenFolderMode == OpenFolderMode.OpenFoldersInMultipleWindows)
 
                 for (int i = 1; i < paths.Count; i++)
 
-                    new MainWindow().New_Tab(new Util.ValueObject<IBrowsableObjectInfo>((IBrowsableObjectInfo)e.Paths[i].Clone()));
+                    new MainWindow().New_Tab(new ValueObject<IBrowsableObjectInfo>((IBrowsableObjectInfo)e.OriginalEventArgs.Value[i].Clone()));
 
             else
 
@@ -88,17 +90,15 @@ namespace WinCopies.GUI
 
                 for (int i = 1; i < paths.Count; i++)
 
-                    mainWindow.New_Tab(new Util.ValueObject<IBrowsableObjectInfo>((IBrowsableObjectInfo)e.Paths[i].Clone()));
+                    mainWindow.New_Tab(new ValueObject<IBrowsableObjectInfo>((IBrowsableObjectInfo)e.OriginalEventArgs.Value[i].Clone()));
 
             }
 
         }
 
-        private void PART_ExplorerControl_NavigationRequested(object sender, Util.EventArgs<IBrowsableObjectInfo> e) =>
+        private void PART_ExplorerControl_NavigationRequested(object sender, RoutedEventArgs<EventArgs<IBrowsableObjectInfo>> e) =>
 
-            (((App)Application.Current).ErgonomicsProperties.OpenFolderMode == OpenFolderMode.OpenFoldersInMultipleWindows ? new MainWindow() : ((MainWindow)Window.GetWindow(this))).New_Tab(new Util.ValueObject<IBrowsableObjectInfo>((IBrowsableObjectInfo)e.Value.Clone()));
-
-
+            (((App)Application.Current).ErgonomicsProperties.OpenFolderMode == OpenFolderMode.OpenFoldersInMultipleWindows ? new MainWindow() : ((MainWindow)Window.GetWindow(this))).New_Tab(new ValueObject<IBrowsableObjectInfo>((IBrowsableObjectInfo) e.OriginalEventArgs. Value.Clone()));
 
         //public override void OnApplyTemplate()
         //{

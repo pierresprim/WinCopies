@@ -47,8 +47,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\x64\Debug\WinCopies.GUI.Explorer.dll</HintPath>
     </Reference>
-    <Reference Include="WinCopies.Util">
-      <HintPath>..\bin\x64\Debug\WinCopies.Util.dll</HintPath>
+    <Reference Include="WinCopies.Util, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\WinCopies-framework\bin\x64\Debug\WinCopies.Util.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
