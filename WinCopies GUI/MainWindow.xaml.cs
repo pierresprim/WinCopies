@@ -127,6 +127,11 @@ namespace WinCopies.GUI
 
         private void FileSystemOperation_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
+
+            // todo: temp
+
+            e.CanExecute = true;
+
             // var explorerControl = SelectedItem.PART_ExplorerControl;
 
             //if (GetFileSystemOperation_CanExecute((string)e.Parameter)) e.CanExecute = true;
@@ -294,7 +299,7 @@ namespace WinCopies.GUI
 
             if (e.Command == Commands.SizeOne)
 
-                app.CommonProperties. ViewStyle = ViewStyles.SizeOne;
+                app.CommonProperties.ViewStyle = ViewStyles.SizeOne;
 
             else if (e.Command == Commands.SizeTwo)
 
@@ -623,7 +628,7 @@ namespace WinCopies.GUI
 
         }
 
-        private void PART_ExplorerControl_VisibleItemsCountChanged(object sender, RoutedEventArgs< ValueChangedEventArgs<int>> e) => SetValue(SelectedItemVisibleItemsCountPropertyKey, e.OriginalEventArgs.NewValue);
+        private void PART_ExplorerControl_VisibleItemsCountChanged(object sender, RoutedEventArgs<ValueChangedEventArgs<int>> e) => SetValue(SelectedItemVisibleItemsCountPropertyKey, e.OriginalEventArgs.NewValue);
 
         private void Rename_Executed(object sender, ExecutedRoutedEventArgs e)
         {
