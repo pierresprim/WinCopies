@@ -1,5 +1,5 @@
-WinCopies
-=========
+WinCopies®
+==========
 
 File management software
 
