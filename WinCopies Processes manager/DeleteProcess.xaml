@@ -7,7 +7,7 @@
          xmlns:windows="clr-namespace:System.Windows;assembly=PresentationCore"
          xmlns:fileProcesses="clr-namespace:WinCopies.IO.FileProcesses;assembly=WinCopies.IO.FileProcesses"
          xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
-         xmlns:utils="clr-namespace:WinCopies.Util.DataConverters;assembly=WinCopies.Util"
+         xmlns:utils="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Control.Resources>

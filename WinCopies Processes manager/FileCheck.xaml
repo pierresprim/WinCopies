@@ -7,7 +7,7 @@
                   xmlns:gui="clr-namespace:WinCopies.GUI;assembly=WinCopies.GUI"
                       xmlns:dialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI"
         xmlns:windows="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI.Windows"
-                      xmlns:converters="clr-namespace:WinCopies.Util.DataConverters;assembly=WinCopies.Util"
+                      xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util"
         mc:Ignorable="d"
         Title="FileCheck" Height="450" Width="800">
     <dialogs:DialogWindow.Resources>

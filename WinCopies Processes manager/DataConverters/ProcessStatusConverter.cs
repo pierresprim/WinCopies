@@ -11,7 +11,7 @@ namespace WinCopiesProcessesManager
 
     // todo : implémenter dans un datatrigger : - isBusy pas assez précis : quand le processus est terminé, mais qu'il y a des exceptions à gérer.
 
-    public class ProcessStatusConverter : WinCopies.Util.DataConverters.ConverterBase
+    public class ProcessStatusConverter : WinCopies.Util.Data.ConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -40,7 +40,7 @@ namespace WinCopiesProcessesManager
 
                                 string result = $"{Application.Current.Resources[p.ActionType.ToString()]} {Application.Current.Resources["from"]} {p.FilesInfoLoader.SourcePath}";
 
-                                if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, p.ActionType, ActionType.Copy, ActionType.Move))
+                                if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, p.ActionType, ActionType.Copy, ActionType.Move))
 
                                     result += $" {Application.Current.Resources["to"]} { ((CopyProcessInfo)p).DestPath}";
 

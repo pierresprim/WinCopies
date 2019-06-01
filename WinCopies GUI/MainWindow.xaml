@@ -8,7 +8,6 @@
         xmlns:local="clr-namespace:WinCopies.GUI"
         xmlns:guiExplorer="clr-namespace:WinCopies.GUI.Explorer;assembly=WinCopies.GUI.Explorer"
         xmlns:dataConverters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util"
-         xmlns:pushbindings="clr-namespace:PushBindingExtension;assembly=PushBinding"
         xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
         xmlns:util="clr-namespace:WinCopies.Util;assembly=WinCopies.Util"
         xmlns:commands="clr-namespace:WinCopies.Util.Commands;assembly=WinCopies.Util"

@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace WinCopiesProcessesManager
 {
-    public class IntegerOperationsOnSizesConverter : WinCopies.Util.DataConverters.MultiConverterBase
+    public class IntegerOperationsOnSizesConverter : WinCopies.Util.Data.MultiConverterBase
     {
         public override object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
 #if DEBUG 

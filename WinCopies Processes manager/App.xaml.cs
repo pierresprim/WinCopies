@@ -40,7 +40,7 @@ namespace WinCopiesProcessesManager
         private void Processes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
 
-            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, e.Action, NotifyCollectionChangedAction.Remove, NotifyCollectionChangedAction.Replace, NotifyCollectionChangedAction.Reset))
+            if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, e.Action, NotifyCollectionChangedAction.Remove, NotifyCollectionChangedAction.Replace, NotifyCollectionChangedAction.Reset))
 
                 foreach (object item in e.OldItems)
 
@@ -128,7 +128,7 @@ namespace WinCopiesProcessesManager
 
                             using (path = new ShellObjectInfo(ShellObject.FromParsingName(sevenZipCompressorWrapper.SourcePaths[i]), sevenZipCompressorWrapper.SourcePaths[i]))
 
-                                if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equals, path.FileType, FileType.Folder, FileType.Drive, FileType.SpecialFolder))
+                                if (If(ComparisonType.Or, ComparisonMode.Logical, Comparison.Equal, path.FileType, FileType.Folder, FileType.Drive, FileType.SpecialFolder))
 
                                     sevenZipCompressorWrapper.BeginCompressDirectory(sevenZipCompressorWrapper.SourcePaths[i]);
 

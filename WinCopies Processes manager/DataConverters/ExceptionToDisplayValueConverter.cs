@@ -4,7 +4,7 @@ using System.Windows;
 
 namespace WinCopiesProcessesManager
 {
-    public class ExceptionToDisplayValueConverter : WinCopies.Util.DataConverters.ConverterBase
+    public class ExceptionToDisplayValueConverter : WinCopies.Util.Data.ConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

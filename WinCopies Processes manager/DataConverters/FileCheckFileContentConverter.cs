@@ -4,7 +4,7 @@ using System.Windows;
 
 namespace WinCopiesProcessesManager
 {
-    public class FileCheckFileContentConverter : WinCopies.Util.DataConverters.MultiConverterBase
+    public class FileCheckFileContentConverter : WinCopies.Util.Data.MultiConverterBase
     {
 
         private const string SameContent = "SameContent";

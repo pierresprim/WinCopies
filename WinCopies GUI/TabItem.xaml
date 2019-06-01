@@ -8,7 +8,6 @@
          xmlns:commands="clr-namespace:WinCopies.Util.Commands;assembly=WinCopies.Util"
          xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util"
          xmlns:settings="clr-namespace:WinCopies.SettingsManagement;assembly=WinCopies.SettingsManagement"
-         xmlns:pushBindings="clr-namespace:PushBindingExtension;assembly=PushBinding"
              mc:Ignorable="d" 
              d:DesignHeight="50">
     <TabItem.Style>

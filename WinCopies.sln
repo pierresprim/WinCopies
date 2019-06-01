@@ -11,10 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies Processes manager
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCopies.SettingsManagement", "WinCopies.SettingsManagement\WinCopies.SettingsManagement.csproj", "{D5669B4B-E208-4205-8792-A2DBF0509997}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Third parties", "Third parties", "{531463E6-BFE8-46A8-B6B0-357F704B10E4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LockFinder", "Third parties\LockFinder\LockFinder.csproj", "{E1693C93-C023-40B0-9BA7-E48EE37A1415}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,20 +51,9 @@ Global
 		{D5669B4B-E208-4205-8792-A2DBF0509997}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D5669B4B-E208-4205-8792-A2DBF0509997}.Release|x64.ActiveCfg = Release|Any CPU
 		{D5669B4B-E208-4205-8792-A2DBF0509997}.Release|x64.Build.0 = Release|Any CPU
-		{E1693C93-C023-40B0-9BA7-E48EE37A1415}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E1693C93-C023-40B0-9BA7-E48EE37A1415}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E1693C93-C023-40B0-9BA7-E48EE37A1415}.Debug|x64.ActiveCfg = Debug|x64
-		{E1693C93-C023-40B0-9BA7-E48EE37A1415}.Debug|x64.Build.0 = Debug|x64
-		{E1693C93-C023-40B0-9BA7-E48EE37A1415}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E1693C93-C023-40B0-9BA7-E48EE37A1415}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E1693C93-C023-40B0-9BA7-E48EE37A1415}.Release|x64.ActiveCfg = Release|x64
-		{E1693C93-C023-40B0-9BA7-E48EE37A1415}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{E1693C93-C023-40B0-9BA7-E48EE37A1415} = {531463E6-BFE8-46A8-B6B0-357F704B10E4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F84C4347-AAA3-4963-9F8F-48CF4374C588}

@@ -5,7 +5,7 @@ using WinCopies.IO;
 
 namespace WinCopiesProcessesManager
 {
-    public class ShowCurrentCopiedFileInfoConverter : WinCopies.Util.DataConverters.MultiConverterBase
+    public class ShowCurrentCopiedFileInfoConverter : WinCopies.Util.Data.MultiConverterBase
     {
         public override object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {

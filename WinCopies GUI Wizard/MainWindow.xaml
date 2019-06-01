@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WinCopiesGUIWizard"
-        xmlns:converters="clr-namespace:WinCopies.Util.DataConverters;assembly=WinCopies.Util"
+        xmlns:converters="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" Closing="Window_Closing">
     <Grid>

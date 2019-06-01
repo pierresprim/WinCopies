@@ -7,7 +7,7 @@ using WinCopies.GUI.Explorer;
 
 namespace WinCopiesGUIWizard
 {
-    public class ViewStyleConverter : WinCopies.Util.DataConverters.ConverterBase
+    public class ViewStyleConverter : WinCopies.Util.Data.ConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 

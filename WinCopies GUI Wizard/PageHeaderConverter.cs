@@ -4,7 +4,7 @@ using System.Windows;
 
 namespace WinCopiesGUIWizard
 {
-    public class PageHeaderConverter : WinCopies.Util.DataConverters.ConverterBase
+    public class PageHeaderConverter : WinCopies.Util.Data.ConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

@@ -8,7 +8,7 @@ using System.Windows;
 
 namespace WinCopiesProcessesManager
 {
-    public class TypeToVisibilityConverter : WinCopies.Util.DataConverters.ConverterBase
+    public class TypeToVisibilityConverter : WinCopies.Util.Data.ConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture) => value is WinCopies.IO.FileProcesses.Process ? Visibility.Visible : Visibility.Collapsed;
         public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();

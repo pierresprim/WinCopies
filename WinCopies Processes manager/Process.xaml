@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WinCopiesProcessesManager"
          xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
-         xmlns:utils="clr-namespace:WinCopies.Util.DataConverters;assembly=WinCopies.Util" 
+         xmlns:utils="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util" 
          xmlns:fileProcesses="clr-namespace:WinCopies.IO.FileProcesses;assembly=WinCopies.IO.FileProcesses"
          xmlns:sevenZip="clr-namespace:SevenZip;assembly=SevenZipSharp"
              mc:Ignorable="d" 

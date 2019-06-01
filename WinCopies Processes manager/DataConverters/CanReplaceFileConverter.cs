@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WinCopiesProcessesManager
 {
-    public class CanReplaceFileConverter : WinCopies.Util.DataConverters.ConverterBase
+    public class CanReplaceFileConverter : WinCopies.Util.Data.ConverterBase
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture) => (WinCopies.IO.FileProcesses.Exceptions)value == WinCopies.IO.FileProcesses.Exceptions.FileAlreadyExists ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
 
