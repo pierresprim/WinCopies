@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" SelectionChanged="TabControl_SelectionChanged">
     <controls:TabControl.CommandBindings>
-        <CommandBinding Command="{x:Static commands:NavigationAndWindowCommands.CloseTab}" CanExecute="CloseTab_CanExecute" Executed="CloseTab_Executed" />
+        <CommandBinding Command="{x:Static commands:ApplicationCommands.CloseTab}" CanExecute="CloseTab_CanExecute" Executed="CloseTab_Executed" />
     </controls:TabControl.CommandBindings>
     <!--<pushbindings:PushBindingManager.PushBindings>
                 <pushbindings:PushBindingCollection>
@@ -28,7 +28,7 @@
                         <Setter Property="ContextMenu" >
                             <Setter.Value >
                                 <ContextMenu>
-                                    <MenuItem Header="{StaticResource CloseTab}" Command="{x:Static commands:NavigationAndWindowCommands.CloseTab}" />
+                                    <MenuItem Header="{StaticResource CloseTab}" Command="{x:Static commands:ApplicationCommands.CloseTab}" />
                                 </ContextMenu>
                             </Setter.Value>
                         </Setter>

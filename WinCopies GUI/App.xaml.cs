@@ -162,7 +162,7 @@ namespace WinCopies.GUI
                 application.IsFirstInstance = true;
 
 #if DEBUG 
-                application.Args = new System.Collections.ObjectModel.ObservableCollection<string>();
+                application.Args = new ObservableCollection<string>();
                 application.Args.CollectionChanged += Args_CollectionChanged;
 #endif
 

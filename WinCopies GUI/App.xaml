@@ -19,7 +19,7 @@
         <sys:String x:Key="CloseOtherTabs" >Fermer les autres onglets</sys:String>
         <sys:String x:Key="CloseOtherTabsStatusBarLabel" >Ferme tous les onglets ouverts sauf l'onglet actif.</sys:String>
         <sys:String x:Key="CloseAllTabs" >Fermer _tous les onglets</sys:String>
-        <sys:String x:Key="CloseAllTabsStatusBarLabel" >Ferme tous les onglets ouverts.</sys:String>
+        <sys:String x:Key="CloseAllTabsStatusBarLabel" >Ferme tous les onglets ouverts sauf l'onglet actif.</sys:String>
         <sys:String x:Key="CloseWindow" >_Fermer la fenêtre</sys:String>
         <sys:String x:Key="CloseWindowStatusBarLabel" >Ferme la fenêtre.</sys:String>
         <sys:String x:Key="NewFolder" >Nouveau _dossier...</sys:String>
@@ -48,6 +48,13 @@
         <sys:String x:Key="DeletePermanentlyStatusBarLabel" >Supprime directement l'élément sélectionné, sans le placer dans la Corbeille au préalable.</sys:String>
         <sys:String x:Key="ExtractArchive" >Extraire l'archive</sys:String>
         <sys:String x:Key="ExtractArchiveStatusBarLabel" >Extrait les fichiers et dossiers contenus dans l'archive dans le répertoire actif.</sys:String>
+        <sys:String x:Key="Selection" >Sélection</sys:String>
+        <sys:String x:Key="SelectAll" >Sélectionner tout</sys:String>
+        <sys:String x:Key="SelectAllStatusBarLabel" >Sélectionne tous les éléments dans la partie droite de la fenêtre</sys:String>
+        <sys:String x:Key="DeselectAll" >Désélectionner tout</sys:String>
+        <sys:String x:Key="DeselectAllStatusBarLabel" >Désélectionne tous les éléments dans la partie droite de la fenêtre</sys:String>
+        <sys:String x:Key="ReverseSelection" >Inverser la sélection</sys:String>
+        <sys:String x:Key="ReverseSelectionStatusBarLabel" >Inverse la sélection dans la partie droite de la fenêtre</sys:String>
         <sys:String x:Key="ViewMenu" >_Affichage</sys:String>
         <sys:String x:Key="IconSizeMenu" >_Taille des icônes</sys:String>
         <sys:String x:Key="ListViewStyle" >_Liste</sys:String>

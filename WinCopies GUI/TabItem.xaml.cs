@@ -98,7 +98,7 @@ namespace WinCopies.GUI
 
         private void PART_ExplorerControl_NavigationRequested(object sender, RoutedEventArgs<EventArgs<IBrowsableObjectInfo>> e) =>
 
-            (((App)Application.Current).ErgonomicsProperties.OpenFolderMode == OpenFolderMode.OpenFoldersInMultipleWindows ? new MainWindow() : ((MainWindow)Window.GetWindow(this))).New_Tab(new ValueObject<IBrowsableObjectInfo>((IBrowsableObjectInfo) e.OriginalEventArgs. Value.Clone()));
+            (((App)Application.Current).ErgonomicsProperties.OpenFolderMode == OpenFolderMode.OpenFoldersInMultipleWindows ? new MainWindow() : ((MainWindow)Window.GetWindow(this))).New_Tab(new ValueObject<IBrowsableObjectInfo>((IBrowsableObjectInfo)e.OriginalEventArgs.Value.Clone()));
 
         //public override void OnApplyTemplate()
         //{

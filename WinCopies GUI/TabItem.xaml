@@ -18,7 +18,7 @@
                         <DockPanel ToolTip="{Binding}" Height="30" Width="100">
                             <Image DockPanel.Dock="Left" Source="{Binding DataContext.Value.ShellObject.Thumbnail.BitmapSource, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TabItem}}}" HorizontalAlignment="Left" />
                             <TextBlock Text="{Binding}" TextAlignment="Center" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                            <Button DockPanel.Dock="Right" Width="26" Command="{x:Static commands:NavigationAndWindowCommands.CloseTab}" CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TabItem}}}" ToolTip="Close (Ctrl + W)" HorizontalAlignment="Right" >
+                            <Button DockPanel.Dock="Right" Width="26" Command="{x:Static commands:ApplicationCommands.CloseTab}" CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TabItem}}}" ToolTip="Close (Ctrl + W)" HorizontalAlignment="Right" >
                                 <Button.Content>
                                     <Image Source="Resources/tab_delete.png" Height="16" Width="16" />
                                 </Button.Content>
@@ -30,7 +30,7 @@
                                             <Image Source="Resources/folder.png" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{StaticResource CloseTab}" Command="{x:Static commands:NavigationAndWindowCommands.CloseTab}" CommandParameter="{Binding PlacementTarget. DataContext.Value, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}}" >
+                                    <MenuItem Header="{StaticResource CloseTab}" Command="{x:Static commands:ApplicationCommands.CloseTab}" CommandParameter="{Binding PlacementTarget. DataContext.Value, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}}" >
                                         <MenuItem.Icon>
                                             <Image Source="Resources/tab_delete.png" />
                                         </MenuItem.Icon>

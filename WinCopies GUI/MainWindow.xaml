@@ -14,22 +14,24 @@
         mc:Ignorable="d"
         Title="{Binding SelectedItem.Value.Name, RelativeSource={RelativeSource Mode=Self}, StringFormat={}{0} - WinCopies, Converter={dataConverters:CoalesceConverter}, ConverterParameter=WinCopies}" Icon="{Binding SelectedItem.Value, RelativeSource={RelativeSource Mode=Self}, Converter={local:IBrowsableObjectInfoToImageSourceConverter}}" Height="350" Width="525" Closing="Window_Closing" >
 
-    <!--<Window.Resources>
-        <sys:String x:Key="s" >{a}
+    <Window.Resources>
+        <!--<sys:String x:Key="s" >{a}
             <StaticResource ResourceKey="CloseTab" />
-        </sys:String>
-    </Window.Resources>-->
+        </sys:String>-->
+        <local:MenuItemCommandTargetConverter x:Key="MenuItemCommandTargetConverter" />
+    </Window.Resources>
 
     <Window.CommandBindings>
-        <CommandBinding Command="{x:Static commands:NavigationAndWindowCommands.NewTab}" CanExecute="Command_CanExecute" Executed="NewTab_Executed" />
-        <CommandBinding Command="{x:Static commands:NavigationAndWindowCommands.NewWindow}" CanExecute="Command_CanExecute" Executed="NewWindow_Executed" />
-        <CommandBinding Command="{x:Static commands:NavigationAndWindowCommands.NewWindowInNewInstance}" CanExecute="Command_CanExecute" Executed="NewWindowInNewInstance_Executed" />
-        <CommandBinding Command="{x:Static commands:NavigationAndWindowCommands.CloseTab}" CanExecute="CloseTab_CanExecute" Executed="CloseTab_Executed" />
-        <CommandBinding Command="{x:Static commands:NavigationAndWindowCommands.CloseAllTabs}" CanExecute="CloseAllTabs_CanExecute" Executed="CloseAllTabs_Executed" />
+        <CommandBinding Command="{x:Static commands:ApplicationCommands.NewTab}" CanExecute="Command_CanExecute" Executed="NewTab_Executed" />
+        <CommandBinding Command="{x:Static commands:ApplicationCommands.NewWindow}" CanExecute="Command_CanExecute" Executed="NewWindow_Executed" />
+        <CommandBinding Command="{x:Static commands:ApplicationCommands.NewWindowInNewInstance}" CanExecute="Command_CanExecute" Executed="NewWindowInNewInstance_Executed" />
+        <CommandBinding Command="{x:Static local:Commands.OpenInSystemFileExplorer}" CanExecute="OpenInSystemFileExplorer_CanExecute" Executed="OpenInSystemFileExplorer_Executed" />
+        <CommandBinding Command="{x:Static commands:ApplicationCommands.CloseTab}" CanExecute="CloseTab_CanExecute" Executed="CloseTab_Executed" />
+        <CommandBinding Command="{x:Static commands:ApplicationCommands.CloseAllTabs}" CanExecute="CloseAllTabs_CanExecute" Executed="CloseAllTabs_Executed" />
         <CommandBinding Command="{x:Static commands:FileSystemCommands.NewFolder}" CanExecute="FileSystemOperation_CanExecute" Executed="NewFolder_Executed" />
         <CommandBinding Command="{x:Static commands:FileSystemCommands.NewArchive}" CanExecute="FileSystemOperation_CanExecute" Executed="NewArchive_Executed" />
         <CommandBinding Command="{x:Static commands:FileSystemCommands.FileProperties}" CanExecute="FileProperties_CanExecute" Executed="FileProperties_Executed" />
-        <CommandBinding Command="{x:Static commands:NavigationAndWindowCommands.CloseWindow}" CanExecute="Command_CanExecute" Executed="CloseWindow_Executed" />
+        <CommandBinding Command="{x:Static commands:ApplicationCommands.CloseWindow}" CanExecute="Command_CanExecute" Executed="CloseWindow_Executed" />
         <CommandBinding Command="{x:Static local:Commands.Quit}" CanExecute="Command_CanExecute" Executed="QuitCommand_Executed" />
 
         <!--<CommandBinding Command="Copy" CanExecute="FileSystemOperation_CanExecute" Executed="Copy_Executed" />
@@ -66,30 +68,30 @@
                             <Menu>
                                 <MenuItem>
                                     <MenuItem.Header>
+                                        <!--todo-->
                                         <Label Content="{StaticResource FileMenu}"></Label>
                                     </MenuItem.Header>
-                                    <MenuItem x:Name="NewTabMenuItem" Header="{StaticResource NewTab}" Command="{x:Static commands:NavigationAndWindowCommands.NewTab}" >
+                                    <MenuItem x:Name="NewTabMenuItem" Header="{StaticResource NewTab}" Command="{x:Static commands:ApplicationCommands.NewTab}" >
                                         <MenuItem.Icon>
                                             <Image Source="Resources/tab_add.png" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem x:Name="NewWindowMenuItem" Header="{StaticResource NewWindow}" Command="{x:Static commands:NavigationAndWindowCommands.NewWindow}">
+                                    <MenuItem x:Name="NewWindowMenuItem" Header="{StaticResource NewWindow}" Command="{x:Static commands:ApplicationCommands.NewWindow}">
                                         <MenuItem.Icon>
                                             <Image Source="Resources/application_window_add.png" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem x:Name="NewWindowInNewInstanceMenuItem" Header="{StaticResource NewWindowInNewInstance}" Command="{x:Static commands:NavigationAndWindowCommands.NewWindowInNewInstance}" />
-                                    <MenuItem x:Name="OpenInSystemFileExplorerMenuItem" Header="{StaticResource OpenInSystemFileExplorer}" />
-                                    <MenuItem x:Name="CloseTabMenuItem" Header="{StaticResource CloseTab}" Command="{x:Static commands:NavigationAndWindowCommands.CloseTab}">
+                                    <MenuItem x:Name="NewWindowInNewInstanceMenuItem" Header="{StaticResource NewWindowInNewInstance}" Command="{x:Static commands:ApplicationCommands.NewWindowInNewInstance}" />
+                                    <MenuItem x:Name="OpenInSystemFileExplorerMenuItem" Header="{StaticResource OpenInSystemFileExplorer}" Command="{x:Static local:Commands.OpenInSystemFileExplorer}" />
+                                    <MenuItem x:Name="CloseTabMenuItem" Header="{StaticResource CloseTab}" Command="{x:Static commands:ApplicationCommands.CloseTab}">
                                         <MenuItem.Icon>
                                             <Image Source="Resources/tab_delete.png" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem x:Name="CloseOtherTabsMenuItem" Header="{StaticResource CloseOtherTabs}" />
-                                    <MenuItem x:Name="CloseAllTabsMenuItem" Header="{StaticResource CloseAllTabs}" Command="{x:Static commands:NavigationAndWindowCommands.CloseAllTabs}" />
-                                    <MenuItem x:Name="CloseWindowMenuItem" Header="{StaticResource CloseWindow}" Command="{x:Static commands:NavigationAndWindowCommands.CloseWindow}" />
+                                    <MenuItem x:Name="CloseAllTabsMenuItem" Header="{StaticResource CloseAllTabs}" Command="{x:Static commands:ApplicationCommands.CloseAllTabs}" />
+                                    <MenuItem x:Name="CloseWindowMenuItem" Header="{StaticResource CloseWindow}" Command="{x:Static commands:ApplicationCommands.CloseWindow}" />
                                     <Separator />
-                                    <MenuItem x:Name="NewFolderMenuItem" Header="{StaticResource NewFolder}" Command="{x:Static commands:FileSystemCommands.NewFolder}">
+                                    <MenuItem x:Name="NewFolderMenuItem" Header="{StaticResource NewFolder}" Command="{x:Static commands:FileSystemCommands.NewFolder}" CommandTarget="{Binding}">
                                         <MenuItem.Icon>
                                             <Image Source="Resources/folder_add.png" />
                                         </MenuItem.Icon>
@@ -112,38 +114,111 @@
                                     </MenuItem>
                                 </MenuItem>
                                 <MenuItem Header="{StaticResource EditMenu}" >
-                                    <MenuItem x:Name="CopyMenuItem" Header="{StaticResource Copy}" Command="Copy" CommandParameter="FileSystemItemCommand" Loaded="FileSystemOperationMenuItem_Loaded" >
+                                    <MenuItem x:Name="CopyMenuItem" Header="{StaticResource Copy}" Command="Copy" >
+                                        <MenuItem.CommandTarget>
+                                            <MultiBinding Converter="{StaticResource MenuItemCommandTargetConverter}" >
+                                                <Binding Path="SelectedItem" Mode="OneWay" />
+                                                <Binding />
+                                            </MultiBinding>
+                                        </MenuItem.CommandTarget>
                                         <MenuItem.Icon>
                                             <Image Source="Resources/page_copy.png" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem x:Name="CutMenuItem" Header="{StaticResource Cut}" Command="Cut" CommandParameter="FileSystemItemCommand" Loaded="FileSystemOperationMenuItem_Loaded" >
+                                    <MenuItem x:Name="CutMenuItem" Header="{StaticResource Cut}" Command="Cut" >
+                                        <MenuItem.CommandTarget>
+                                            <MultiBinding Converter="{StaticResource MenuItemCommandTargetConverter}" >
+                                                <Binding Path="SelectedItem" Mode="OneWay" />
+                                                <Binding />
+                                            </MultiBinding>
+                                        </MenuItem.CommandTarget>
                                         <MenuItem.Icon>
                                             <Image Source="Resources/cut.png" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem x:Name="PasteMenuItem" Header="{StaticResource Paste}" Command="Paste" CommandParameter="FileSystemOpenDirectoryCommand" Loaded="FileSystemOperationMenuItem_Loaded" >
+                                    <MenuItem x:Name="PasteMenuItem" Header="{StaticResource Paste}" Command="Paste" >
+                                        <MenuItem.CommandTarget>
+                                            <MultiBinding Converter="{StaticResource MenuItemCommandTargetConverter}" >
+                                                <Binding Path="SelectedItem" Mode="OneWay" />
+                                                <Binding />
+                                            </MultiBinding>
+                                        </MenuItem.CommandTarget>
                                         <MenuItem.Icon>
                                             <Image Source="Resources/page_paste.png" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem x:Name="RenameMenuItem" Header="{StaticResource Rename}" Command="{x:Static commands:FileSystemCommands.Rename}" CommandParameter="FileSystemItemCommand" Loaded="FileSystemOperationMenuItem_Loaded" >
+                                    <MenuItem x:Name="RenameMenuItem" Header="{StaticResource Rename}" Command="{x:Static commands:FileSystemCommands.Rename}" >
+                                        <MenuItem.CommandTarget>
+                                            <MultiBinding Converter="{StaticResource MenuItemCommandTargetConverter}" >
+                                                <Binding Path="SelectedItem" Mode="OneWay" />
+                                                <Binding />
+                                            </MultiBinding>
+                                        </MenuItem.CommandTarget>
                                         <MenuItem.Icon>
                                             <Image Source="Resources/textfield_rename.png" />
                                         </MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem Header="{StaticResource Delete}" >
-                                        <MenuItem x:Name="DeleteMenuItem" Header="{StaticResource Delete}" Command="Delete" Loaded="FileSystemOperationMenuItem_Loaded" >
+                                        <MenuItem x:Name="DeleteMenuItem" Header="{StaticResource Delete}" Command="Delete" >
+                                            <MenuItem.CommandTarget>
+                                                <MultiBinding Converter="{StaticResource MenuItemCommandTargetConverter}" >
+                                                    <Binding Path="SelectedItem" Mode="OneWay" />
+                                                    <Binding />
+                                                </MultiBinding>
+                                            </MenuItem.CommandTarget>
                                             <MenuItem.Icon>
                                                 <Image Source="Resources/page_white_delete.png" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem x:Name="DeletePermanentlyMenuItem" Header="{StaticResource DeletePermanently}" Command="{x:Static commands:FileSystemCommands.DeletePermanently}" Loaded="FileSystemOperationMenuItem_Loaded" />
+                                        <MenuItem x:Name="DeletePermanentlyMenuItem" Header="{StaticResource DeletePermanently}" Command="{x:Static commands:FileSystemCommands.DeletePermanently}" >
+                                            <MenuItem.CommandTarget>
+                                                <MultiBinding Converter="{StaticResource MenuItemCommandTargetConverter}" >
+                                                    <Binding Path="SelectedItem" Mode="OneWay" />
+                                                    <Binding />
+                                                </MultiBinding>
+                                            </MenuItem.CommandTarget>
+                                        </MenuItem>
                                     </MenuItem>
                                     <Separator />
-                                    <MenuItem x:Name="ExtractArchiveMenuItem" Header="{StaticResource ExtractArchive}" Command="{x:Static local:Commands.ExtractArchive}" />
+                                    <MenuItem x:Name="ExtractArchiveMenuItem" Header="{StaticResource ExtractArchive}" Command="{x:Static local:Commands.ExtractArchive}" >
+                                        <MenuItem.CommandTarget>
+                                            <MultiBinding Converter="{StaticResource MenuItemCommandTargetConverter}" >
+                                                <Binding Path="SelectedItem" Mode="OneWay" />
+                                                <Binding />
+                                            </MultiBinding>
+                                        </MenuItem.CommandTarget>
+                                    </MenuItem>
                                     <!-- todo: -->
                                     <!--<MenuItem Header="Extract archive temp" Click="MenuItem_Click" ></MenuItem>-->
+                                    <Separator />
+                                    <MenuItem Header="{StaticResource Selection}" >
+                                        <MenuItem x:Name="SelectAllMenuItem" Header="{StaticResource SelectAll}" Command="SelectAll" >
+                                            <MenuItem.CommandTarget>
+                                                <MultiBinding Converter="{StaticResource MenuItemCommandTargetConverter}" >
+                                                    <Binding Path="SelectedItem" Mode="OneWay" />
+                                                    <Binding />
+                                                </MultiBinding>
+                                            </MenuItem.CommandTarget>
+                                        </MenuItem>
+                                        <MenuItem x:Name="DeselectAllMenuItem" Header="{StaticResource DeselectAll}" >
+                                            <MenuItem.CommandTarget>
+                                                <MultiBinding Converter="{StaticResource MenuItemCommandTargetConverter}" >
+                                                    <Binding Path="SelectedItem" Mode="OneWay" />
+                                                    <Binding />
+                                                </MultiBinding>
+                                            </MenuItem.CommandTarget>
+                                        </MenuItem>
+                                        <!--todo: Command="DeselectAll"-->
+                                        <MenuItem x:Name="ReverseSelectionMenuItem" Header="{StaticResource ReverseSelection}" >
+                                            <MenuItem.CommandTarget>
+                                                <MultiBinding Converter="{StaticResource MenuItemCommandTargetConverter}" >
+                                                    <Binding Path="SelectedItem" Mode="OneWay" />
+                                                    <Binding />
+                                                </MultiBinding>
+                                            </MenuItem.CommandTarget>
+                                        </MenuItem>
+                                        <!--todo: Command="InverseSelection"-->
+                                    </MenuItem>
                                 </MenuItem>
                                 <MenuItem Header="{StaticResource ViewMenu}" >
                                     <MenuItem Header="{StaticResource IconSizeMenu}" >
@@ -190,14 +265,14 @@
                                 </MenuItem>
                             </Menu>
 
-                            <local:TabControl x:Name="TabControl" ItemsSource="{Binding Items, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:MainWindow}}}" Grid.Row="1" Margin="0,0,0,0" SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:MainWindow}}, Mode=OneWayToSource}" SelectionChanged="TabControl_SelectionChanged" />
+                            <local:TabControl x:Name="TabControl" ItemsSource="{Binding Items}" Grid.Row="1" Margin="0,0,0,0" SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}" SelectionChanged="TabControl_SelectionChanged" />
 
                             <StatusBar Grid.Row="2" >
                                 <Label x:Name="StatusBarLabel" >
                                     <Label.Content>
                                         <MultiBinding Converter="{local:StatusBarConverter}">
-                                            <Binding Path="SelectedItemVisibleItemsCount" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow }"  />
-                                            <Binding Path="SelectedItem.Value.SelectedItems.Count" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}" />
+                                            <Binding Path="SelectedItemVisibleItemsCount" />
+                                            <Binding Path="SelectedItem.Value.SelectedItems.Count" />
                                         </MultiBinding>
                                     </Label.Content>
                                 </Label>
@@ -221,9 +296,9 @@
                             <Trigger SourceName="CloseTabMenuItem" Property="IsMouseOver" Value="true" >
                                 <Setter TargetName="StatusBarLabel" Property="Content" Value="{StaticResource CloseTabStatusBarLabel}" />
                             </Trigger>
-                            <Trigger SourceName="CloseOtherTabsMenuItem" Property="IsMouseOver" Value="true" >
+                            <!--<Trigger SourceName="CloseOtherTabsMenuItem" Property="IsMouseOver" Value="true" >
                                 <Setter TargetName="StatusBarLabel" Property="Content" Value="{StaticResource CloseOtherTabsStatusBarLabel}" />
-                            </Trigger>
+                            </Trigger>-->
                             <Trigger SourceName="CloseAllTabsMenuItem" Property="IsMouseOver" Value="true" >
                                 <Setter TargetName="StatusBarLabel" Property="Content" Value="{StaticResource CloseAllTabsStatusBarLabel}" />
                             </Trigger>

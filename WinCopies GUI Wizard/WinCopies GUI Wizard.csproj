@@ -71,11 +71,11 @@
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.1.0, Culture=neutral, PublicKeyToken=2b99ebdf8bdbb372, processorArchitecture=MSIL">
       <HintPath>..\packages\WinCopies.WindowsAPICodePack.Shell.1.1.1\lib\net48\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack.Win32Native, Version=1.0.0.0, Culture=neutral, PublicKeyToken=83ecd65d6ddba0f8, processorArchitecture=MSIL">
-      <HintPath>..\packages\WinCopies.WindowsAPICodePack.Win32Native.1.0.0\lib\net48\Microsoft.WindowsAPICodePack.Win32Native.dll</HintPath>
+    <Reference Include="Microsoft.WindowsAPICodePack.Win32Native, Version=1.1.0.0, Culture=neutral, PublicKeyToken=83ecd65d6ddba0f8, processorArchitecture=MSIL">
+      <HintPath>..\packages\WinCopies.WindowsAPICodePack.Win32Native.1.1.0\lib\net48\Microsoft.WindowsAPICodePack.Win32Native.dll</HintPath>
     </Reference>
-    <Reference Include="SevenZipSharp, Version=1.1.144.0, Culture=neutral, PublicKeyToken=c8ff6ba0184838bb, processorArchitecture=MSIL">
-      <HintPath>..\packages\Squid-Box.SevenZipSharp.1.1.144\lib\net45\SevenZipSharp.dll</HintPath>
+    <Reference Include="SevenZipSharp, Version=1.2.184.0, Culture=neutral, PublicKeyToken=c8ff6ba0184838bb, processorArchitecture=MSIL">
+      <HintPath>..\packages\Squid-Box.SevenZipSharp.1.2.184\lib\net45\SevenZipSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

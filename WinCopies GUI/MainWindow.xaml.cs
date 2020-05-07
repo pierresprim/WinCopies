@@ -1,4 +1,5 @@
-﻿using Microsoft.WindowsAPICodePack.Shell;
+﻿using AttachedCommandBehavior;
+using Microsoft.WindowsAPICodePack.Shell;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -11,6 +12,7 @@ using System.Windows.Input;
 using WinCopies.GUI.Explorer;
 using WinCopies.GUI.Windows.Dialogs;
 using WinCopies.Util;
+using WinCopies.Util.Commands;
 using WinCopies.Util.Data;
 
 namespace WinCopies.GUI
@@ -40,9 +42,9 @@ namespace WinCopies.GUI
 
         public ValueObject<IBrowsableObjectInfo> SelectedItem => (ValueObject<IBrowsableObjectInfo>)GetValue(SelectedItemProperty);
 
-        public static readonly DependencyProperty HistoryProperty = DependencyProperty.Register(nameof(History), typeof(System.Collections.ObjectModel.ObservableCollection<IHistoryItemData>), typeof(MainWindow), new PropertyMetadata(new System.Collections.ObjectModel.ObservableCollection<IHistoryItemData>()));
+        public static readonly DependencyProperty HistoryProperty = DependencyProperty.Register(nameof(History), typeof(ObservableCollection<IHistoryItemData>), typeof(MainWindow), new PropertyMetadata(new ObservableCollection<IHistoryItemData>()));
 
-        public System.Collections.ObjectModel.ObservableCollection<IHistoryItemData> History { get => (System.Collections.ObjectModel.ObservableCollection<IHistoryItemData>)GetValue(HistoryProperty); set => SetValue(HistoryProperty, value); }
+        public ObservableCollection<IHistoryItemData> History { get => (ObservableCollection<IHistoryItemData>)GetValue(HistoryProperty); set => SetValue(HistoryProperty, value); }
 
         private static readonly DependencyPropertyKey SelectedItemVisibleItemsCountPropertyKey = DependencyProperty.RegisterReadOnly(nameof(SelectedItemVisibleItemsCount), typeof(int), typeof(MainWindow), new PropertyMetadata(0));
 
@@ -53,6 +55,10 @@ namespace WinCopies.GUI
         public MainWindow()
         {
             InitializeComponent();
+
+            InputBindings.Add(new InputBinding(System.Windows.Input.ApplicationCommands.SelectAll, new KeyGesture(Key.A, ModifierKeys.Control)));
+
+            DataContext = this;
 
             SetValue(ItemsPropertyKey, new ObservableCollection<ValueObject<IBrowsableObjectInfo>>());
             // DataContext = this;
@@ -81,9 +87,9 @@ namespace WinCopies.GUI
 
         public void New_Tab() => New_Tab(new ValueObject<IBrowsableObjectInfo>(new ShellObjectInfo(ShellObject.FromParsingName(KnownFolders.Desktop.ParsingName), KnownFolders.Desktop.ParsingName, IO.FileType.SpecialFolder, IO.SpecialFolders.Desktop)));
 
-        public void New_Tab(ValueObject<IBrowsableObjectInfo> shellObject) => Add_New_Tab(shellObject).PART_ExplorerControl.Navigate(shellObject.Value, true);
+        public void New_Tab(ValueObject<IBrowsableObjectInfo> shellObject) => Add_New_Tab(shellObject).PART_ExplorerControl.Navigate(shellObject.Value);
 
-        public void Restore_Tab(ValueObject<IBrowsableObjectInfo> shellObject) => Add_New_Tab(shellObject).PART_ExplorerControl.Navigate(shellObject.Value, true);
+        public void Restore_Tab(ValueObject<IBrowsableObjectInfo> shellObject) => Add_New_Tab(shellObject).PART_ExplorerControl.Navigate(shellObject.Value);
 
         //private void TabControl_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         //{
@@ -143,37 +149,31 @@ namespace WinCopies.GUI
             //e.ContinueRouting = false;
         }
 
-        private void InputBox_Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private bool InputBox_Command_CanExecute(string text, InputBox inputBox)
 
         {
 
-            if (string.IsNullOrEmpty(((InputBox)sender).Text) || string.IsNullOrWhiteSpace(((InputBox)sender).Text))
+            if (string.IsNullOrEmpty(text) || string.IsNullOrWhiteSpace(text))
+
+                return false;
+
+            // todo: to add the other characters ...
+
+            else if (text.ContainsOneOrMoreValues('\\',
+                     '/',
+                     ':',
+                     '*',
+                     '?',
+                     '"',
+                     '<',
+                     '>',
+                     '|'))
 
             {
 
-                ((InputBox)sender).Text = null;
+                inputBox.ErrorText = (string)Application.Current.Resources["PathContainsUnauthorizedCharacters"];
 
-                e.CanExecute = false;
-
-            }
-
-            // todo: to add other characters ...
-
-            else if (((InputBox)sender).Text.Contains('\\')
-                     || ((InputBox)sender).Text.Contains('/')
-                     || ((InputBox)sender).Text.Contains(':')
-                     || ((InputBox)sender).Text.Contains('*')
-                     || ((InputBox)sender).Text.Contains('?')
-                     || ((InputBox)sender).Text.Contains('"')
-                     || ((InputBox)sender).Text.Contains('<')
-                     || ((InputBox)sender).Text.Contains('>')
-                     || ((InputBox)sender).Text.Contains('|'))
-
-            {
-
-                ((InputBox)sender).ErrorText = (string)Application.Current.Resources["PathContainsUnauthorizedCharacters"];
-
-                e.CanExecute = false;
+                return false;
 
             }
 
@@ -181,63 +181,59 @@ namespace WinCopies.GUI
 
             {
 
-                ((InputBox)sender).ErrorText = null;
+                inputBox.ErrorText = null;
 
-                e.CanExecute = true;
+                return true;
 
             }
+
+        }
+
+        private InputBox GetInputBox(string prefix)
+
+        {
+
+            InputBox inputBox = new InputBox
+            {
+
+                // inputBox.CommandBindings.Add(new CommandBinding(WinCopies.Util.Commands.FileSystemCommands.NewFolder, (object _sender, ExecutedRoutedEventArgs _e) => { }, InputBox_Command_CanExecute));
+
+                Label = (string)Application.Current.Resources[$"{prefix}WindowLabel"],
+
+                // inputBox.Text = "azerty";
+
+                Placeholder = new Controls.PlaceholderProperties((string)Application.Current.Resources[$"{prefix}WindowPlaceholder"], false, false, new System.Windows.Media.FontFamily(), 12, FontStretches.Normal, FontStyles.Italic, FontWeights.Normal, System.Windows.Media.Brushes.DimGray, TextAlignment.Left, null, TextWrapping.NoWrap),
+
+                // inputBox.Orientation = Orientation.Vertical;
+
+                ButtonAlignment = Windows.Dialogs.HorizontalAlignment.Right
+
+            };
+
+            return inputBox;
 
         }
 
         private void NewFolder_Executed(object sender, ExecutedRoutedEventArgs e)
         {
 
-            InputBox GetInputBox(string prefix, out InputBox inputBox)
+            InputBox inputBox = GetInputBox("NewFolder");
 
-            {
+            inputBox.Command = FileSystemCommands.NewFolder; // new DelegateCommand() { CanExecuteDelegate = (object o) => InputBox_Command_CanExecute((string)o, inputBox) };
 
-                /*InputBox */
+            inputBox.CommandTarget = inputBox;
 
-                inputBox = new InputBox
-                {
-
-                    Command = Util.Commands.FileSystemCommands.NewFolder,
-
-                    // inputBox.CommandBindings.Add(new CommandBinding(WinCopies.Util.Commands.FileSystemCommands.NewFolder, (object _sender, ExecutedRoutedEventArgs _e) => { }, InputBox_Command_CanExecute));
-
-                    Label = (string)Application.Current.Resources[$"{prefix}WindowLabel"],
-
-                    // inputBox.Text = "azerty";
-
-                    Placeholder = new Controls.PlaceholderProperties((string)Application.Current.Resources[$"{prefix}WindowPlaceholder"], false, false, new System.Windows.Media.FontFamily(), 12, FontStretches.Normal, FontStyles.Italic, FontWeights.Normal, System.Windows.Media.Brushes.DimGray, TextAlignment.Left, null, TextWrapping.NoWrap),
-
-                    // inputBox.Orientation = Orientation.Vertical;
-
-                    ButtonAlignment = Windows.Dialogs.HorizontalAlignment.Right,
-
-                    DialogButton = DialogButton.OKCancel
-
-                };
-
-                inputBox.
-
-                    CommandBindings.Add(new CommandBinding(Util.Commands.FileSystemCommands.NewFolder, null, InputBox_Command_CanExecute));
-
-                return inputBox;
-
-            }
-
-            InputBox _inputBox = GetInputBox("NewFolder", out _inputBox);
+            inputBox.CommandBindings.Add(new CommandBinding(FileSystemCommands.NewFolder, null, (object _sender, CanExecuteRoutedEventArgs _e) => _e.CanExecute = InputBox_Command_CanExecute((string)_e.Parameter, inputBox)));
 
 #if DEBUG
 
-            bool? result = _inputBox.ShowDialog();
+            bool? result = inputBox.ShowDialog();
 
             Debug.WriteLine(result == null ? "null" : result.ToString());
 
-            Debug.WriteLine(_inputBox.MessageBoxResult.ToString());
+            Debug.WriteLine(inputBox.MessageBoxResult.ToString());
 
-            Debug.WriteLine(_inputBox.Text);
+            Debug.WriteLine(inputBox.Text);
 
             if (result == true)
 
@@ -250,7 +246,7 @@ namespace WinCopies.GUI
                 try
                 {
 
-                    Directory.CreateDirectory(SelectedItem.Value.Path + "\\\\" + _inputBox.Text);
+                    Directory.CreateDirectory(SelectedItem.Value.Path + "\\\\" + inputBox.Text);
 
                 }
 
@@ -403,7 +399,23 @@ namespace WinCopies.GUI
 
                 ProcessStartInfo processStartInfo = new ProcessStartInfo(WinCopiesProcessesManager, args);
 
-                Process.Start(processStartInfo);
+                try
+
+                {
+
+                    Process.Start(processStartInfo);
+
+                }
+
+                catch (Exception ex) when (((object)ex).Is(true, typeof(FileNotFoundException), typeof(Win32Exception)))
+
+                {
+
+                    // todo:
+
+                    MessageBox.Show("An error as occurred.");
+
+                }
 
             }
         }
@@ -558,15 +570,21 @@ namespace WinCopies.GUI
         private void CloseAllTabs_Executed(object sender, ExecutedRoutedEventArgs e)
         {
 
-            for (int i = 0; i <= Items.Count - 1; i++)
+            for (int i = 0; i < Items.Count;)
 
-            {
+                if (Items[i].Value.IsSelected)
 
-                Items[i].Value.Dispose();
+                    i++;
 
-                Items.RemoveAt(i);
+                else
 
-            }
+                {
+
+                    Items[i].Value.Dispose();
+
+                    Items.RemoveAt(i);
+
+                }
 
         }
 
@@ -651,6 +669,10 @@ namespace WinCopies.GUI
 
         private void CloseWindow_Executed(object sender, ExecutedRoutedEventArgs e) => Close();
 
+        private void OpenInSystemFileExplorer_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = SelectedItem.Value is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.ArchiveShellObject.Path.ToLower().EndsWith(".zip") : true;
+
+        private void OpenInSystemFileExplorer_Executed(object sender, ExecutedRoutedEventArgs e) => Process.Start("explorer.exe", SelectedItem.Value.Path);
+
         //private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         //{
 
@@ -663,7 +685,7 @@ namespace WinCopies.GUI
 
         //}
 
-        private void FileSystemOperationMenuItem_Loaded(object sender, RoutedEventArgs e) => ((System.Windows.Controls.MenuItem)sender).CommandTarget = GetVisualTabItem(SelectedItem)?.PART_ExplorerControl;
+        //private void FileSystemOperationMenuItem_Loaded(object sender, RoutedEventArgs e) => ((System.Windows.Controls.MenuItem)sender).CommandTarget = GetVisualTabItem(SelectedItem)?.PART_ExplorerControl;
 
 
 
@@ -708,6 +730,8 @@ namespace WinCopies.GUI
     {
 
         #region File menu commands
+
+        public static RoutedUICommand OpenInSystemFileExplorer { get; } = new RoutedUICommand((string)Application.Current.Resources[nameof(OpenInSystemFileExplorer)], nameof(OpenInSystemFileExplorer), typeof(Commands));
 
         public static RoutedUICommand Quit { get; } = new RoutedUICommand((string)Application.Current.Resources[nameof(Quit)], nameof(Quit), typeof(Commands), new InputGestureCollection() { new KeyGesture(Key.Q, ModifierKeys.Control) });
 
