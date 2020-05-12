@@ -1,765 +1,380 @@
-﻿using AttachedCommandBehavior;
+﻿using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Shell;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
-using WinCopies.GUI.Explorer;
-using WinCopies.GUI.Windows.Dialogs;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.Xml;
+using WinCopies.Collections;
+using WinCopies.GUI;
+using WinCopies.GUI.IO;
+using WinCopies.IO;
+using WinCopies.Properties;
 using WinCopies.Util;
 using WinCopies.Util.Commands;
-using WinCopies.Util.Data;
+using static WinCopies.App;
 
-namespace WinCopies.GUI
+namespace WinCopies
 {
-
-    // todo : setting icon sizes from the bigger (size one) to the lower (size four) for better "compatibility" for the user with the Windows explorer.
-
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        //public static readonly DependencyProperty MenuProperty = DependencyProperty.Register(nameof(Menu), typeof(MenuViewModel), typeof(MainWindow));
 
-        private const string WinCopiesProcessesManager = "WinCopiesProcessesManager.exe";
+        //public MenuViewModel Menu { get => (MenuViewModel)GetValue(MenuProperty); set => SetValue(MenuProperty, value); }
 
-        public readonly string CloseTabButtonUserToolTip = string.Format("{0} ({1})", (string)Application.Current.Resources["CloseTab"], "Ctrl + W");
+        //public static readonly DependencyPropertyKey SelectedMenuItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(SelectedMenuItem), typeof(MenuItemViewModel), typeof(MainWindow), new PropertyMetadata(false));
 
-        // todo: should be public also for the set accessor:
+        //public static readonly DependencyProperty SelectedMenuItemProperty = SelectedMenuItemPropertyKey.DependencyProperty;
 
-        private static readonly DependencyPropertyKey ItemsPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Items), typeof(ObservableCollection<ValueObject<IBrowsableObjectInfo>>), typeof(MainWindow), new PropertyMetadata(null));
+        //public MenuItemViewModel SelectedMenuItem { get => (MenuItemViewModel)GetValue(SelectedMenuItemProperty); internal set => SetValue(SelectedMenuItemPropertyKey, value); }
 
-        public static readonly DependencyProperty ItemsProperty = ItemsPropertyKey.DependencyProperty;
+        public static RoutedCommand NewTab => Util.Commands.ApplicationCommands.NewTab;
 
-        public ObservableCollection<ValueObject<IBrowsableObjectInfo>> Items => (ObservableCollection<ValueObject<IBrowsableObjectInfo>>)GetValue(ItemsProperty);
+        public static RoutedCommand NewWindow => Util.Commands.ApplicationCommands.NewWindow;
 
-        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(ValueObject<IBrowsableObjectInfo>), typeof(MainWindow));
+        public static RoutedCommand CloseTab => Util.Commands.ApplicationCommands.CloseTab;
 
-        public ValueObject<IBrowsableObjectInfo> SelectedItem => (ValueObject<IBrowsableObjectInfo>)GetValue(SelectedItemProperty);
+        public static RoutedCommand CloseOtherTabs { get; } = new RoutedUICommand(Properties.Resources.CloseOtherTabs, nameof(CloseOtherTabs), typeof(MainWindow), new InputGestureCollection() { new KeyGesture(Key.W, ModifierKeys.Control | ModifierKeys.Alt) });
 
-        public static readonly DependencyProperty HistoryProperty = DependencyProperty.Register(nameof(History), typeof(ObservableCollection<IHistoryItemData>), typeof(MainWindow), new PropertyMetadata(new ObservableCollection<IHistoryItemData>()));
+        public static RoutedCommand CloseAllTabs => Util.Commands.ApplicationCommands.CloseAllTabs;
 
-        public ObservableCollection<IHistoryItemData> History { get => (ObservableCollection<IHistoryItemData>)GetValue(HistoryProperty); set => SetValue(HistoryProperty, value); }
+        public static RoutedCommand CloseWindow => System.Windows.Input.ApplicationCommands.Close;
 
-        private static readonly DependencyPropertyKey SelectedItemVisibleItemsCountPropertyKey = DependencyProperty.RegisterReadOnly(nameof(SelectedItemVisibleItemsCount), typeof(int), typeof(MainWindow), new PropertyMetadata(0));
+        public static RoutedCommand Quit { get; } = new RoutedUICommand(Properties.Resources.Quit, nameof(Quit), typeof(MainWindow));
 
-        public static readonly DependencyProperty SelectedItemVisibleItemsCountProperty = SelectedItemVisibleItemsCountPropertyKey.DependencyProperty;
+        public static RoutedCommand About { get; } = new RoutedUICommand(Properties.Resources.About, nameof(About), typeof(MainWindow));
 
-        public int SelectedItemVisibleItemsCount { get => (int)GetValue(SelectedItemVisibleItemsCountProperty); }
+        public static RoutedCommand SubmitABug { get; } = new RoutedUICommand(Properties.Resources.SubmitABug, nameof(SubmitABug), typeof(MainWindow));
+
+        public static Func<MainWindowViewModel, object> GetCloseTabParameter { get; } = mainWindow => mainWindow.SelectedItem;
+
+        public static Func<MainWindowViewModel, object> GetCloseOtherTabsParameter { get; } = mainWindow => mainWindow.SelectedItem;
+
+        public static ImageSource NewTabIcon { get; } = GUI.Icons.Properties.Resources.tab_add.ToImageSource();
+
+        public static ImageSource NewWindowIcon { get; } = GUI.Icons.Properties.Resources.application_add.ToImageSource();
+
+        public static ImageSource CloseTabIcon { get; } = GUI.Icons.Properties.Resources.tab_delete.ToImageSource();
+
+        public static ImageSource SubmitABugIcon { get; } = GUI.Icons.Properties.Resources.bug.ToImageSource();
 
         public MainWindow()
         {
+            _ = _OpenWindows.AddFirst(this);
+
+            var mainWindow = new MainWindowViewModel();
+
+            var xml = new XmlDocument();
+
+            xml.LoadXml(Properties.Resources.Menus);
+
+            XmlElement xmlMenu = xml.DocumentElement;
+
+            var arrayBuilder = new ArrayBuilder<PropertyInfo>();
+
+            PropertyInfo[] mainWindowProperties = typeof(MainWindow).GetProperties(BindingFlags.Public | BindingFlags.Static);
+
+            foreach (PropertyInfo p in mainWindowProperties.Where(p => p.PropertyType.IsAssignableFrom(typeof(RoutedCommand))))
+
+                _ = arrayBuilder.AddLast(p);
+
+            PropertyInfo[] commands = arrayBuilder.ToArray(true);
+
+            foreach (PropertyInfo p in mainWindowProperties.Where(p => p.Name.EndsWith("Parameter")))
+
+                _ = arrayBuilder.AddLast(p);
+
+            PropertyInfo[] commandParameters = arrayBuilder.ToArray(true);
+
+            foreach (PropertyInfo p in mainWindowProperties.Where(p => p.PropertyType.IsAssignableFrom(typeof(ImageSource))))
+
+                _ = arrayBuilder.AddLast(p);
+
+            PropertyInfo[] iconImageSources = arrayBuilder.ToArray(true);
+
+            string getStringResource(string resourceId) => (string)ResourceProperties.First(p => p.Name == resourceId).GetValue(null);
+
+            RoutedCommand getCommand(string resourceId) => (RoutedCommand)commands.FirstOrDefault(c => c.Name == resourceId)?.GetValue(null);
+
+            Func getCommandParameter(string resourceId)
+            {
+                PropertyInfo p = commandParameters.FirstOrDefault(p => p.Name == $"{resourceId}Parameter");
+
+                object value;
+
+                if (p != null)
+
+                {
+
+                    value = p.GetValue(null);
+
+                    return new Func(() => value);
+
+                }
+
+                p = commandParameters.FirstOrDefault(p => p.Name == $"Get{resourceId}Parameter");
+
+                if (p == null)
+
+                    return null;
+
+                value = p.GetValue(null);
+
+                return new Func(() => ((Func<MainWindowViewModel, object>)value)(mainWindow));
+            }
+
+            ImageSource getIconImageSource(string resourceId) => (ImageSource)iconImageSources.FirstOrDefault(i => i.Name == $"{resourceId}Icon")?.GetValue(null);
+
+            void addMenuItem(XmlElement xmlMenuItem, MenuItemViewModel menuItem)
+            {
+                string resourceId;
+
+                foreach (XmlElement _xmlMenuItem in xmlMenuItem)
+                {
+                    resourceId = _xmlMenuItem.Attributes["Resource"].Value;
+
+                    addMenuItem(_xmlMenuItem, new MenuItemViewModel(menuItem, getStringResource(resourceId), resourceId, getCommand(resourceId), getCommandParameter(resourceId), getIconImageSource(resourceId)));
+                }
+            }
+
+            string resourceId;
+
+            foreach (XmlElement xmlMenuItem in xmlMenu)
+            {
+                resourceId = xmlMenuItem.Attributes["Resource"].Value;
+
+                addMenuItem(xmlMenuItem, new MenuItemViewModel(mainWindow.Menu, getStringResource(resourceId), resourceId, null, null, null));
+            }
+
+            DataContext = mainWindow;
+
             InitializeComponent();
-
-            InputBindings.Add(new InputBinding(System.Windows.Input.ApplicationCommands.SelectAll, new KeyGesture(Key.A, ModifierKeys.Control)));
-
-            DataContext = this;
-
-            SetValue(ItemsPropertyKey, new ObservableCollection<ValueObject<IBrowsableObjectInfo>>());
-            // DataContext = this;
-            // ShellInterop.Shell.ShellFile
         }
 
-        public TabControl TabControl => (TabControl)Template.FindName("TabControl", this);
-
-        private TabItem Add_New_Tab(ValueObject<IBrowsableObjectInfo> shellObject)
-
+        ~MainWindow()
         {
-
-            if (!IsLoaded)
-
-                Show();
-
-            Items.Add(shellObject);
-
-            shellObject.Value.IsSelected = true;
-
-            return (TabItem)TabControl.ItemContainerGenerator.ContainerFromItem(shellObject);
-
+            _ = _OpenWindows.Remove(this);
         }
 
-        // WinCopies.GUI.Explorer.ExplorerControl.fsw.SynchronizingObject = (ISynchronizeInvoke)this;
-
-        public void New_Tab() => New_Tab(new ValueObject<IBrowsableObjectInfo>(new ShellObjectInfo(ShellObject.FromParsingName(KnownFolders.Desktop.ParsingName), KnownFolders.Desktop.ParsingName, IO.FileType.SpecialFolder, IO.SpecialFolders.Desktop)));
-
-        public void New_Tab(ValueObject<IBrowsableObjectInfo> shellObject) => Add_New_Tab(shellObject).PART_ExplorerControl.Navigate(shellObject.Value);
-
-        public void Restore_Tab(ValueObject<IBrowsableObjectInfo> shellObject) => Add_New_Tab(shellObject).PART_ExplorerControl.Navigate(shellObject.Value);
-
-        //private void TabControl_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        //{
-
-        //    if (e.OriginalSource.GetType() == typeof(TabControl))
-
-        //        if (e.AddedItems.Count > 0)
-
-        //            SetValue(SelectedItemPropertyKey, (IBrowsableObjectInfo)e.AddedItems[0]);
-
-        //        else
-
-        //            SetValue(SelectedItemPropertyKey, null);
-
-        //    // GetVisualTabItem( (IBrowsableObjectInfo) e.AddedItems[0]).Navigate(WinCopies.IO.Util.GetNormalizedOSPath(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)), true);
-
-        //}
-
-        private void Command_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
-
-        private void NewTab_Executed(object sender, ExecutedRoutedEventArgs e) => New_Tab();
-
-        private void NewWindow_Executed(object sender, ExecutedRoutedEventArgs e) => new MainWindow().New_Tab();
-
-        private void NewWindowInNewInstance_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-#if DEBUG 
-            Debug.WriteLine("Assembly path: " + System.Reflection.Assembly.GetExecutingAssembly().Location);
-#endif 
-            Process.Start(System.Reflection.Assembly.GetExecutingAssembly().Location);
-        }
-
-        //private bool GetFileSystemOperation_CanExecute(string parameter)
-        //{
-
-        //    bool openDirectoryIsShellFolder = SelectedItem.Value is ShellObjectInfo shellObjectInfo && shellObjectInfo.ShellObject is ShellFolder;
-
-        //    return true; //  parameter == openDirectoryIsShellFolder && : parameter == "FileSystemOpenDirectoryCommand" ? openDirectoryIsShellFolder : false;
-
-        //}
-
-        private void FileSystemOperation_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-
-            // todo: temp
-
             e.CanExecute = true;
 
-            // var explorerControl = SelectedItem.PART_ExplorerControl;
-
-            //if (GetFileSystemOperation_CanExecute((string)e.Parameter)) e.CanExecute = true;
-
-            // e.CanExecute = e.Command.CanExecute(e.Parameter, GetVisualTabItem(SelectedItem).PART_ExplorerControl);
-
-            //e.Handled = true;
-
-            //e.ContinueRouting = false;
+            e.Handled = true;
         }
 
-        private bool InputBox_Command_CanExecute(string text, InputBox inputBox)
-
+        private void NewTab_CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            ExplorerControlBrowsableObjectInfoViewModel explorerControlBrowsableObjectInfo = MainWindowViewModel.GetNewExplorerControlBrowsableObjectInfo();
 
-            if (string.IsNullOrEmpty(text) || string.IsNullOrWhiteSpace(text))
+            explorerControlBrowsableObjectInfo.IsSelected = true;
 
-                return false;
+            ((MainWindowViewModel)DataContext).Paths.Add(explorerControlBrowsableObjectInfo);
 
-            // todo: to add the other characters ...
+            e.Handled = true;
+        }
 
-            else if (text.ContainsOneOrMoreValues('\\',
-                     '/',
-                     ':',
-                     '*',
-                     '?',
-                     '"',
-                     '<',
-                     '>',
-                     '|'))
+        private void NewWindow_CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            new MainWindow().Show();
+
+            e.Handled = true;
+        }
+
+        private void CloseTab_CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = ((MainWindowViewModel)DataContext).Paths.Count > 1;
+
+            e.Handled = true;
+        }
+
+        private void CloseTab_CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            _ = ((MainWindowViewModel)DataContext).Paths.Remove((ExplorerControlBrowsableObjectInfoViewModel)(e.Parameter is Func func ? func() : e.Parameter));
+
+            e.Handled = true;
+        }
+
+        private void CloseOtherTabs_CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            _ = RemoveAll(((MainWindowViewModel)DataContext).Paths, (ExplorerControlBrowsableObjectInfoViewModel)(e.Parameter is Func func ? func() : e.Parameter), false, false);
+
+            e.Handled = true;
+        }
+
+        // todo: replace by the WinCopies.Util's same method.
+
+        public static bool RemoveAll<T>(in IList<T> collection, in T itemToKeep, in bool onlyOne, in bool throwIfMultiple) where T : class
+        {
+            while (collection.Count != 1)
 
             {
 
-                inputBox.ErrorText = (string)Application.Current.Resources["PathContainsUnauthorizedCharacters"];
+                if (collection[0] == itemToKeep)
 
-                return false;
+                {
+
+                    if (onlyOne)
+                    {
+
+                        while (collection.Count != 1)
+
+                        {
+
+                            if (collection[1] == itemToKeep)
+
+                            {
+
+                                if (throwIfMultiple)
+
+                                    throw new InvalidOperationException("More than one occurences was found.");
+
+                                else
+
+                                    while (collection.Count != 1)
+
+                                        collection.RemoveAt(1);
+
+                                return false;
+
+                            }
+
+                            collection.RemoveAt(1);
+
+                            return true;
+
+                        }
+
+                    }
+
+                    while (collection.Count != 1)
+
+                        collection.RemoveAt(1);
+
+                    return true;
+
+                }
+
+                collection.RemoveAt(0);
 
             }
 
-            else
-
-            {
-
-                inputBox.ErrorText = null;
-
-                return true;
-
-            }
-
+            return false;
         }
 
-        private InputBox GetInputBox(string prefix)
-
+        private void CloseAllTabs_CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            System.Collections.ObjectModel.ObservableCollection<ExplorerControlBrowsableObjectInfoViewModel> paths = ((MainWindowViewModel)DataContext).Paths;
 
-            InputBox inputBox = new InputBox
-            {
+            paths.Clear();
 
-                // inputBox.CommandBindings.Add(new CommandBinding(WinCopies.Util.Commands.FileSystemCommands.NewFolder, (object _sender, ExecutedRoutedEventArgs _e) => { }, InputBox_Command_CanExecute));
+            ExplorerControlBrowsableObjectInfoViewModel explorerControlBrowsableObjectInfo = MainWindowViewModel.GetNewExplorerControlBrowsableObjectInfo();
 
-                Label = (string)Application.Current.Resources[$"{prefix}WindowLabel"],
+            explorerControlBrowsableObjectInfo.IsSelected = true;
 
-                // inputBox.Text = "azerty";
+            paths.Add(explorerControlBrowsableObjectInfo);
 
-                Placeholder = new Controls.PlaceholderProperties((string)Application.Current.Resources[$"{prefix}WindowPlaceholder"], false, false, new System.Windows.Media.FontFamily(), 12, FontStretches.Normal, FontStyles.Italic, FontWeights.Normal, System.Windows.Media.Brushes.DimGray, TextAlignment.Left, null, TextWrapping.NoWrap),
-
-                // inputBox.Orientation = Orientation.Vertical;
-
-                ButtonAlignment = Windows.Dialogs.HorizontalAlignment.Right
-
-            };
-
-            return inputBox;
-
+            e.Handled = true;
         }
-
-        private void NewFolder_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
-            InputBox inputBox = GetInputBox("NewFolder");
-
-            inputBox.Command = FileSystemCommands.NewFolder; // new DelegateCommand() { CanExecuteDelegate = (object o) => InputBox_Command_CanExecute((string)o, inputBox) };
-
-            inputBox.CommandTarget = inputBox;
-
-            inputBox.CommandBindings.Add(new CommandBinding(FileSystemCommands.NewFolder, null, (object _sender, CanExecuteRoutedEventArgs _e) => _e.CanExecute = InputBox_Command_CanExecute((string)_e.Parameter, inputBox)));
-
-#if DEBUG
-
-            bool? result = inputBox.ShowDialog();
-
-            Debug.WriteLine(result == null ? "null" : result.ToString());
-
-            Debug.WriteLine(inputBox.MessageBoxResult.ToString());
-
-            Debug.WriteLine(inputBox.Text);
-
-            if (result == true)
-
-#else    
-
-                if (inputBox.ShowDialog() == true)
-
-#endif
-
-                try
-                {
-
-                    Directory.CreateDirectory(SelectedItem.Value.Path + "\\\\" + inputBox.Text);
-
-                }
-
-                catch (IOException)
-                {
-
-                    MessageBox.Show((string)Application.Current.Resources["FileAlreadyExistsExceptionMessage"]);
-
-                }
-
-                catch (UnauthorizedAccessException)
-
-                {
-
-                    MessageBox.Show((string)Application.Current.Resources["AccessDeniedExceptionMessage"]);
-
-                }
-
-        }
-
-        private void Copy_Executed(object sender, ExecutedRoutedEventArgs e) => GetVisualTabItem(SelectedItem).PART_ExplorerControl.Copy(ActionsFromObjects.ListView);
-
-        private void Cut_Executed(object sender, ExecutedRoutedEventArgs e) => GetVisualTabItem(SelectedItem).PART_ExplorerControl.Cut((ActionsFromObjects)e.Parameter);
-
-        private void Paste_Executed(object sender, ExecutedRoutedEventArgs e) => GetVisualTabItem(SelectedItem).PART_ExplorerControl.Paste(ActionsFromObjects.ListView);
-
-        private void Delete_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
-            // todo
-
-        }
-
-        // todo: better gesture by checking directly for which comment is running.
-
-        private void ViewStyleCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
-#if DEBUG 
-
-            Debug.WriteLine((string)e.Parameter);
-
-#endif 
-
-            App app = (App)Application.Current;
-
-            if (e.Command == Commands.SizeOne)
-
-                app.CommonProperties.ViewStyle = ViewStyles.SizeOne;
-
-            else if (e.Command == Commands.SizeTwo)
-
-                app.CommonProperties.ViewStyle = ViewStyles.SizeTwo;
-
-            else if (e.Command == Commands.SizeThree)
-
-                app.CommonProperties.ViewStyle = ViewStyles.SizeThree;
-
-            else if (e.Command == Commands.SizeFour)
-
-                app.CommonProperties.ViewStyle = ViewStyles.SizeFour;
-
-            else if (e.Command == Commands.ListViewStyle)
-
-                app.CommonProperties.ViewStyle = ViewStyles.List;
-
-            else if (e.Command == Commands.DetailsViewStyle)
-
-                app.CommonProperties.ViewStyle = ViewStyles.Details;
-
-            else if (e.Command == Commands.TileViewStyle)
-
-                app.CommonProperties.ViewStyle = ViewStyles.Tiles;
-
-            else if (e.Command == Commands.ContentViewStyle)
-
-                app.CommonProperties.ViewStyle = ViewStyles.Content;
-
-        }
-
-        private bool OnTabsClosing() => ((App)Application.Current)._IsClosing == false && Items.Count > 1 && MessageBox.Show((string)Application.Current.Resources["WindowClosingMessage"], System.Reflection.Assembly.GetEntryAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes;
-
-        private void Window_Closing(object sender, CancelEventArgs e)
-        {
-
-            if (OnTabsClosing())
-
-                e.Cancel = true;
-
-        }
-
-        private void QuitCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            bool areMultipleMainWindowsOpen()
-
-            {
-
-                int openMainWindowsCount = 0;
-
-                WindowCollection openWindows = Application.Current.Windows;
-
-                foreach (Window window in openWindows)
-
-                    if (window.GetType() == typeof(MainWindow))
-
-                        if (openMainWindowsCount == 1) return true;
-
-                        else openMainWindowsCount += 1;
-
-                return false;
-
-            }
-
-            ((App)Application.Current)._IsClosing = true;
-
-            bool multipleMainWindowsOpen = areMultipleMainWindowsOpen();
-
-            if (multipleMainWindowsOpen)
-
-                if (MessageBox.Show((string)Application.Current.Resources["ApplicationClosingMessage"], System.Reflection.Assembly.GetEntryAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-
-                    Application.Current.Shutdown();
-
-                else
-
-                    ((App)Application.Current)._IsClosing = false;
-
-            else
-
-                Application.Current.Shutdown();
-        }
-
-        private void NewArchive_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            ArchiveCompression archiveCompression = new ArchiveCompression();
-
-            bool? showDialogResult = archiveCompression.ShowDialog();
-
-            if (showDialogResult == true)
-
-            {
-
-                string args = $"\"Compression\" \"{archiveCompression.ArchiveFormat}\" \"{archiveCompression.CompressionLevel}\" \"{archiveCompression.CompressionMethod}\" \"{archiveCompression.CompressionMode}\" \"{archiveCompression.DirectoryStructure}\" \"{archiveCompression.IncludeEmptyDirectories}\" \"{archiveCompression.SourcePath}\" \"{archiveCompression.DestPath}\"";
-
-#if DEBUG 
-
-                Debug.WriteLine(args);
-
-#endif 
-
-                ProcessStartInfo processStartInfo = new ProcessStartInfo(WinCopiesProcessesManager, args);
-
-                try
-
-                {
-
-                    Process.Start(processStartInfo);
-
-                }
-
-                catch (Exception ex) when (((object)ex).Is(true, typeof(FileNotFoundException), typeof(Win32Exception)))
-
-                {
-
-                    // todo:
-
-                    MessageBox.Show("An error as occurred.");
-
-                }
-
-            }
-        }
-
-        private void ExtractArchive_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = (SelectedItem.Value.SelectedItem?.FileType == IO.FileType.Archive && SelectedItem.Value.SelectedItems.Count == 1) || (SelectedItem.Value.FileType == IO.FileType.Archive && SelectedItem.Value.SelectedItems.Count == 0);
-
-        private void ExtractArchive_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
-
-            folderBrowserDialog.Mode = FolderBrowserDialogMode.OpenFolder;
-
-            if (folderBrowserDialog.ShowDialog() == true)
-
-            {
-
-            }
-
-        }
-
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
-            //ShellObject so;so.Properties.System.ItemNameDisplay.Value;
-            openFileDialog.AddExtension = true;
-
-            openFileDialog.CheckFileExists = true;
-
-            openFileDialog.CheckPathExists = true;
-
-            openFileDialog.Filter = "*.zip|*.zip";
-
-            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-
-            openFileDialog.Multiselect = false;
-
-            openFileDialog.Title = "Open an archive...";
-
-            // if (openFileDialog.ShowDialog() == true)
-
-            //#if DEBUG
-
-            //            {
-
-            //#endif 
-
-            // SevenZip.SevenZipExtractor sevenZipExtractor = new SevenZip.SevenZipExtractor(openFileDialog.FileName);
-
-            //#if DEBUG 
-
-            //                foreach (SevenZip.ArchiveProperty archiveProperty in sevenZipExtractor.ArchiveProperties)
-
-            //                    Debug.WriteLine("Name: " + archiveProperty.Name + ", Value: " + archiveProperty.Value);
-
-            //                foreach (SevenZip.ArchiveFileInfo archiveFileInfo in sevenZipExtractor.ArchiveFileData)
-
-            //                    foreach (SevenZip.ArchiveProperty archiveFileInfoProperty in archiveFileInfo..ArchiveFileInfoProperties)
-
-            //                        Debug.WriteLine("Name: " + archiveFileInfoProperty.Name + ", Value: " + archiveFileInfoProperty.Value);
-
-            //            }
-
-            //#endif 
-
-        }
-
-        //private void Button_Click(object sender, RoutedEventArgs e)
-        //{
-        //#if DEBUG
-        //            Console.WriteLine(WinCopies.IO.Util.GetNormalizedOSPath(SelectedItem.WinCopies.GUI.Explorer.ExplorerControl.CurrentPath).Path);
-        //            var machin = WinCopies.IO.Util.GetNormalizedOSPath(SelectedItem.WinCopies.GUI.Explorer.ExplorerControl.CurrentPath);
-        //            if (machin.ShellObject != null)
-
-        //            {
-
-        //                if (machin.ShellObject.Name != null)
-
-        //                    Console.WriteLine("Path: " + machin.ShellObject.Name);
-
-        //                Console.WriteLine("Path: " + machin.ShellObject.ParsingName);
-        //                Console.WriteLine("Path: " + machin.ShellObject.Properties.System.ItemFolderPathDisplay.Value);
-        //                Console.WriteLine("Path: " + machin.ShellObject.Properties.System.ItemFolderPathDisplayNarrow.Value);
-        //                Console.WriteLine("Path: " + machin.ShellObject.Properties.System.ItemPathDisplay.Value);
-        //                Console.WriteLine("Path: " + machin.ShellObject.Properties.System.ItemPathDisplayNarrow.Value);
-        //                Console.WriteLine("Path: " + machin.ShellObject.Properties.System.ParsingPath.Value);
-        //                Console.WriteLine("Path: " + machin.ShellObject.Properties.System.FileName.Value);
-        //                Console.WriteLine("Path: " + machin.ShellObject.Properties.System.ItemFolderNameDisplay.Value);
-        //                Console.WriteLine("Path: " + machin.ShellObject.Properties.System.ItemName.Value);
-        //                Console.WriteLine("Path: " + machin.ShellObject.Properties.System.ItemNameDisplay.Value);
-        //                Console.WriteLine("Path: " + machin.ShellObject.Properties.System.OriginalFileName.Value);
-        //                Console.WriteLine("Path: " + machin.ShellObject.Properties.System.ParsingName.Value);
-        //                Console.WriteLine(((ShellFolder)machin.ShellObject).Name);
-        //                Console.WriteLine(((ShellFolder)machin.ShellObject).ParsingName);
-
-        //            }
-        //#endif
-        //SelectedItem.ExplorerControl.Open(WinCopies.IO.Util.GetNormalizedOSPath(SelectedItem.ExplorerControl.CurrentPath));
-        //}
-
-        //private void TextBox_KeyDown(object sender, KeyEventArgs e)
-        //{
-        //if (e.Key == Key.Enter)
-
-        //SelectedItem.ExplorerControl.Open(WinCopies.IO.Util.GetNormalizedOSPath(SelectedItem.ExplorerControl.CurrentPath));
-        // new WinCopies.IO.ShellObjectInfo(Microsoft.WindowsAPICodePack.Shell.ShellObject.FromParsingName(WinCopies.IO.Util.GetNormalizedOSPath(WinCopies.GUI.Explorer.ExplorerControl.CurrentPath)), WinCopies.IO.Util.GetNormalizedOSPath(WinCopies.GUI.Explorer.ExplorerControl.CurrentPath), WinCopies.IO.SpecialFolders)
-        //}
-
-        //private void PreviousButton_Click(object sender, RoutedEventArgs e) => SelectedItem.ExplorerControl.Navigate(SelectedItem.ExplorerControl.HistorySelectedIndex - 1);
-
-        //private void ForwardButton_Click(object sender, RoutedEventArgs e) => SelectedItem.ExplorerControl.Navigate(SelectedItem.ExplorerControl.HistorySelectedIndex + 1);
-
-        private void RestoreTab_Executed(object sender, ExecutedRoutedEventArgs e) => Restore_Tab((ValueObject<IBrowsableObjectInfo>)e.Parameter);
-
-        private void FileProperties_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = (SelectedItem.Value.SelectedItem is IO.ShellObjectInfo && SelectedItem.Value.SelectedItems.Count == 1) || (SelectedItem.Value is IO.ShellObjectInfo && SelectedItem.Value.SelectedItems.Count == 0);
-
-        private void FileProperties_Executed(object sender, ExecutedRoutedEventArgs e) => new FilePropertiesDialog((IO.ShellObjectInfo)SelectedItem.Value.SelectedItem ?? (IO.ShellObjectInfo)SelectedItem.Value).ShowDialog();
-
-        private void CloseTab_CanExecute(object sender, CanExecuteRoutedEventArgs e) => OnCloseTab_CanExecute(this, e);
-
-        internal static void OnCloseTab_CanExecute(MainWindow mainWindow, CanExecuteRoutedEventArgs e) => e.CanExecute = mainWindow.Items.Count > 1;
-
-        private void CloseTab_Executed(object sender, ExecutedRoutedEventArgs e) => OnCloseTab_Executed(this, e);
-
-        internal static void OnCloseTab_Executed(MainWindow mainWindow, ExecutedRoutedEventArgs e)
-
-        {
-
-            ValueObject<IBrowsableObjectInfo> item = (ValueObject<IBrowsableObjectInfo>)e.Parameter;
-
-            if (item == null)
-
-                item = mainWindow.SelectedItem;
-
-            if (item.Value.ItemsLoader != null && item.Value.ItemsLoader.IsBusy)
-
-                item.Value.ItemsLoader.Cancel();
-
-            item.Value.Dispose();
-
-            var tabItem = mainWindow.GetVisualTabItem(item);
-
-            mainWindow.History.Add(new HistoryItemData(tabItem.PART_ExplorerControl.Header, tabItem.PART_ExplorerControl.Path, new ScrollViewerOffset(tabItem.PART_ExplorerControl.ListView.ScrollHost.HorizontalOffset, tabItem.PART_ExplorerControl.ListView.ScrollHost.VerticalOffset), null));
-
-            mainWindow.Items.Remove(item);
-
-        }
-
-        private TabItem GetVisualTabItem(ValueObject<IBrowsableObjectInfo> item) => (TabItem)TabControl.ItemContainerGenerator.ContainerFromItem(item);
-
-        private void CloseAllTabs_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = Items.Count > 1;
-
-        private void CloseAllTabs_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
-            for (int i = 0; i < Items.Count;)
-
-                if (Items[i].Value.IsSelected)
-
-                    i++;
-
-                else
-
-                {
-
-                    Items[i].Value.Dispose();
-
-                    Items.RemoveAt(i);
-
-                }
-
-        }
-
-        // private void Window_Loaded(object sender, RoutedEventArgs e) => New_Tab();
-
-        private void MenuItem_Click_1(object sender, RoutedEventArgs e) => new About().ShowDialog();
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            System.Collections.ObjectModel.ObservableCollection<ExplorerControlBrowsableObjectInfoViewModel> paths = ((MainWindowViewModel)DataContext).Paths;
+
+            if (!IsClosing && paths.Count > 1 && MessageBox.Show(this, Properties.Resources.WindowClosingMessage, "WinCopies", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) != MessageBoxResult.Yes)
+
+                e.Cancel = true;
 
             base.OnClosing(e);
-
-            foreach (ValueObject<IBrowsableObjectInfo> item in Items)
-
-                item.Value.ItemsLoader.Cancel();
-
-            if (((System.Collections.IEnumerable)((App)Application.Current).Windows).OfType<MainWindow>().Count() > 1)
-
-                foreach (ValueObject<IBrowsableObjectInfo> item in Items)
-
-                    item.Value.Dispose();
-
         }
 
-        private void TabControl_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void CloseWindow_CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Close();
 
-            TabItem item = null;
+            e.Handled = true;
+        }
 
-            if (e.AddedItems.Count > 0)
+        private void Quit_CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            System.Collections.Generic.LinkedList<MainWindow> openWindows = _OpenWindows;
+
+            if (openWindows.Count == 1 || MessageBox.Show(this, Properties.Resources.ApplicationClosingMessage, "WinCopies", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
 
             {
 
-                item = (TabItem)TabControl.ItemContainerGenerator.ContainerFromItem(e.AddedItems[0]);
+                IsClosing = true;
 
-                if (item != null)
-
+                while (openWindows.Count > 0)
                 {
+                    openWindows.First.Value.Close();
 
-                    item.PART_ExplorerControl.VisibleItemsCountChanged += PART_ExplorerControl_VisibleItemsCountChanged;
-
-                    SetValue(SelectedItemVisibleItemsCountPropertyKey, item.PART_ExplorerControl.VisibleItemsCount);
-
+                    openWindows.RemoveFirst();
                 }
 
             }
 
-            if (e.RemovedItems.Count > 0)
-
-            {
-
-                item = (TabItem)TabControl.ItemContainerGenerator.ContainerFromItem(e.RemovedItems[0]);
-
-                if (item != null)
-
-                    item.PART_ExplorerControl.VisibleItemsCountChanged -= PART_ExplorerControl_VisibleItemsCountChanged;
-
-            }
-
+            e.Handled = true;
         }
 
-        private void PART_ExplorerControl_VisibleItemsCountChanged(object sender, RoutedEventArgs<ValueChangedEventArgs<int>> e) => SetValue(SelectedItemVisibleItemsCountPropertyKey, e.OriginalEventArgs.NewValue);
-
-        private void Rename_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void About_CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            _ = new About().ShowDialog();
 
-            InputBox inputBox = new InputBox();
-
-            IO.IBrowsableObjectInfo browsableObject = (ActionsFromObjects)e.Parameter == ActionsFromObjects.ListView ? SelectedItem.Value.SelectedItem ?? SelectedItem.Value : (IBrowsableObjectInfo)((TabItem)TabControl.ItemContainerGenerator.ContainerFromIndex(TabControl.SelectedIndex)).PART_ExplorerControl.TreeView.SelectedItem;
-
-            inputBox.Text = browsableObject.Name;
-
-            // inputBox.Command = WinCopies.Util.Commands.FileSystemCommands.Rename;
-
-            // inputBox.CommandBindings.Add(new CommandBinding(WinCopies.Util.Commands.FileSystemCommands.Rename, (object _sender, ExecutedRoutedEventArgs _e) => { }, InputBox_Command_CanExecute));
-
-            if (inputBox.ShowDialog() == true)
-
-                browsableObject.Rename(inputBox.Text);
-
+            e.Handled = true;
         }
 
-        private void CloseWindow_Executed(object sender, ExecutedRoutedEventArgs e) => Close();
+        private void SubmitABug_CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            string url = "https://github.com/pierresprim/WinCopies/issues";
 
-        private void OpenInSystemFileExplorer_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = SelectedItem.Value is ArchiveItemInfo archiveItemInfo ? archiveItemInfo.ArchiveShellObject.Path.ToLower().EndsWith(".zip") : true;
+            // https://brockallen.com/2016/09/24/process-start-for-urls-on-net-core/
 
-        private void OpenInSystemFileExplorer_Executed(object sender, ExecutedRoutedEventArgs e) => Process.Start("explorer.exe", SelectedItem.Value.Path);
+            //try
+            //{
+            //    Process.Start(url);
+            //}
+            //catch
+            //{
+            // hack because of this: https://github.com/dotnet/corefx/issues/10361
+            //if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            //{
+            url = url.Replace("&", "^&");
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+            //}
+            //    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            //    {
+            //        Process.Start("xdg-open", url);
+            //    }
+            //    else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            //    {
+            //        Process.Start("open", url);
+            //    }
+            //    else
+            //    {
+            //        throw;
+            //    }
+            //}
 
-        //private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        //{
-
-        //    if (!(SelectedItem.Value.SelectedItems.Count > 1 && FileOperation.QueryRecycleBinInfo(System.IO.Path.GetPathRoot(SelectedItem.Value.Path), out RecycleBinInfo recycleBinInfo)) && GetFileSystemOperation_CanExecute("FileSystemItemCommand") && SelectedItem.Value.SelectedItem.FileType != IO.FileType.Drive) e.CanExecute = true;
-
-        //}
-
-        //private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
-        //{
-
-        //}
-
-        //private void FileSystemOperationMenuItem_Loaded(object sender, RoutedEventArgs e) => ((System.Windows.Controls.MenuItem)sender).CommandTarget = GetVisualTabItem(SelectedItem)?.PART_ExplorerControl;
-
-
-
-        //private void TabItem_Loaded(object sender, RoutedEventArgs e)
-        //{
-
-        //    GetExplorerControl((TabItem) sender).Navigate(WinCopies.IO.Util.GetNormalizedOSPath(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)), true);
-
-        //}
-
-        //private void GetExplorerControl_Loaded(object sender, RoutedEventArgs e)
-        //{
-        //    GetExplorerControl((TabItem) sender).
-        //}
-
-        //private void Open_Executed(object sender, ExecutedRoutedEventArgs e)
-
-        //{
-
-        //    var selectedFolders = SelectedItems.Count((IBrowsableObjectInfo _path) => _path.FileType == FileTypes.Folder || _path.FileType == FileTypes.Drive || _path.FileType == FileTypes.Archive);
-
-        //    foreach (IBrowsableObjectInfo path in SelectedItems)
-
-        //    {
-
-        //        if (path.FileType == FileTypes.Folder || path.FileType == FileTypes.Drive || path.FileType == FileTypes.Archive)
-
-        //            if (selectedFolders > 1)
-
-        //            {
-
-
-
-        //            }
-
-        //    }
-
-        //}
-    }
-
-    public static class Commands
-    {
-
-        #region File menu commands
-
-        public static RoutedUICommand OpenInSystemFileExplorer { get; } = new RoutedUICommand((string)Application.Current.Resources[nameof(OpenInSystemFileExplorer)], nameof(OpenInSystemFileExplorer), typeof(Commands));
-
-        public static RoutedUICommand Quit { get; } = new RoutedUICommand((string)Application.Current.Resources[nameof(Quit)], nameof(Quit), typeof(Commands), new InputGestureCollection() { new KeyGesture(Key.Q, ModifierKeys.Control) });
-
-        #endregion
-
-        public static RoutedUICommand ExtractArchive { get; } = new RoutedUICommand((string)Application.Current.Resources[nameof(ExtractArchive)], nameof(ExtractArchive), typeof(Commands), new InputGestureCollection() { new KeyGesture(Key.E, ModifierKeys.Control) });
-
-        #region View menu commands
-
-        public static RoutedUICommand SizeOne { get; } = new RoutedUICommand("1", nameof(SizeOne), typeof(Commands), new InputGestureCollection() { new KeyGesture(Key.D1, ModifierKeys.Control | ModifierKeys.Shift) });
-
-        public static RoutedUICommand SizeTwo { get; } = new RoutedUICommand("2", nameof(SizeTwo), typeof(Commands), new InputGestureCollection() { new KeyGesture(Key.D2, ModifierKeys.Control | ModifierKeys.Shift) });
-
-        public static RoutedUICommand SizeThree { get; } = new RoutedUICommand("3", nameof(SizeThree), typeof(Commands), new InputGestureCollection() { new KeyGesture(Key.D3, ModifierKeys.Control | ModifierKeys.Shift) });
-
-        public static RoutedUICommand SizeFour { get; } = new RoutedUICommand("4", nameof(SizeFour), typeof(Commands), new InputGestureCollection() { new KeyGesture(Key.D4, ModifierKeys.Control | ModifierKeys.Shift) });
-
-        public static RoutedUICommand ListViewStyle { get; } = new RoutedUICommand((string)Application.Current.Resources[nameof(ListViewStyle)], nameof(ListViewStyle), typeof(Commands), new InputGestureCollection() { new KeyGesture(Key.D5, ModifierKeys.Control | ModifierKeys.Shift) });
-
-        public static RoutedUICommand DetailsViewStyle { get; } = new RoutedUICommand((string)Application.Current.Resources[nameof(DetailsViewStyle)], nameof(DetailsViewStyle), typeof(Commands), new InputGestureCollection() { new KeyGesture(Key.D6, ModifierKeys.Control | ModifierKeys.Shift) });
-
-        public static RoutedUICommand TileViewStyle { get; } = new RoutedUICommand((string)Application.Current.Resources[nameof(TileViewStyle)], nameof(TileViewStyle), typeof(Commands), new InputGestureCollection() { new KeyGesture(Key.D7, ModifierKeys.Control | ModifierKeys.Shift) });
-
-        public static RoutedUICommand ContentViewStyle { get; } = new RoutedUICommand((string)Application.Current.Resources[nameof(ContentViewStyle)], nameof(ContentViewStyle), typeof(Commands), new InputGestureCollection() { new KeyGesture(Key.D8, ModifierKeys.Control | ModifierKeys.Shift) });
-
-        #endregion
-
-        public static RoutedUICommand RestoreTab { get; } = new RoutedUICommand((string)Application.Current.Resources[nameof(RestoreTab)], nameof(RestoreTab), typeof(Commands), new InputGestureCollection() { new KeyGesture(Key.T, ModifierKeys.Control | ModifierKeys.Shift) });
-
+            e.Handled = true;
+        }
     }
 }

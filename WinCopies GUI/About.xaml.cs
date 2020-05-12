@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Documents;
 
-namespace WinCopies.GUI
+namespace WinCopies
 {
     /// <summary>
     /// Logique d'interaction pour About.xaml
@@ -12,7 +12,7 @@ namespace WinCopies.GUI
     public partial class About : WinCopies.GUI.Windows.Dialogs.DialogWindow
     {
 
-        private static string GetVersion() => "Version " + FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+        private static string GetVersion() => $"Version {FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion} Beta";
 
         private static readonly DependencyPropertyKey VersionPropertyKey = DependencyProperty.RegisterReadOnly("Version", typeof(string), typeof(About), new PropertyMetadata(GetVersion()));
 
@@ -32,7 +32,7 @@ namespace WinCopies.GUI
 
             var w = new StreamWriter(s);
 
-            w.Write(Properties.Resources.gpl);
+            w.Write(Properties.Resources.gpl_3_0);
 
             var textRange = new TextRange(RTB.Document.ContentStart, RTB.Document.ContentEnd);
 

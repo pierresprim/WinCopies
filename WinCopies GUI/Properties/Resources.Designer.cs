@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WinCopies.GUI.Properties {
+namespace WinCopies.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace WinCopies.GUI.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WinCopies.GUI.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WinCopies.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,102 +61,110 @@ namespace WinCopies.GUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to _About....
         /// </summary>
-        internal static System.Drawing.Bitmap application_view_columns {
+        internal static string About {
             get {
-                object obj = ResourceManager.GetObject("application_view_columns", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("About", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to Opens the About dialog box..
         /// </summary>
-        internal static System.Drawing.Bitmap application_view_detail {
+        internal static string AboutStatusBarLabel {
             get {
-                object obj = ResourceManager.GetObject("application_view_detail", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("AboutStatusBarLabel", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to You have multiple windows open. Are you sure you want to close the application?.
         /// </summary>
-        internal static System.Drawing.Bitmap application_view_list {
+        internal static string ApplicationClosingMessage {
             get {
-                object obj = ResourceManager.GetObject("application_view_list", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("ApplicationClosingMessage", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to Close _all tabs.
         /// </summary>
-        internal static System.Drawing.Bitmap application_view_tile {
+        internal static string CloseAllTabs {
             get {
-                object obj = ResourceManager.GetObject("application_view_tile", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("CloseAllTabs", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to Closes all tabs..
         /// </summary>
-        internal static System.Drawing.Bitmap application_window_add {
+        internal static string CloseAllTabsStatusBarLabel {
             get {
-                object obj = ResourceManager.GetObject("application_window_add", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("CloseAllTabsStatusBarLabel", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to Close other _tabs.
         /// </summary>
-        internal static System.Drawing.Bitmap bug {
+        internal static string CloseOtherTabs {
             get {
-                object obj = ResourceManager.GetObject("bug", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("CloseOtherTabs", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to Closes all tabs but the current one..
         /// </summary>
-        internal static System.Drawing.Bitmap cut {
+        internal static string CloseOtherTabsStatusBarLabel {
             get {
-                object obj = ResourceManager.GetObject("cut", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("CloseOtherTabsStatusBarLabel", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to _Close tab.
         /// </summary>
-        internal static System.Drawing.Bitmap door_out {
+        internal static string CloseTab {
             get {
-                object obj = ResourceManager.GetObject("door_out", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("CloseTab", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to Closes the current tab..
         /// </summary>
-        internal static System.Drawing.Bitmap folder {
+        internal static string CloseTabStatusBarLabel {
             get {
-                object obj = ResourceManager.GetObject("folder", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("CloseTabStatusBarLabel", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to Close _window.
         /// </summary>
-        internal static System.Drawing.Bitmap folder_add {
+        internal static string CloseWindow {
             get {
-                object obj = ResourceManager.GetObject("folder_add", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("CloseWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Closes the window..
+        /// </summary>
+        internal static string CloseWindowStatusBarLabel {
+            get {
+                return ResourceManager.GetString("CloseWindowStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _File.
+        /// </summary>
+        internal static string File {
+            get {
+                return ResourceManager.GetString("File", resourceCulture);
             }
         }
         
@@ -173,99 +181,124 @@ namespace WinCopies.GUI.Properties {
         ///&gt;\par}
         ///{\pard \ql \f0 \sa180 \li0 \fi0 Everyone is permitted to co [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string gpl {
+        internal static string gpl_3_0 {
             get {
-                return ResourceManager.GetString("gpl", resourceCulture);
+                return ResourceManager.GetString("gpl_3_0", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to _Help.
         /// </summary>
-        internal static System.Drawing.Bitmap information {
+        internal static string Help {
             get {
-                object obj = ResourceManager.GetObject("information", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("Help", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+        ///&lt;menus&gt;
+        ///  &lt;menu Resource=&quot;File&quot;&gt;
+        ///    &lt;menu Resource=&quot;NewTab&quot; /&gt;
+        ///    &lt;menu Resource=&quot;NewWindow&quot; /&gt;
+        ///    &lt;menu Resource=&quot;CloseTab&quot; /&gt;
+        ///    &lt;menu Resource=&quot;CloseOtherTabs&quot; /&gt;
+        ///    &lt;menu Resource=&quot;CloseAllTabs&quot; /&gt;
+        ///    &lt;menu Resource=&quot;CloseWindow&quot; /&gt;
+        ///    &lt;menu Resource=&quot;Quit&quot; /&gt;
+        ///  &lt;/menu&gt;
+        ///  &lt;menu Resource=&quot;Help&quot;&gt;
+        ///    &lt;menu Resource=&quot;About&quot; /&gt;
+        ///    &lt;menu Resource=&quot;SubmitABug&quot; /&gt;
+        ///  &lt;/menu&gt;
+        ///&lt;/menus&gt;
+        ///.
         /// </summary>
-        internal static System.Drawing.Bitmap page_copy {
+        internal static string Menus {
             get {
-                object obj = ResourceManager.GetObject("page_copy", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("Menus", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to _New tab.
         /// </summary>
-        internal static System.Drawing.Bitmap page_paste {
+        internal static string NewTab {
             get {
-                object obj = ResourceManager.GetObject("page_paste", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("NewTab", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to Opens new tab..
         /// </summary>
-        internal static System.Drawing.Bitmap page_white_delete {
+        internal static string NewTabStatusBarLabel {
             get {
-                object obj = ResourceManager.GetObject("page_white_delete", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("NewTabStatusBarLabel", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to New _window....
         /// </summary>
-        internal static System.Drawing.Bitmap page_white_wrench {
+        internal static string NewWindow {
             get {
-                object obj = ResourceManager.GetObject("page_white_wrench", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("NewWindow", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to Opens new window..
         /// </summary>
-        internal static System.Drawing.Bitmap tab_add {
+        internal static string NewWindowStatusBarLabel {
             get {
-                object obj = ResourceManager.GetObject("tab_add", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("NewWindowStatusBarLabel", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to _Quit.
         /// </summary>
-        internal static System.Drawing.Bitmap tab_delete {
+        internal static string Quit {
             get {
-                object obj = ResourceManager.GetObject("tab_delete", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("Quit", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to Closes all windows of the current process..
         /// </summary>
-        internal static System.Drawing.Bitmap textfield_rename {
+        internal static string QuitStatusBarLabel {
             get {
-                object obj = ResourceManager.GetObject("textfield_rename", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("QuitStatusBarLabel", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to Submit a _bug....
         /// </summary>
-        internal static System.Drawing.Bitmap wrench {
+        internal static string SubmitABug {
             get {
-                object obj = ResourceManager.GetObject("wrench", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("SubmitABug", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens your default browser at the WinCopies&apos; GitHub page..
+        /// </summary>
+        internal static string SubmitABugStatusBarLabel {
+            get {
+                return ResourceManager.GetString("SubmitABugStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have multiple tabs open. Are you sure you want to close the window?.
+        /// </summary>
+        internal static string WindowClosingMessage {
+            get {
+                return ResourceManager.GetString("WindowClosingMessage", resourceCulture);
             }
         }
     }

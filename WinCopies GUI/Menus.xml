@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<menus>
+  <menu Resource="File">
+    <menu Resource="NewTab" />
+    <menu Resource="NewWindow" />
+    <menu Resource="CloseTab" />
+    <menu Resource="CloseOtherTabs" />
+    <menu Resource="CloseAllTabs" />
+    <menu Resource="CloseWindow" />
+    <menu Resource="Quit" />
+  </menu>
+  <menu Resource="Help">
+    <menu Resource="About" />
+    <menu Resource="SubmitABug" />
+  </menu>
+</menus>
