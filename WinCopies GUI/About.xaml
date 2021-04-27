@@ -4,8 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WinCopies"
-        xmlns:dialogs="clr-namespace:WinCopies.GUI.Windows.Dialogs;assembly=WinCopies.GUI.Windows"
-                    xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
+        xmlns:dialogs="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
+                    xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
         mc:Ignorable="d"
         Title="About" Height="450" Width="800" DialogButton="OK">
     <Grid>
@@ -21,18 +21,18 @@
             <TextBlock Text="WinCopies" />
             <TextBlock Text="®" FontFamily="Times New Roman" >
                 <TextBlock.LayoutTransform>
-                    <!-- Typography.Variants="Superscript" didn't work -->
                     <TransformGroup>
                         <ScaleTransform ScaleX=".75" ScaleY=".75"/>
                         <TranslateTransform Y="-5"/>
                     </TransformGroup>
-                </TextBlock.LayoutTransform></TextBlock>
+                </TextBlock.LayoutTransform>
+            </TextBlock>
         </StackPanel>
         <Label Grid.Row="1" Content="{Binding Version}" />
-        <TextBlock Grid.Row="2" TextWrapping="Wrap">WinCopies is a free software distributed under the GNU GPL (version 3 or later, at your option) license.</TextBlock>
+        <TextBlock Grid.Row="2" TextWrapping="Wrap">WinCopies is free software distributed under the GNU GPL (version 3 or later, at your option) license.</TextBlock>
         <ScrollViewer Grid.Row="3">
             <TextBlock TextWrapping="Wrap" >
-            <Run Text="Copyright (C) 2020 Pierre Sprimont" />    
+            <Run Text="Copyright (C) 2021 Pierre Sprimont" />    
             <LineBreak />
     <Run Text="This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version." />
             <LineBreak />

@@ -2,34 +2,37 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <RootNamespace>WinCopies</RootNamespace>
     <UseWPF>true</UseWPF>
     <AssemblyName>WinCopies</AssemblyName>
-    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionPrefix>2.0</VersionPrefix>
     <VersionSuffix>beta</VersionSuffix>
     <ApplicationIcon>WinCopies.ico</ApplicationIcon>
     <Authors>Pierre Sprimont</Authors>
-    <Description>File explorer software (beta)</Description>
-    <Copyright>Copyright © Pierre Sprimont 2020</Copyright>
+    <Description>File explorer software (alpha)</Description>
+    <Copyright>Copyright © Pierre Sprimont 2021</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageProjectUrl>https://wincopies.com</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/pierresprim/WinCopies.git</RepositoryUrl>
-    <RepositoryType>Git</RepositoryType>
-    <PackageReleaseNotes>See Changelog</PackageReleaseNotes>
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryUrl></RepositoryUrl>
+    <RepositoryType></RepositoryType>
+    <PackageReleaseNotes></PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.GUI.Icons" Version="2.2.0-preview4" />
-    <PackageReference Include="WinCopies.GUI.IO" Version="2.2.0-preview4" />
-    <PackageReference Include="WinCopies.GUI.Windows" Version="2.2.0-preview4" />
-    <PackageReference Include="WinCopies.PushBinding" Version="1.2.2" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="2.2.0-preview4" />
+    <PackageReference Include="WinCopies.GUI.Icons" Version="3.0.0-preview" />
+    <PackageReference Include="WinCopies.GUI.Templates" Version="3.0.0-preview" />
+    <PackageReference Include="WinCopies.IO" Version="3.1.0-preview" />
+    <PackageReference Include="WinCopies.GUI.IO" Version="3.1.0-preview" />
+    <PackageReference Include="WinCopies.Collections" Version="3.6.0-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.6.0-preview" />
+    <!--<PackageReference Include="WinCopies.GUI" Version="3.0.0-preview" />
+    <PackageReference Include="WinCopies.Util" Version="3.4.0-preview" />-->
   </ItemGroup>
 
   <ItemGroup>

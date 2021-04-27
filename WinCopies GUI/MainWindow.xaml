@@ -4,81 +4,30 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WinCopies"
-        xmlns:util="clr-namespace:WinCopies.Util;assembly=WinCopies.Util.Desktop"
-        xmlns:commands="clr-namespace:WinCopies.Util.Commands;assembly=WinCopies.Util.Desktop"
-        xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI.Controls"
-        xmlns:io="clr-namespace:WinCopies.GUI.IO;assembly=WinCopies.GUI.IO"
-        xmlns:pushBinding="clr-namespace:PushBindingExtension;assembly=WinCopies.PushBinding"
+        xmlns:util="clr-namespace:WinCopies;assembly=WinCopies.Util.Desktop"
+        xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
+        xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
+        xmlns:io="clr-namespace:WinCopies.GUI.IO.ObjectModel;assembly=WinCopies.GUI.IO"
+        xmlns:pushBinding="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
+        xmlns:media="clr-namespace:System.Windows.Media;assembly=PresentationCore"
         mc:Ignorable="d"
-        d:DesignHeight="300" d:DesignWidth="400" Title="{Binding SelectedItem.Path.Name, StringFormat={}{0} - WinCopies Beta}" Icon="{Binding SelectedItem.Path.SmallBitmapSource}">
+        d:DesignHeight="300" d:DesignWidth="400" Title="{Binding SelectedItem.Path.Name, StringFormat={}{0} - WinCopies Alpha}" Icon="{Binding SelectedItem.Path.SmallBitmapSource}">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="Menu.Static.Foreground" Color="#FF212121"/>
-        <SolidColorBrush x:Key="Menu.Disabled.Foreground" Color="#FF707070"/>
-        <SolidColorBrush x:Key="MenuItem.Selected.Background" Color="#3D26A0DA"/>
-        <SolidColorBrush x:Key="MenuItem.Selected.Border" Color="#FF26A0DA"/>
-        <SolidColorBrush x:Key="MenuItem.Highlight.Background" Color="#3D26A0DA"/>
-        <SolidColorBrush x:Key="MenuItem.Highlight.Border" Color="#FF26A0DA"/>
-        <SolidColorBrush x:Key="MenuItem.Highlight.Disabled.Background" Color="#0A000000"/>
-        <SolidColorBrush x:Key="MenuItem.Highlight.Disabled.Border" Color="#21000000"/>
-        <Geometry x:Key="Checkmark">F1 M 10.0,1.2 L 4.7,9.1 L 4.5,9.1 L 0,5.2 L 1.3,3.5 L 4.3,6.1L 8.3,0 L 10.0,1.2 Z</Geometry>
-        <ControlTemplate x:Key="MenuItemTemplate" TargetType="{x:Type MenuItem}">
-            <Border x:Name="templateRoot" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Height="22" SnapsToDevicePixels="true">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition MinWidth="22" SharedSizeGroup="MenuItemIconColumnGroup" Width="Auto"/>
-                        <ColumnDefinition Width="13"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition SharedSizeGroup="MenuItemIGTColumnGroup" Width="Auto"/>
-                        <ColumnDefinition Width="20"/>
-                    </Grid.ColumnDefinitions>
-                    <Image x:Name="Icon" Source="{TemplateBinding Icon}" HorizontalAlignment="Center" Height="16" Margin="3" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center" Width="16"/>
-                    <Border x:Name="GlyphPanel" Background="{StaticResource MenuItem.Selected.Background}" BorderThickness="1" BorderBrush="{StaticResource MenuItem.Selected.Border}" ClipToBounds="False" HorizontalAlignment="Center" Height="22" Margin="-1,0,0,0" VerticalAlignment="Center" Visibility="Hidden" Width="22">
-                        <Path x:Name="Glyph" Data="{StaticResource Checkmark}" FlowDirection="LeftToRight" Fill="{StaticResource Menu.Static.Foreground}" Height="11" Width="10"/>
-                    </Border>
-                    <ContentPresenter x:Name="menuHeaderContainer" ContentSource="Header" Grid.Column="2" HorizontalAlignment="Left" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center"/>
-                    <TextBlock x:Name="menuGestureText" Grid.Column="4" Margin="{TemplateBinding Padding}" Opacity="0.7" Text="{TemplateBinding InputGestureText}" VerticalAlignment="Center"/>
-                </Grid>
-            </Border>
-            <ControlTemplate.Triggers>
-                <Trigger Property="Icon" Value="{x:Null}">
-                    <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
-                </Trigger>
-                <Trigger Property="IsChecked" Value="True">
-                    <Setter Property="Visibility" TargetName="GlyphPanel" Value="Visible"/>
-                    <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
-                </Trigger>
-                <Trigger Property="IsHighlighted" Value="True">
-                    <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Background}"/>
-                    <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Border}"/>
-                </Trigger>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="{StaticResource Menu.Disabled.Foreground}"/>
-                    <Setter Property="Fill" TargetName="Glyph" Value="{StaticResource Menu.Disabled.Foreground}"/>
-                </Trigger>
-                <MultiTrigger>
-                    <MultiTrigger.Conditions>
-                        <Condition Property="IsHighlighted" Value="True"/>
-                        <Condition Property="IsEnabled" Value="False"/>
-                    </MultiTrigger.Conditions>
-                    <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Disabled.Background}"/>
-                    <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Disabled.Border}"/>
-                </MultiTrigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate>
-
-        <Style x:Key="MenuItemBaseStyle" TargetType="{x:Type MenuItem}" x:Shared="false">
+        <Style x:Key="MenuItemBaseStyle" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}" x:Shared="false">
             <Setter Property="Header" Value="{Binding Header}" />
-            <Setter Property="ItemsSource" Value="{Binding MenuItems}" />
+            <Setter Property="ItemsSource" Value="{Binding Items}" />
             <Setter Property="ItemContainerStyle" Value="{DynamicResource MenuItemStyle}" />
         </Style>
+
+        <DataTemplate DataType="{x:Type media:ImageSource}" x:Shared="false">
+            <Image Source="{Binding}" />
+        </DataTemplate>
 
         <Style x:Key="MenuItemStyle" TargetType="{x:Type local:MenuItem}" BasedOn="{StaticResource MenuItemBaseStyle}" x:Shared="false">
             <Setter Property="Command" Value="{Binding Command}" />
             <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
             <Setter Property="CommandTarget" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" />
-            <Setter Property="Template" Value="{StaticResource MenuItemTemplate}" />
             <Setter Property="Icon" Value="{Binding Icon}" />
             <Setter Property="pushBinding:PushBindingManager.StylePushBindings">
                 <Setter.Value>
@@ -91,15 +40,21 @@
     </Window.Resources>
 
     <Window.CommandBindings>
-        <CommandBinding Command="{x:Static commands:ApplicationCommands.NewTab}" CanExecute="CommandBinding_CanExecute" Executed="NewTab_CommandBinding_Executed" />
-        <CommandBinding Command="{x:Static commands:ApplicationCommands.NewWindow}" CanExecute="CommandBinding_CanExecute" Executed="NewWindow_CommandBinding_Executed" />
-        <CommandBinding Command="{x:Static commands:ApplicationCommands.CloseTab}" CanExecute="CloseTab_CommandBinding_CanExecute" Executed="CloseTab_CommandBinding_Executed" />
-        <CommandBinding Command="{x:Static local:MainWindow.CloseOtherTabs}" CanExecute="CloseTab_CommandBinding_CanExecute" Executed="CloseOtherTabs_CommandBinding_Executed" />
-        <CommandBinding Command="{x:Static commands:ApplicationCommands.CloseAllTabs}" CanExecute="CloseTab_CommandBinding_CanExecute" Executed="CloseAllTabs_CommandBinding_Executed" />
-        <CommandBinding Command="Close" CanExecute="CommandBinding_CanExecute" Executed="CloseWindow_CommandBinding_Executed" />
-        <CommandBinding Command="{x:Static local:MainWindow.Quit}" CanExecute="CommandBinding_CanExecute" Executed="Quit_CommandBinding_Executed" />
-        <CommandBinding Command="{x:Static local:MainWindow.About}" CanExecute="CommandBinding_CanExecute" Executed="About_CommandBinding_Executed" />
-        <CommandBinding Command="{x:Static local:MainWindow.SubmitABug}" CanExecute="CommandBinding_CanExecute" Executed="SubmitABug_CommandBinding_Executed" />
+        <CommandBinding Command="{x:Static commands:ApplicationCommands.NewTab}" CanExecute="Command_CanExecute" Executed="NewTab_Executed" />
+        <CommandBinding Command="{x:Static local:MainWindow.NewRegistryTab}" CanExecute="Command_CanExecute" Executed="NewRegistryTab_Executed" />
+        <CommandBinding Command="{x:Static local:MainWindow.NewWMITab}" CanExecute="Command_CanExecute" Executed="NewWMITab_Executed" />
+        <CommandBinding Command="{x:Static commands:ApplicationCommands.NewWindow}" CanExecute="Command_CanExecute" Executed="NewWindow_Executed" />
+        <CommandBinding Command="{x:Static commands:ApplicationCommands.CloseTab}" CanExecute="CloseTab_CanExecute" Executed="CloseTab_Executed" />
+        <CommandBinding Command="{x:Static local:MainWindow.CloseOtherTabs}" CanExecute="CloseTab_CanExecute" Executed="CloseOtherTabs_Executed" />
+        <CommandBinding Command="{x:Static commands:ApplicationCommands.CloseAllTabs}" CanExecute="CloseTab_CanExecute" Executed="CloseAllTabs_Executed" />
+        <CommandBinding Command="Close" CanExecute="Command_CanExecute" Executed="CloseWindow_Executed" />
+        <CommandBinding Command="{x:Static local:MainWindow.Quit}" CanExecute="Command_CanExecute" Executed="Quit_Executed" />
+
+        <CommandBinding Command="{x:Static local:MainWindow.Copy}" CanExecute="Copy_CanExecute" Executed="Copy_Executed" />
+        <CommandBinding Command="{x:Static local:MainWindow.Paste}" CanExecute="Paste_CanExecute" Executed="Paste_Executed" />
+
+        <CommandBinding Command="{x:Static local:MainWindow.About}" CanExecute="Command_CanExecute" Executed="About_Executed" />
+        <CommandBinding Command="{x:Static local:MainWindow.SubmitABug}" CanExecute="Command_CanExecute" Executed="SubmitABug_Executed" />
     </Window.CommandBindings>
 
     <!--Title="{Binding SelectedItem.Value.Name, RelativeSource={RelativeSource Mode=Self}, StringFormat={}{0} - WinCopies, Converter={dataConverters:CoalesceConverter}, ConverterParameter=WinCopies}" Icon="{Binding SelectedItem.Value, RelativeSource={RelativeSource Mode=Self}, Converter={local:IBrowsableObjectInfoToImageSourceConverter}}" Height="350" Width="525" Closing="Window_Closing"-->
@@ -162,7 +117,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <local:Menu ItemsSource="{Binding Menu.MenuItems}" ItemContainerStyle="{StaticResource MenuItemBaseStyle}">
+        <local:Menu ItemsSource="{Binding Menu.Items}" ItemContainerStyle="{StaticResource MenuItemBaseStyle}">
             <!--<MenuItem x:Name="NewWindowMenuItem" Header="{StaticResource NewWindow}" Command="{x:Static commands:ApplicationCommands.NewWindow}">
                     <MenuItem.Icon>
                         <Image Source="Resources/application_window_add.png" />

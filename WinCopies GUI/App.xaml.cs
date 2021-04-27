@@ -1,44 +1,80 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Windows;
+﻿/* Copyright © Pierre Sprimont, 2020
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-//using WinCopies.GUI.Explorer;
-//using WinCopies.SettingsManagement;
-//using WinCopies.Util;
-using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
-using System.Runtime.InteropServices;
-using System.Windows.Input;
-using System.Reflection;
-using WinCopies.Properties;
-using System.Collections;
+using Microsoft.WindowsAPICodePack.PortableDevices;
+using Microsoft.WindowsAPICodePack.Shell;
+using Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager;
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Interop;
+using WinCopies.Collections;
+using WinCopies.Collections.DotNetFix.Generic;
+using WinCopies.Collections.Generic;
+using WinCopies.GUI.IO.ObjectModel;
+using WinCopies.GUI.IO.Process;
+using WinCopies.IO.ObjectModel;
 
 namespace WinCopies
 {
-    // todo: replace by the WinCopies.Util ones:
-
-    public interface ICountableEnumerable : IEnumerable
+    public interface IProcessWindow
     {
-        int Count { get; }
+        public ICollection<IProcess> Processes { get; }
+
+        public void Close();
     }
 
-    public interface ICountableEnumerable<out T> : IEnumerable<T>, ICountableEnumerable { }
-
-    public class ReadOnlyLinkedList<T> : ICountableEnumerable<T>
+    public sealed class ProcessWindow : WinCopies.GUI.IO.Controls.Process.ProcessWindow, IProcessWindow
     {
-        private readonly LinkedList<T> _linkedList;
+        public static IProcessWindow Instance { get; } = new ProcessWindow();
 
-        public ReadOnlyLinkedList(LinkedList<T> linkedList) => _linkedList = linkedList;
+        ICollection<IProcess> IProcessWindow.Processes => (ICollection<IProcess>)Processes;
 
-        public int Count => _linkedList.Count;
+        private ProcessWindow()
+        {
+            var processes = new ObservableCollection<IProcess>();
 
-        public IEnumerator<T> GetEnumerator() => _linkedList.GetEnumerator();
+            processes.CollectionChanged += Processes_CollectionChanged;
 
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_linkedList).GetEnumerator();
+            Processes = processes;
+        }
+
+        private void Processes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                Show();
+
+                _ = Activate();
+            }
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+
+            WindowState = WindowState.Minimized;
+
+            e.Cancel = true;
+        }
     }
 
     /// <summary>
@@ -46,421 +82,475 @@ namespace WinCopies
     /// </summary>
     public partial class App : Application/*, INotifyPropertyChanged, ISingleInstanceApp*/
     {
+        public static IO.Process.IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
-        //protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType)
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
 
-        //{
+            BrowsableObjectInfo.RegisterDefaultSelectors();
 
-        //    (bool propertyChanged, object oldValue) = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
+            BrowsableObjectInfo.RegisterDefaultProcessSelectors();
 
-        //    if (propertyChanged) PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)); // OnPropertyChanged(propertyName, result.oldValue, newValue);
+            _OpenWindows.CollectionChanged += OpenWindows_CollectionChanged;
 
-        //}
+            OpenWindows = new UIntCountableProvider<MainWindow, IEnumeratorInfo2<MainWindow>>(() => new EnumeratorInfo<MainWindow>(_OpenWindows), () => _OpenWindows.Count);
+        }
 
-        // protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        private void OpenWindows_CollectionChanged(object sender, LinkedCollectionChangedEventArgs<MainWindow> e)
+        {
+            if ((e.Action == Collections.DotNetFix.LinkedCollectionChangedAction.Remove && OpenWindows.Count == 0) || e.Action == Collections.DotNetFix.LinkedCollectionChangedAction.Reset)
 
-        // todo:
+                ProcessWindow.Instance.Close();
+        }
 
-        //private const string Unique = "08248566-c8c4-4b19-96b7-489fe3b1049b";
+        // TODO:
+        public class CustomEnumeratorProvider<TItems, TEnumerator> : System.Collections.Generic.IEnumerable<TItems> where TEnumerator : System.Collections.Generic.IEnumerator<TItems>
+        {
+            protected Func<TEnumerator> Func { get; }
 
-        //        private FileSystemWatcher FileSystemWatcher { get; set; } = new FileSystemWatcher(Path.GetDirectoryName(SavePath)) { NotifyFilter = NotifyFilters.LastWrite, IncludeSubdirectories = false, Filter = "settings.settings", EnableRaisingEvents = true };
+            public CustomEnumeratorProvider(in Func<TEnumerator> func) => Func = func;
 
-        //        public bool IsFirstInstance { get; private set; } = false;
+            public TEnumerator GetEnumerator() => Func();
 
-        //#if DEBUG
-        //        private ObservableCollection<string> _args = null;
+            System.Collections.Generic.IEnumerator<TItems> System.Collections.Generic.IEnumerable<TItems>.GetEnumerator() => Func();
 
-        //        public ObservableCollection<string> Args { get => _args; set { _args = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Args))); } }
-        //#endif
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => Func();
+        }
 
-        //public Common CommonProperties { get; } = new Common(true);
+        public class UIntCountableProvider<TItems, TEnumerator> : CustomEnumeratorProvider<TItems, TEnumerator>, IUIntCountableEnumerable<TItems> where TEnumerator : IEnumeratorInfo2<TItems>
+        {
+            private Func<uint> CountFunc { get; }
 
-        //public Ergonomics ErgonomicsProperties { get; } = new Ergonomics(true);
+            uint IUIntCountable.Count => CountFunc();
 
-        //public IOOperations IOOperationsProperties { get; } = new IOOperations(true);
+            public UIntCountableProvider(in Func<TEnumerator> func, in Func<uint> countFunc) : base(func) => CountFunc = countFunc;
 
-        public static bool IsClosing { get; internal set; } = false;
+            IUIntCountableEnumerator<TItems> IUIntCountableEnumerable<TItems, IUIntCountableEnumerator<TItems>>.GetEnumerator() => new UIntCountableEnumeratorInfo<TItems>(GetEnumerator(), CountFunc);
+        }
 
-        internal static LinkedList<MainWindow> _OpenWindows { get; } = new LinkedList<MainWindow>();
+        public static ClientVersion ClientVersion { get; } = new ClientVersion(Assembly.GetExecutingAssembly().GetName());
 
-        public static ICountableEnumerable<MainWindow> OpenWindows { get; } = new ReadOnlyLinkedList<MainWindow>(_OpenWindows);
+        public  bool IsClosing { get; internal set; } = false;
 
-       public static ImmutableArray<PropertyInfo> ResourceProperties { get; } = ImmutableArray.Create(typeof(Resources).GetProperties(BindingFlags.NonPublic | BindingFlags.Static));
+        internal  ObservableLinkedCollection<MainWindow> _OpenWindows { get; } = new ObservableLinkedCollection<MainWindow>();
 
-        //public event PropertyChangedEventHandler PropertyChanged;
+        public  IUIntCountableEnumerable<MainWindow> OpenWindows { get; internal set; }
 
-        //public App()
+        public static new App Current => (App)Application.Current;
 
-        //{
+        public static ImmutableArray<PropertyInfo> ResourceProperties { get; } = ImmutableArray.Create(typeof(Properties.Resources).GetProperties(BindingFlags.NonPublic | BindingFlags.Static));
 
-        //    foreach (CheckableObject item in CommonProperties.KnownExtensionsToOpenDirectly)
+        public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfo browsableObjectInfo) => ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(browsableObjectInfo));
 
-        //        item.PropertyChanged += Item_PropertyChanged;
+        public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel() => GetDefaultExplorerControlBrowsableObjectInfoViewModel(new ShellObjectInfo(KnownFolders.Desktop, ClientVersion));
 
-        //}
+        /*protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType)
 
-        //private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        //{
+        {
 
-        //    // todo
+            (bool propertyChanged, object oldValue) = ((INotifyPropertyChanged)this).SetProperty(propertyName, fieldName, newValue, declaringType);
 
-        //}
+            if (propertyChanged) PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)); // OnPropertyChanged(propertyName, result.oldValue, newValue);
 
-        //static async System.Threading.Tasks.Task DefaultLaunchAsync()
-        //{
-        //    // Path to the file in the app package to launch
-        //    string imageFile = "C:\\Users\\pierr\\Desktop\\DVD2-1218-640.png";
+        }
 
-        //    var file = StorageFile.GetFileFromPathAsync(imageFile);
+         protected virtual void OnPropertyChanged(string propertyName, object oldValue, object newValue) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        //    file.Completed = (IAsyncOperation<StorageFile> asyncInfo, AsyncStatus asyncStatus) =>
-        //    {
-        //        var sto = asyncInfo.GetResults();
-        //        if (sto != null)
-        //        {
-        //            // Set the option to show the picker
-        //            var options = new LauncherOptions
-        //            {
+         todo:
 
-        //                DisplayApplicationPicker = false
-        //            };
+        private const string Unique = "08248566-c8c4-4b19-96b7-489fe3b1049b";
 
-        //            //options.PreferredApplicationPackageFamilyName = "Capture d'écran et croquis";
+                private FileSystemWatcher FileSystemWatcher { get; set; } = new FileSystemWatcher(Path.GetDirectoryName(SavePath)) { NotifyFilter = NotifyFilters.LastWrite, IncludeSubdirectories = false, Filter = "settings.settings", EnableRaisingEvents = true };
 
-        //            // Launch the retrieved file
-        //            var result = Launcher.LaunchFileAsync(sto, options);
-        //            result.Completed = (IAsyncOperation<bool> _asyncInfo, AsyncStatus _asyncStatus) =>
-        //            {
+                public bool IsFirstInstance { get; private set; } = false;
 
-        //                bool r = _asyncInfo.GetResults();
+        #if DEBUG
+                private ObservableCollection<string> _args = null;
 
-        //            };
-        //            //if (success)
-        //            //{
-        //            //    // File launched
-        //            //}
-        //            //else
-        //            //{
-        //            //    // File launch failed
-        //            //}
-        //        }
-        //        else
-        //        {
-        //            // Could not find file
-        //        }
-        //    };
-        //}
+                public ObservableCollection<string> Args { get => _args; set { _args = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Args))); } }
+        #endif
 
-        //private static Dictionary<string, IReadOnlyList<AppInfo>> _appInfos = new Dictionary<string, IReadOnlyList<AppInfo>>();
+        public Common CommonProperties { get; } = new Common(true);
 
-        //public static ReadOnlyDictionary<string, IReadOnlyList<AppInfo>> AppInfos { get; } = new ReadOnlyDictionary<string, IReadOnlyList<AppInfo>>(_appInfos);
+        public Ergonomics ErgonomicsProperties { get; } = new Ergonomics(true);
 
-        //[STAThread]
-        //public static void Main()
+        public IOOperations IOOperationsProperties { get; } = new IOOperations(true);
 
-        //{
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        //    Debug.WriteLine("System.Security.Principal.WindowsIdentity.GetCurrent().User.AccountDomainSid: " + System.Security.Principal.WindowsIdentity.GetCurrent().User.Value);
+        public App()
 
-        //    // Process.Start("ms-windows-store://navigatetopage/?Id=Games");
+        {
 
-        //    // Process.Start( new ProcessStartInfo( "ms-photos:viewer?filename=\"c:\\users\\pierr\\desktop\\dvd2-1218-640.png\""));
+            foreach (CheckableObject item in CommonProperties.KnownExtensionsToOpenDirectly)
 
-        //    // DefaultLaunchAsync();
+                item.PropertyChanged += Item_PropertyChanged;
 
-        //    // var activation = (IApplicationActivationManager)new ApplicationActivationManager();
+        }
 
-        //            if (SingleInstance<App>.InitializeAsFirstInstance(Unique))
+        private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
 
-        //            {
+            // todo
 
-        //                SplashScreen splashScreen = new SplashScreen("/SplashScreen.png");
+        }
 
-        //                splashScreen.Show(false);
+        static async System.Threading.Tasks.Task DefaultLaunchAsync()
+        {
+            // Path to the file in the app package to launch
+            string imageFile = "C:\\Users\\pierr\\Desktop\\DVD2-1218-640.png";
 
-        //                application = new App();
+            var file = StorageFile.GetFileFromPathAsync(imageFile);
 
-        //                application.IsFirstInstance = true;
+            file.Completed = (IAsyncOperation<StorageFile> asyncInfo, AsyncStatus asyncStatus) =>
+            {
+                var sto = asyncInfo.GetResults();
+                if (sto != null)
+                {
+                    // Set the option to show the picker
+                    var options = new LauncherOptions
+                    {
 
-        //#if DEBUG 
-        //                application.Args = new ObservableCollection<string>();
-        //                application.Args.CollectionChanged += Args_CollectionChanged;
-        //#endif
+                        DisplayApplicationPicker = false
+                    };
 
-        //                application.Startup += Application_Startup;
-        //                application.InitializeComponent();
+                    //options.PreferredApplicationPackageFamilyName = "Capture d'écran et croquis";
 
-        //                application.MainWindow = new MainWindow();
+                    // Launch the retrieved file
+                    var result = Launcher.LaunchFileAsync(sto, options);
+                    result.Completed = (IAsyncOperation<bool> _asyncInfo, AsyncStatus _asyncStatus) =>
+                    {
 
-        //                splashScreen.Close(new TimeSpan(30000000));
-        //                application.Run();
+                        bool r = _asyncInfo.GetResults();
 
-        //                SingleInstance<App>.Cleanup();
+                    };
+                    //if (success)
+                    //{
+                    //    // File launched
+                    //}
+                    //else
+                    //{
+                    //    // File launch failed
+                    //}
+                }
+                else
+                {
+                    // Could not find file
+                }
+            };
+        }
 
-        //            }
+        private static Dictionary<string, IReadOnlyList<AppInfo>> _appInfos = new Dictionary<string, IReadOnlyList<AppInfo>>();
 
-        //            else
-        //            {
+        public static ReadOnlyDictionary<string, IReadOnlyList<AppInfo>> AppInfos { get; } = new ReadOnlyDictionary<string, IReadOnlyList<AppInfo>>(_appInfos);
 
-        //                SplashScreen splashScreen = new SplashScreen("/SplashScreen.png");
+        [STAThread]
+        public static void Main()
 
-        //                splashScreen.Show(false);
+        {
 
-        //                App app = new App();
+            Debug.WriteLine("System.Security.Principal.WindowsIdentity.GetCurrent().User.AccountDomainSid: " + System.Security.Principal.WindowsIdentity.GetCurrent().User.Value);
 
-        //                app.Startup += Application_Startup;
+            // Process.Start("ms-windows-store://navigatetopage/?Id=Games");
 
-        //                app.InitializeComponent();
+            // Process.Start( new ProcessStartInfo( "ms-photos:viewer?filename=\"c:\\users\\pierr\\desktop\\dvd2-1218-640.png\""));
 
-        //                MainWindow mainWindow = new MainWindow();
-        //                app.MainWindow = mainWindow;
-        //                // mainWindow.Show();
+            // DefaultLaunchAsync();
 
-        //                splashScreen.Close(new TimeSpan(30000000));
+            // var activation = (IApplicationActivationManager)new ApplicationActivationManager();
 
-        //                app.Run();
-        //            }
+                    if (SingleInstance<App>.InitializeAsFirstInstance(Unique))
 
-        //        }
+                    {
 
-        //#if DEBUG
-        //        private static void Args_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => Console.WriteLine(e.NewItems[0].ToString());
-        //#endif
+                        SplashScreen splashScreen = new SplashScreen("/SplashScreen.png");
 
-        //        private void AddNewArgs(IList<string> new_args)
+                        splashScreen.Show(false);
 
-        //        {
+                        application = new App();
 
-        //#if DEBUG 
-        //            foreach (string new_arg in new_args)
+                        application.IsFirstInstance = true;
 
-        //                Args.Add(new_arg);
-        //#endif
+        #if DEBUG 
+                        application.Args = new ObservableCollection<string>();
+                        application.Args.CollectionChanged += Args_CollectionChanged;
+        #endif
 
-        //            OnNewArgsAdded(new_args);
+                        application.Startup += Application_Startup;
+                        application.InitializeComponent();
 
-        //        }
+                        application.MainWindow = new MainWindow();
 
-        //private void OnNewArgsAdded(IList<string> new_args)
+                        splashScreen.Close(new TimeSpan(30000000));
+                        application.Run();
 
-        //{
+                        SingleInstance<App>.Cleanup();
 
-        //    if (new_args[0] == "/select")
+                    }
 
-        //    {
+                    else
+                    {
 
-        //        if (new_args.Count > 1)
+                        SplashScreen splashScreen = new SplashScreen("/SplashScreen.png");
 
-        //        {
+                        splashScreen.Show(false);
 
-        //            for (int i = 1; i < new_args.Count; i++)
+                        App app = new App();
 
-        //                new_args[i] = new_args[i].Replace("/", "\\");
+                        app.Startup += Application_Startup;
 
-        //            string path = new_args[1];
+                        app.InitializeComponent();
 
-        //            MainWindow mainWindow = (MainWindow)application.MainWindow;
+                        MainWindow mainWindow = new MainWindow();
+                        app.MainWindow = mainWindow;
+                        // mainWindow.Show();
 
-        //            bool alreadyPathOpen = false;
+                        splashScreen.Close(new TimeSpan(30000000));
 
-        //            foreach (IBrowsableObjectInfo browsableObject in mainWindow.Items)
+                        app.Run();
+                    }
 
-        //                if (browsableObject.Path == path)
+                }
 
-        //                {
+        #if DEBUG
+                private static void Args_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => Console.WriteLine(e.NewItems[0].ToString());
+        #endif
 
-        //                    alreadyPathOpen = true;
+                private void AddNewArgs(IList<string> new_args)
 
-        //                    browsableObject.IsSelected = true;
+                {
 
-        //                    break;
+        #if DEBUG 
+                    foreach (string new_arg in new_args)
 
-        //                }
+                        Args.Add(new_arg);
+        #endif
 
-        //            if (!alreadyPathOpen)
+                    OnNewArgsAdded(new_args);
 
-        //                mainWindow.New_Tab(new ValueObject<IBrowsableObjectInfo>(new ShellObjectInfo(ShellObject.FromParsingName(path), path)));
+                }
 
-        //            foreach (ValueObject<IBrowsableObjectInfo> shellObject in
+        private void OnNewArgsAdded(IList<string> new_args)
 
-        //                mainWindow.SelectedItem.Value.Items)
+        {
 
-        //                for (int i = 2; i <= new_args.Count - 1; i++)
+            if (new_args[0] == "/select")
 
-        //                    if (new_args[i] == Path.GetFileName(shellObject.Value.Path))
+            {
 
-        //                        shellObject.Value.IsSelected = true;
+                if (new_args.Count > 1)
 
-        //        }
+                {
 
-        //    }
+                    for (int i = 1; i < new_args.Count; i++)
 
-        //    else
+                        new_args[i] = new_args[i].Replace("/", "\\");
 
-        //    {
+                    string path = new_args[1];
 
-        //        MainWindow mainWindow = (MainWindow)application.MainWindow;
+                    MainWindow mainWindow = (MainWindow)application.MainWindow;
 
-        //        foreach (string arg in new_args)
+                    bool alreadyPathOpen = false;
 
-        //        {
+                    foreach (IBrowsableObjectInfo browsableObject in mainWindow.Items)
 
-        //            string _arg = arg.Replace("/", "\\");
+                        if (browsableObject.Path == path)
 
-        //            try
-        //            {
+                        {
 
-        //                mainWindow.New_Tab(new ValueObject<IBrowsableObjectInfo>(new ShellObjectInfo(ShellObject.FromParsingName(_arg), _arg)));
+                            alreadyPathOpen = true;
 
-        //            }
-        //            catch (ShellException)
-        //            {
+                            browsableObject.IsSelected = true;
 
-        //                MessageBox.Show("This file does not exists.");
+                            break;
 
-        //            }
+                        }
 
-        //        }
+                    if (!alreadyPathOpen)
 
-        //        if (mainWindow.Items.Count == 0)
+                        mainWindow.New_Tab(new ValueObject<IBrowsableObjectInfo>(new ShellObjectInfo(ShellObject.FromParsingName(path), path)));
 
-        //            mainWindow.New_Tab();
+                    foreach (ValueObject<IBrowsableObjectInfo> shellObject in
 
-        //    }
+                        mainWindow.SelectedItem.Value.Items)
 
-        //}
+                        for (int i = 2; i <= new_args.Count - 1; i++)
 
-        //public virtual void OnPropertyChanged(string propertyName)
-        //{
-        //    throw new NotImplementedException();
-        //}
+                            if (new_args[i] == Path.GetFileName(shellObject.Value.Path))
 
-        //public virtual void OnPropertyChanged(string propertyName, string fieldName, object previousValue, object newValue)
-        //{
-        //   WinCopies.GUI. CommonHelper.OnPropertyChangedHelper(this, propertyName, fieldName, previousValue, newValue);
+                                shellObject.Value.IsSelected = true;
 
-        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName, previousValue, newValue));
-        //}
+                }
 
-        //public virtual void OnPropertyChangedReadOnly(string propertyName, object previousValue, object newValue)
-        //{
-        //    throw new NotImplementedException();
-        //}
+            }
 
-        //public void OnPropertyChanged(string propertyName, object previousValue, object newValue)
-        //{
-        //    throw new NotImplementedException();
-        //}
+            else
 
-        //private void SetProperty(string propertyName, string fieldName, object newValue)
+            {
 
-        //{
+                MainWindow mainWindow = (MainWindow)application.MainWindow;
 
-        //    BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
-        //                 BindingFlags.Static | BindingFlags.Instance |
-        //                 BindingFlags.DeclaredOnly;
+                foreach (string arg in new_args)
 
-        //    var field = this.GetType().GetField(fieldName, flags);
+                {
 
-        //    MessageBox.Show((this == application).ToString());
+                    string _arg = arg.Replace("/", "\\");
 
-        //    MessageBox.Show((this == Application.Current).ToString());
+                    try
+                    {
 
-        //    object previousValue = field.GetValue(this);
+                        mainWindow.New_Tab(new ValueObject<IBrowsableObjectInfo>(new ShellObjectInfo(ShellObject.FromParsingName(_arg), _arg)));
 
-        //    if (!newValue.Equals(previousValue))
+                    }
+                    catch (ShellException)
+                    {
 
-        //    {
+                        MessageBox.Show("This file does not exists.");
 
-        //        field.SetValue(this, newValue);
+                    }
 
-        //        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                }
 
-        //    }
+                if (mainWindow.Items.Count == 0)
 
-        //}
+                    mainWindow.New_Tab();
 
-        //private static void Application_Startup(object sender, StartupEventArgs e)
-        //{
+            }
 
-        //    // SettingsManagement.SettingsManagement.LoadSettings(sender);    
+        }
 
-        //    ((App)sender).FileSystemWatcher.Changed += ((App)sender).FileSystemWatcher_Changed;
+        public virtual void OnPropertyChanged(string propertyName)
+        {
+            throw new NotImplementedException();
+        }
 
-        //    if (e.Args.Length > 0)
+        public virtual void OnPropertyChanged(string propertyName, string fieldName, object previousValue, object newValue)
+        {
+           WinCopies.GUI. CommonHelper.OnPropertyChangedHelper(this, propertyName, fieldName, previousValue, newValue);
 
-        //        application.AddNewArgs(e.Args);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName, previousValue, newValue));
+        }
 
-        //    // else if (!((App)sender).IsFirstInstance)
+        public virtual void OnPropertyChangedReadOnly(string propertyName, object previousValue, object newValue)
+        {
+            throw new NotImplementedException();
+        }
 
-        //    else
+        public void OnPropertyChanged(string propertyName, object previousValue, object newValue)
+        {
+            throw new NotImplementedException();
+        }
 
-        //        ((MainWindow)((App)sender).MainWindow).New_Tab();
+        private void SetProperty(string propertyName, string fieldName, object newValue)
 
-        //    // else
+        {
 
-        //    // ((MainWindow)application.MainWindow).Show();
+            BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
+                         BindingFlags.Static | BindingFlags.Instance |
+                         BindingFlags.DeclaredOnly;
 
-        //}
+            var field = this.GetType().GetField(fieldName, flags);
 
-        //DateTime OptionFileLastWriteTime { get; set; } = File.GetLastWriteTime(SavePath);
+            MessageBox.Show((this == application).ToString());
 
-        //private void FileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
+            MessageBox.Show((this == Application.Current).ToString());
 
-        //{
+            object previousValue = field.GetValue(this);
 
-        //    DateTime d = File.GetLastWriteTime(SavePath);
+            if (!newValue.Equals(previousValue))
 
-        //    if (d == OptionFileLastWriteTime)
+            {
 
-        //        return;
+                field.SetValue(this, newValue);
 
-        //    OptionFileLastWriteTime = d;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        //    // if (MessageBox.Show((string)Current.Resources["SettingsFileChanged"], "WinCopies", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            }
 
-        //    // {
+        }
 
-        //    void reloadSettings()
-        //    {
+        private static void Application_Startup(object sender, StartupEventArgs e)
+        {
 
-        //        LoadSettings(CommonProperties);
+            // SettingsManagement.SettingsManagement.LoadSettings(sender);    
 
-        //        LoadSettings(ErgonomicsProperties);
+            ((App)sender).FileSystemWatcher.Changed += ((App)sender).FileSystemWatcher_Changed;
 
-        //        LoadSettings(IOOperationsProperties);
+            if (e.Args.Length > 0)
 
-        //    }
+                application.AddNewArgs(e.Args);
 
-        //    Reload();
+            // else if (!((App)sender).IsFirstInstance)
 
-        //    if (!Current.Dispatcher.CheckAccess())
+            else
 
-        //        Current.Dispatcher.InvokeAsync(() => reloadSettings());
+                ((MainWindow)((App)sender).MainWindow).New_Tab();
 
-        //    else
+            // else
 
-        //        reloadSettings();
+            // ((MainWindow)application.MainWindow).Show();
 
-        //    // }
+        }
 
-        //}
+        DateTime OptionFileLastWriteTime { get; set; } = File.GetLastWriteTime(SavePath);
 
-        //public bool SignalExternalCommandLineArgs(IList<string> args)
-        //{
+        private void FileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
 
-        //    if (args.Count > 1)
+        {
 
-        //    {
+            DateTime d = File.GetLastWriteTime(SavePath);
 
-        //        args.RemoveAt(0);
+            if (d == OptionFileLastWriteTime)
 
-        //        AddNewArgs(args);
+                return;
 
-        //    }
+            OptionFileLastWriteTime = d;
 
-        //    return true;
+            // if (MessageBox.Show((string)Current.Resources["SettingsFileChanged"], "WinCopies", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
 
-        //}
+            // {
+
+            void reloadSettings()
+            {
+
+                LoadSettings(CommonProperties);
+
+                LoadSettings(ErgonomicsProperties);
+
+                LoadSettings(IOOperationsProperties);
+
+            }
+
+            Reload();
+
+            if (!Current.Dispatcher.CheckAccess())
+
+                Current.Dispatcher.InvokeAsync(() => reloadSettings());
+
+            else
+
+                reloadSettings();
+
+            // }
+
+        }
+
+        public bool SignalExternalCommandLineArgs(IList<string> args)
+        {
+
+            if (args.Count > 1)
+
+            {
+
+                args.RemoveAt(0);
+
+                AddNewArgs(args);
+
+            }
+
+            return true;
+
+        }*/
     }
 }

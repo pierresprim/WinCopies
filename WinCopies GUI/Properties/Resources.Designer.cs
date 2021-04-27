@@ -160,6 +160,33 @@ namespace WinCopies.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copy.
+        /// </summary>
+        internal static string Copy {
+            get {
+                return ResourceManager.GetString("Copy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copies the selected items on the Clipboard..
+        /// </summary>
+        internal static string CopyStatusBarLabel {
+            get {
+                return ResourceManager.GetString("CopyStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Edit.
+        /// </summary>
+        internal static string Edit {
+            get {
+                return ResourceManager.GetString("Edit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _File.
         /// </summary>
         internal static string File {
@@ -179,7 +206,7 @@ namespace WinCopies.Properties {
         ///https://fsf.org/
         ///}}}
         ///&gt;\par}
-        ///{\pard \ql \f0 \sa180 \li0 \fi0 Everyone is permitted to co [rest of string was truncated]&quot;;.
+        ///{\pard \ql \f0 \sa180 \li0 \fi0 Everyone is permi [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string gpl_3_0 {
             get {
@@ -200,24 +227,60 @@ namespace WinCopies.Properties {
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
         ///&lt;menus&gt;
         ///  &lt;menu Resource=&quot;File&quot;&gt;
-        ///    &lt;menu Resource=&quot;NewTab&quot; /&gt;
+        ///    &lt;menu Resource=&quot;NewTab&quot;&gt;
+        ///      &lt;menu Resource=&quot;NewFileSystemTab&quot; /&gt;
+        ///      &lt;menu Resource=&quot;NewRegistryTab&quot; /&gt;
+        ///      &lt;menu Resource=&quot;NewWMITab&quot; /&gt;
+        ///    &lt;/menu&gt;
         ///    &lt;menu Resource=&quot;NewWindow&quot; /&gt;
-        ///    &lt;menu Resource=&quot;CloseTab&quot; /&gt;
-        ///    &lt;menu Resource=&quot;CloseOtherTabs&quot; /&gt;
-        ///    &lt;menu Resource=&quot;CloseAllTabs&quot; /&gt;
+        ///    &lt;menu Resource=&quot;CloseTab&quot;&gt;
+        ///      &lt;menu Resource=&quot;CloseTab&quot; /&gt;
+        ///      &lt;menu Resource=&quot;CloseOtherTabs&quot; /&gt;
+        ///      &lt;menu Resource=&quot;CloseAllTabs&quot; /&gt;
+        ///    &lt;/menu&gt;
         ///    &lt;menu Resource=&quot;CloseWindow&quot; /&gt;
         ///    &lt;menu Resource=&quot;Quit&quot; /&gt;
-        ///  &lt;/menu&gt;
-        ///  &lt;menu Resource=&quot;Help&quot;&gt;
-        ///    &lt;menu Resource=&quot;About&quot; /&gt;
-        ///    &lt;menu Resource=&quot;SubmitABug&quot; /&gt;
-        ///  &lt;/menu&gt;
-        ///&lt;/menus&gt;
-        ///.
+        ///  &lt;/m [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Menus {
             get {
                 return ResourceManager.GetString("Menus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New file system tab.
+        /// </summary>
+        internal static string NewFileSystemTab {
+            get {
+                return ResourceManager.GetString("NewFileSystemTab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens a new tab for file system browsing..
+        /// </summary>
+        internal static string NewFileSystemTabStatusBarLabel {
+            get {
+                return ResourceManager.GetString("NewFileSystemTabStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New registry tab.
+        /// </summary>
+        internal static string NewRegistryTab {
+            get {
+                return ResourceManager.GetString("NewRegistryTab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens a new tab for Registry browsing..
+        /// </summary>
+        internal static string NewRegistryTabStatusBarLabel {
+            get {
+                return ResourceManager.GetString("NewRegistryTabStatusBarLabel", resourceCulture);
             }
         }
         
@@ -231,7 +294,7 @@ namespace WinCopies.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Opens new tab..
+        ///   Looks up a localized string similar to Open a new tab..
         /// </summary>
         internal static string NewTabStatusBarLabel {
             get {
@@ -249,11 +312,47 @@ namespace WinCopies.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Opens new window..
+        ///   Looks up a localized string similar to Opens a new window..
         /// </summary>
         internal static string NewWindowStatusBarLabel {
             get {
                 return ResourceManager.GetString("NewWindowStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New WMI tab.
+        /// </summary>
+        internal static string NewWMITab {
+            get {
+                return ResourceManager.GetString("NewWMITab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens a new tab for WMI browsing..
+        /// </summary>
+        internal static string NewWMITabStatusBarLabel {
+            get {
+                return ResourceManager.GetString("NewWMITabStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paste.
+        /// </summary>
+        internal static string Paste {
+            get {
+                return ResourceManager.GetString("Paste", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pastes the Clipboard items in the selected folder..
+        /// </summary>
+        internal static string PasteStatusBarLabel {
+            get {
+                return ResourceManager.GetString("PasteStatusBarLabel", resourceCulture);
             }
         }
         
@@ -272,6 +371,15 @@ namespace WinCopies.Properties {
         internal static string QuitStatusBarLabel {
             get {
                 return ResourceManager.GetString("QuitStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The clipboard operation did not succeeded..
+        /// </summary>
+        internal static string SetClipboardErrorMessage {
+            get {
+                return ResourceManager.GetString("SetClipboardErrorMessage", resourceCulture);
             }
         }
         
