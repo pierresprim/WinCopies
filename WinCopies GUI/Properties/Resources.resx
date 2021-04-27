@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
     <value>_About...</value>
@@ -150,10 +150,19 @@
   <data name="CloseWindowStatusBarLabel" xml:space="preserve">
     <value>Closes the window.</value>
   </data>
+  <data name="Copy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="CopyStatusBarLabel" xml:space="preserve">
+    <value>Copies the selected items on the Clipboard.</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>_Edit</value>
+  </data>
   <data name="File" xml:space="preserve">
     <value>_File</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="gpl_3_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\gpl-3.0.rtf;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
@@ -163,23 +172,50 @@
   <data name="Menus" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\menus.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="NewFileSystemTab" xml:space="preserve">
+    <value>New file system tab</value>
+  </data>
+  <data name="NewFileSystemTabStatusBarLabel" xml:space="preserve">
+    <value>Opens a new tab for file system browsing.</value>
+  </data>
+  <data name="NewRegistryTab" xml:space="preserve">
+    <value>New registry tab</value>
+  </data>
+  <data name="NewRegistryTabStatusBarLabel" xml:space="preserve">
+    <value>Opens a new tab for Registry browsing.</value>
+  </data>
   <data name="NewTab" xml:space="preserve">
     <value>_New tab</value>
   </data>
   <data name="NewTabStatusBarLabel" xml:space="preserve">
-    <value>Opens new tab.</value>
+    <value>Open a new tab.</value>
   </data>
   <data name="NewWindow" xml:space="preserve">
     <value>New _window...</value>
   </data>
   <data name="NewWindowStatusBarLabel" xml:space="preserve">
-    <value>Opens new window.</value>
+    <value>Opens a new window.</value>
+  </data>
+  <data name="NewWMITab" xml:space="preserve">
+    <value>New WMI tab</value>
+  </data>
+  <data name="NewWMITabStatusBarLabel" xml:space="preserve">
+    <value>Opens a new tab for WMI browsing.</value>
+  </data>
+  <data name="Paste" xml:space="preserve">
+    <value>Paste</value>
+  </data>
+  <data name="PasteStatusBarLabel" xml:space="preserve">
+    <value>Pastes the Clipboard items in the selected folder.</value>
   </data>
   <data name="Quit" xml:space="preserve">
     <value>_Quit</value>
   </data>
   <data name="QuitStatusBarLabel" xml:space="preserve">
     <value>Closes all windows of the current process.</value>
+  </data>
+  <data name="SetClipboardErrorMessage" xml:space="preserve">
+    <value>The clipboard operation did not succeeded.</value>
   </data>
   <data name="SubmitABug" xml:space="preserve">
     <value>Submit a _bug...</value>

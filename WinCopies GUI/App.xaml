@@ -6,6 +6,12 @@
              StartupUri="MainWindow.xaml"
               >
     <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
         <!--<sys:String x:Key="EditMenu" >_Édition</sys:String>
         <sys:String x:Key="Copy" >_Copier</sys:String>
         <sys:String x:Key="CopyStatusBarLabel" >Place les fichiers sélectionnés dans le presse-papiers.</sys:String>

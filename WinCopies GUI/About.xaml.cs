@@ -1,18 +1,36 @@
-﻿using System.Diagnostics;
+﻿/* Copyright © Pierre Sprimont, 2020
+ *
+ * This file is part of the WinCopies Framework.
+ *
+ * The WinCopies Framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The WinCopies Framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
+
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Documents;
+
+using WinCopies.GUI.Windows;
 
 namespace WinCopies
 {
     /// <summary>
     /// Logique d'interaction pour About.xaml
     /// </summary>
-    public partial class About : WinCopies.GUI.Windows.Dialogs.DialogWindow
+    public partial class About : DialogWindow
     {
-
-        private static string GetVersion() => $"Version {FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion} Beta";
+        private static string GetVersion() => $"Version {FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion} Alpha";
 
         private static readonly DependencyPropertyKey VersionPropertyKey = DependencyProperty.RegisterReadOnly("Version", typeof(string), typeof(About), new PropertyMetadata(GetVersion()));
 
@@ -21,9 +39,7 @@ namespace WinCopies
         public string Version => (string)GetValue(VersionProperty);
 
         public About()
-
         {
-
             InitializeComponent();
 
             DataContext = this;
@@ -37,8 +53,6 @@ namespace WinCopies
             var textRange = new TextRange(RTB.Document.ContentStart, RTB.Document.ContentEnd);
 
             textRange.Load(s, DataFormats.Rtf); 
-
         }
-
     }
 }
