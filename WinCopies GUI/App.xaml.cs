@@ -17,15 +17,14 @@
 
 using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
-using Microsoft.WindowsAPICodePack.Win32Native.Shell.DesktopWindowManager;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Interop;
+
 using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
