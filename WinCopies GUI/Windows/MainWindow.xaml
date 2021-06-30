@@ -8,37 +8,10 @@
         xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
         xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
         xmlns:io="clr-namespace:WinCopies.GUI.IO.ObjectModel;assembly=WinCopies.GUI.IO"
-        xmlns:pushBinding="clr-namespace:WinCopies.Util.Data;assembly=WinCopies.Util.Desktop"
         xmlns:media="clr-namespace:System.Windows.Media;assembly=PresentationCore"
+        xmlns:guiResources="clr-namespace:WinCopies.GUI.Icons.Properties;assembly=WinCopies.GUI.Icons"
         mc:Ignorable="d"
-        d:DesignHeight="300" d:DesignWidth="400" Title="{Binding SelectedItem.Path.Name, StringFormat={}{0} - WinCopies Alpha}" Icon="{Binding SelectedItem.Path.SmallBitmapSource}">
-
-    <Window.Resources>
-        <Style x:Key="MenuItemBaseStyle" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}" x:Shared="false">
-            <Setter Property="Header" Value="{Binding Header}" />
-            <Setter Property="ItemsSource" Value="{Binding Items}" />
-            <Setter Property="ItemContainerStyle" Value="{DynamicResource MenuItemStyle}" />
-        </Style>
-
-        <DataTemplate DataType="{x:Type media:ImageSource}" x:Shared="false">
-            <Image Source="{Binding}" />
-        </DataTemplate>
-
-        <Style x:Key="MenuItemStyle" TargetType="{x:Type local:MenuItem}" BasedOn="{StaticResource MenuItemBaseStyle}" x:Shared="false">
-            <Setter Property="Command" Value="{Binding Command}" />
-            <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
-            <Setter Property="CommandTarget" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" />
-            <Setter Property="Icon" Value="{Binding Icon}" />
-            <Setter Property="pushBinding:PushBindingManager.StylePushBindings">
-                <Setter.Value>
-                    <pushBinding:PushBindingCollection>
-                        <pushBinding:PushBinding TargetProperty="IsSelected" Path="IsSelected" />
-                    </pushBinding:PushBindingCollection>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
-
+        d:DesignHeight="300" d:DesignWidth="400" Title="{Binding SelectedItem.Path.Name, StringFormat={}{0} - WinCopies Alpha}" Icon="{Binding SelectedItem.Path.BitmapSources.SmallBitmapSource}">
     <Window.CommandBindings>
         <CommandBinding Command="{x:Static commands:ApplicationCommands.NewTab}" CanExecute="Command_CanExecute" Executed="NewTab_Executed" />
         <CommandBinding Command="{x:Static local:MainWindow.NewRegistryTab}" CanExecute="Command_CanExecute" Executed="NewRegistryTab_Executed" />
@@ -47,15 +20,26 @@
         <CommandBinding Command="{x:Static commands:ApplicationCommands.CloseTab}" CanExecute="CloseTab_CanExecute" Executed="CloseTab_Executed" />
         <CommandBinding Command="{x:Static local:MainWindow.CloseOtherTabs}" CanExecute="CloseTab_CanExecute" Executed="CloseOtherTabs_Executed" />
         <CommandBinding Command="{x:Static commands:ApplicationCommands.CloseAllTabs}" CanExecute="CloseTab_CanExecute" Executed="CloseAllTabs_Executed" />
-        <CommandBinding Command="Close" CanExecute="Command_CanExecute" Executed="CloseWindow_Executed" />
+        <CommandBinding Command="{x:Static ApplicationCommands.Close}" CanExecute="Command_CanExecute" Executed="CloseWindow_Executed" />
         <CommandBinding Command="{x:Static local:MainWindow.Quit}" CanExecute="Command_CanExecute" Executed="Quit_Executed" />
 
-        <CommandBinding Command="{x:Static local:MainWindow.Copy}" CanExecute="Copy_CanExecute" Executed="Copy_Executed" />
-        <CommandBinding Command="{x:Static local:MainWindow.Paste}" CanExecute="Paste_CanExecute" Executed="Paste_Executed" />
+        <CommandBinding Command="{x:Static ApplicationCommands.Copy}" CanExecute="Copy_CanExecute" Executed="Copy_Executed" />
+        <CommandBinding Command="{x:Static ApplicationCommands.Paste}" CanExecute="Paste_CanExecute" Executed="Paste_Executed" />
 
-        <CommandBinding Command="{x:Static local:MainWindow.About}" CanExecute="Command_CanExecute" Executed="About_Executed" />
+        <CommandBinding Command="{x:Static ApplicationCommands.Help}" CanExecute="Command_CanExecute" Executed="About_Executed" />
         <CommandBinding Command="{x:Static local:MainWindow.SubmitABug}" CanExecute="Command_CanExecute" Executed="SubmitABug_Executed" />
     </Window.CommandBindings>
+
+    <Window.Resources>
+        <Style x:Key="MenuItemItemContainerStyle" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+            <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+            <Setter Property="Header" Value="{Binding Header}" />
+            <Setter Property="ItemsSource" Value="{Binding Items}" />
+            <Setter Property="Command" Value="{Binding Command}" />
+            <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
+            <Setter Property="CommandTarget" Value="{Binding CommandTarget}" />
+        </Style>
+    </Window.Resources>
 
     <!--Title="{Binding SelectedItem.Value.Name, RelativeSource={RelativeSource Mode=Self}, StringFormat={}{0} - WinCopies, Converter={dataConverters:CoalesceConverter}, ConverterParameter=WinCopies}" Icon="{Binding SelectedItem.Value, RelativeSource={RelativeSource Mode=Self}, Converter={local:IBrowsableObjectInfoToImageSourceConverter}}" Height="350" Width="525" Closing="Window_Closing"-->
 
@@ -110,14 +94,33 @@
     <!--
     </Window.CommandBindings>-->
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-
-        <local:Menu ItemsSource="{Binding Menu.Items}" ItemContainerStyle="{StaticResource MenuItemBaseStyle}">
+    <DockPanel>
+        <Menu DataContext="{Binding Menu}" DockPanel.Dock="Top">
+            <local:MenuItem ResourceKey="File">
+                <local:MenuItem ResourceKey="NewTab">
+                    <local:MenuItem ResourceKey="NewFileSystemTab" Icon="{x:Static guiResources:Resources.tab_add}" Command="{x:Static commands:ApplicationCommands.NewTab}" />
+                    <local:MenuItem ResourceKey="NewRegistryTab" Command="{x:Static local:MainWindow.NewRegistryTab}" />
+                    <local:MenuItem ResourceKey="NewWMITab" Command="{x:Static local:MainWindow.NewWMITab}" />
+                </local:MenuItem>
+                <local:MenuItem ResourceKey="NewWindow" Icon="{x:Static guiResources:Resources.application_add}" Command="{x:Static commands:ApplicationCommands.NewWindow}" />
+                <local:MenuItem ResourceKey="CloseTab">
+                    <local:MenuItem ResourceKey="CloseTab" Icon="{x:Static guiResources:Resources.tab_delete}" Command="{x:Static commands:ApplicationCommands.CloseTab}" />
+                    <local:MenuItem ResourceKey="CloseOtherTabs" Command="{x:Static local:MainWindow.CloseOtherTabs}" />
+                    <local:MenuItem ResourceKey="CloseAllTabs" Command="{x:Static commands:ApplicationCommands.CloseAllTabs}" />
+                </local:MenuItem>
+                <local:MenuItem ResourceKey="CloseWindow" Command="{x:Static ApplicationCommands.Close}" />
+                <local:MenuItem ResourceKey="Quit" Command="{x:Static local:MainWindow.Quit}" />
+            </local:MenuItem>
+            <local:MenuItem ResourceKey="Edit">
+                <local:MenuItem ResourceKey="Copy" Icon="{x:Static guiResources:Resources.page_copy}" Command="{x:Static ApplicationCommands.Copy}" />
+                <local:MenuItem ResourceKey="Paste" Icon="{x:Static guiResources:Resources.page_paste}" Command="{x:Static ApplicationCommands.Paste}" />
+            </local:MenuItem>
+            <MenuItem Header="Open _with" ItemsSource="{Binding DataContext.SelectedItem.BrowsabilityPaths, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:MainWindow}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
+            <MenuItem Header="_Tools" ItemsSource="{Binding DataContext.SelectedItem.CustomProcesses, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:MainWindow}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
+            <local:MenuItem ResourceKey="Help">
+                <local:MenuItem ResourceKey="About" Icon="{x:Static guiResources:Resources.help}" Command="{x:Static ApplicationCommands.Help}" />
+                <local:MenuItem ResourceKey="SubmitABug" Icon="{x:Static guiResources:Resources.bug}" Command="{x:Static local:MainWindow.SubmitABug}" />
+            </local:MenuItem>
             <!--<MenuItem x:Name="NewWindowMenuItem" Header="{StaticResource NewWindow}" Command="{x:Static commands:ApplicationCommands.NewWindow}">
                     <MenuItem.Icon>
                         <Image Source="Resources/application_window_add.png" />
@@ -311,9 +314,20 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>-->
-        </local:Menu>
+        </Menu>
 
-        <TabControl x:Name="TabControl" ItemsSource="{Binding Paths}" Grid.Row="1" Margin="0,0,0,0" SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}">
+        <StatusBar DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
+            <Label Content="{Binding Menu.SelectedItem.StatusBarLabel}">
+                <!--<Label.Content>
+                    <MultiBinding Converter="{local:StatusBarConverter}">
+                        <Binding Path="SelectedItemVisibleItemsCount" />
+                        <Binding Path="SelectedItem.Value.SelectedItems.Count" />
+                    </MultiBinding>
+                </Label.Content>-->
+            </Label>
+        </StatusBar>
+
+        <TabControl x:Name="TabControl" ItemsSource="{Binding Paths}" SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="{x:Type TabItem}">
                     <Setter Property="IsSelected" Value="{Binding IsSelected}" />
@@ -322,7 +336,7 @@
                         <Setter.Value>
                             <DataTemplate DataType="{x:Type io:ExplorerControlBrowsableObjectInfoViewModel}">
                                 <DockPanel>
-                                    <Image DockPanel.Dock="Left" Source="{Binding Path.MediumBitmapSource}" Height="32" Width="32" />
+                                    <Image DockPanel.Dock="Left" Source="{Binding Path.BitmapSources.MediumBitmapSource}" Height="32" Width="32" />
                                     <controls:Label Content="{Binding Path.Name}" RecognizesAccessKey="False" VerticalContentAlignment="Center" />
                                     <Button DockPanel.Dock="Right" Content="X" Command="{x:Static commands:ApplicationCommands.CloseTab}" CommandParameter="{Binding}" Height="20" Width="20" />
                                 </DockPanel>
@@ -337,18 +351,7 @@
                 </Style>
             </TabControl.ItemContainerStyle>
         </TabControl>
-
-        <StatusBar Grid.Row="2" >
-            <Label Content="{Binding Menu.SelectedItem.StatusBarLabel}">
-                <!--<Label.Content>
-                    <MultiBinding Converter="{local:StatusBarConverter}">
-                        <Binding Path="SelectedItemVisibleItemsCount" />
-                        <Binding Path="SelectedItem.Value.SelectedItems.Count" />
-                    </MultiBinding>
-                </Label.Content>-->
-            </Label>
-        </StatusBar>
-    </Grid>
+    </DockPanel>
 
     <!--<ControlTemplate.Triggers>
 
@@ -433,7 +436,6 @@
             </Trigger>
 
         </ControlTemplate.Triggers>-->
-
 </Window>
 
 <!--<ContextMenu>

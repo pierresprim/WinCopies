@@ -15,15 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Windows.Input;
-using System.Windows.Media;
 
 using WinCopies.Util.Data;
-
-using static WinCopies.App;
 
 namespace WinCopies
 {
@@ -31,69 +26,67 @@ namespace WinCopies
     {
         private MenuItemViewModel _selectedItem;
 
-        private ObservableCollection<MenuItemViewModel> _menuItems;
-
-        internal ObservableCollection<MenuItemViewModel> _Items => _menuItems ??= new ObservableCollection<MenuItemViewModel>();
-
-        private ReadOnlyObservableCollection<MenuItemViewModel> _menuItemsReadOnly;
-
-        public ReadOnlyObservableCollection<MenuItemViewModel> Items => _menuItemsReadOnly ??= new ReadOnlyObservableCollection<MenuItemViewModel>(_Items);
-
-        public MenuItemViewModel SelectedItem { get => _selectedItem; internal set {                _selectedItem = value.IsSelected ? value:null; OnPropertyChanged(nameof(SelectedItem));                          } }
+        public MenuItemViewModel SelectedItem { get => _selectedItem; internal set { _selectedItem = value.IsSelected ? value : null; OnPropertyChanged(nameof(SelectedItem)); } }
     }
 
     public class MenuItemViewModel : ViewModelBase
     {
         private readonly MenuViewModel _parentMenu;
 
-        public string ResourceId { get; }
+        public string ResourceId { get; set; }
 
         public MenuItemViewModel ParentMenuItem { get; }
 
         private bool _isSelected;
 
-        public bool IsSelected { get => _isSelected; set { _isSelected = value;
-                
-                _parentMenu.SelectedItem = this; OnPropertyChanged(nameof(IsSelected)); } }
+        public bool IsSelected
+        {
+            get => _isSelected; set
+            {
+                _isSelected = value;
 
-        private ObservableCollection<MenuItemViewModel> _menuItems;
+                _parentMenu.SelectedItem = this; OnPropertyChanged(nameof(IsSelected));
+            }
+        }
 
-        private ObservableCollection<MenuItemViewModel> _Items => _menuItems ??= new ObservableCollection<MenuItemViewModel>();
+        //private ObservableCollection<MenuItemViewModel> _menuItems;
 
-        private ReadOnlyObservableCollection<MenuItemViewModel> _menuItemReadOnly;
+        //private ObservableCollection<MenuItemViewModel> _Items => _menuItems ??= new ObservableCollection<MenuItemViewModel>();
 
-        public ReadOnlyObservableCollection<MenuItemViewModel> Items => _menuItemReadOnly ??= new ReadOnlyObservableCollection<MenuItemViewModel>(_Items);
+        //private ReadOnlyObservableCollection<MenuItemViewModel> _menuItemReadOnly;
 
-        public string Header { get; }
+        //public ReadOnlyObservableCollection<MenuItemViewModel> Items => _menuItemReadOnly ??= new ReadOnlyObservableCollection<MenuItemViewModel>(_Items);
 
-        public RoutedCommand Command { get; }
+        //public string Header { get; }
 
-        public object CommandParameter { get; }
+        //public RoutedCommand Command { get; }
 
-        public ImageSource Icon { get; }
+        //public object CommandParameter { get; }
+
+        //public ImageSource Icon { get; }
 
         private string _statusBarLabel;
 
-        public string StatusBarLabel => _statusBarLabel ??= (string)ResourceProperties.First(p => p.Name == $"{ResourceId}StatusBarLabel").GetValue(null);
+        public string StatusBarLabel => _statusBarLabel ??= (string)typeof(Properties.Resources).GetProperties().FirstOrDefault(p => p.Name == $"{ResourceId}StatusBarLabel")?.GetValue(null);
 
-        private MenuItemViewModel(in ObservableCollection<MenuItemViewModel> parentItemsCollection, in string header, in string resourceId, in RoutedCommand command, Func commandParameter, ImageSource iconImageSource)
-        {
-            parentItemsCollection.Add(this);
+        //private MenuItemViewModel(in string header, in string resourceId, in RoutedCommand command, Func commandParameter, ImageSource iconImageSource)
+        //{
+            //    parentItemsCollection.Add(this);
 
-            Header = header;
+            //Header = header;
 
-            ResourceId = resourceId;
+            //ResourceId = resourceId;
 
-            Command = command;
+            //Command = command;
 
-            CommandParameter = commandParameter;
+            //CommandParameter = commandParameter;
 
-            Icon = iconImageSource;
-        }
+            //Icon = iconImageSource;
+        //}
 
-        public MenuItemViewModel(in MenuViewModel parentMenu, in string header, in string resourceId, in RoutedCommand command, Func commandParameter, ImageSource iconImageSource) : this(parentMenu._Items, header, resourceId, command, commandParameter, iconImageSource) => _parentMenu = parentMenu;
+        public MenuItemViewModel(in MenuViewModel parentMenu/*, in string header, in string resourceId, in RoutedCommand command, Func commandParameter, ImageSource iconImageSource*/) /*: this(parentMenu._Items, header, resourceId, command, commandParameter, iconImageSource)*/ => _parentMenu = parentMenu;
 
-        public MenuItemViewModel(in MenuItemViewModel parentMenuItem, in string header, in string resourceId, in RoutedCommand command, Func commandParameter, ImageSource iconImageSource) : this(parentMenuItem._Items, header, resourceId, command, commandParameter, iconImageSource)
+        public MenuItemViewModel(in MenuItemViewModel parentMenuItem/*, in string header, in string resourceId, in RoutedCommand command, Func commandParameter, ImageSource iconImageSource*/) //: this(parentMenuItem._Items, header, resourceId, command, commandParameter, iconImageSource)
         {
             _parentMenu = parentMenuItem._parentMenu;
 

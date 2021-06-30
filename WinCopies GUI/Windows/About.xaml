@@ -15,23 +15,17 @@
             <RowDefinition Height="auto" />
             <RowDefinition />
             <RowDefinition />
-            <RowDefinition />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Margin="5">
-            <TextBlock Text="WinCopies" />
-            <TextBlock Text="®" FontFamily="Times New Roman" >
-                <TextBlock.LayoutTransform>
-                    <TransformGroup>
-                        <ScaleTransform ScaleX=".75" ScaleY=".75"/>
-                        <TranslateTransform Y="-5"/>
-                    </TransformGroup>
-                </TextBlock.LayoutTransform>
-            </TextBlock>
-        </StackPanel>
+        <TextBlock Margin="5">
+            <Run Text="WinCopies" /><Run Text="®" FontFamily="Times New Roman" BaselineAlignment="Top" />
+        </TextBlock>
         <Label Grid.Row="1" Content="{Binding Version}" />
-        <TextBlock Grid.Row="2" TextWrapping="Wrap">WinCopies is free software distributed under the GNU GPL (version 3 or later, at your option) license.</TextBlock>
-        <ScrollViewer Grid.Row="3">
-            <TextBlock TextWrapping="Wrap" >
+        <TextBlock Grid.Row="2" Margin="5" TextWrapping="Wrap">WinCopies is free software distributed under the GNU GPL (version 3 or later, at your option) license.</TextBlock>
+        <GroupBox Grid.Row="3" Header="License">
+        <ScrollViewer>
+            <TextBlock Margin="5" TextWrapping="Wrap">
             <Run Text="Copyright (C) 2021 Pierre Sprimont" />    
             <LineBreak />
     <Run Text="This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version." />
@@ -46,10 +40,32 @@
                 <LineBreak />
                 <Run Text="The WinCopies logo is Copyright © 2020, Pierre Sprimont. The WinCopies logo cannot be redistributed separately, whether modified or not, or used in another project, even if it is a project based on this software." />
             </TextBlock>
-        </ScrollViewer>
-        <RichTextBox x:Name="RTB" Grid.Row="4" IsReadOnly="True" />
-        <TextBlock Grid.Row="5">
+            </ScrollViewer>
+        </GroupBox>
+        <GroupBox Grid.Row="4" Header="GNU License">
+            <RichTextBox x:Name="RTB" IsReadOnly="True" />
+        </GroupBox>
+        <TextBlock Grid.Row="5" Margin="5" TextWrapping="Wrap" VerticalAlignment="Top">
             For the third-parties used by WinCopies and the WinCopies framework, visit the WinCopies website at the address given above.
         </TextBlock>
+        <GroupBox Grid.Row="6" Header="Framework versions:" VerticalAlignment="Top">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Label>WinCopies Utilities:</Label>
+                <Label Grid.Column="1" Content="{Binding FrameworkVersions.WinCopiesUtilities, Mode=OneTime}" />
+                <Label Grid.Row="1">WinCopies:</Label>
+                <Label Grid.Column="1" Grid.Row="1" Content="{Binding FrameworkVersions.WinCopies, Mode=OneTime}" />
+                <Label Grid.Row="2">Windows API Code Pack:</Label>
+                <Label Grid.Column="1" Grid.Row="2" Content="{Binding FrameworkVersions.WindowsAPICodePack, Mode=OneTime}" />
+            </Grid>
+        </GroupBox>
     </Grid>
 </dialogs:DialogWindow>

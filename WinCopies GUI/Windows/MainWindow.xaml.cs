@@ -18,20 +18,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Xml;
 
 using WinCopies.Collections.DotNetFix.Generic;
-using WinCopies.Collections.Generic;
-using WinCopies.Desktop;
 using WinCopies.GUI.IO.ObjectModel;
-using WinCopies.GUI.IO.Process;
 using WinCopies.IO.ObjectModel;
-using WinCopies.IO.Process;
 using WinCopies.Linq;
 
 using static WinCopies.App;
@@ -54,137 +46,23 @@ namespace WinCopies
 
         //public MenuItemViewModel SelectedMenuItem { get => (MenuItemViewModel)GetValue(SelectedMenuItemProperty); internal set => SetValue(SelectedMenuItemPropertyKey, value); }
 
-        public static RoutedCommand NewFileSystemTab => Commands.ApplicationCommands.NewTab;
-
         public static RoutedCommand NewRegistryTab { get; } = new RoutedUICommand(Properties.Resources.NewRegistryTab, nameof(NewRegistryTab), typeof(MainWindow));
 
         public static RoutedCommand NewWMITab { get; } = new RoutedUICommand(Properties.Resources.NewWMITab, nameof(NewWMITab), typeof(MainWindow));
 
-        public static RoutedCommand NewWindow => Commands.ApplicationCommands.NewWindow;
-
-        public static RoutedCommand CloseTab => Commands.ApplicationCommands.CloseTab;
-
         public static RoutedCommand CloseOtherTabs { get; } = new RoutedUICommand(Properties.Resources.CloseOtherTabs, nameof(CloseOtherTabs), typeof(MainWindow), new InputGestureCollection() { new KeyGesture(Key.W, ModifierKeys.Control | ModifierKeys.Alt) });
-
-        public static RoutedCommand CloseAllTabs => Commands.ApplicationCommands.CloseAllTabs;
-
-        public static RoutedCommand CloseWindow => ApplicationCommands.Close;
 
         public static RoutedCommand Quit { get; } = new RoutedUICommand(Properties.Resources.Quit, nameof(Quit), typeof(MainWindow));
 
-        public static RoutedCommand Copy { get; } = new RoutedUICommand(Properties.Resources.CopyStatusBarLabel, nameof(Copy), typeof(MainWindow));
-
-        public static RoutedCommand Paste { get; } = new RoutedUICommand(Properties.Resources.Paste, nameof(Paste), typeof(MainWindow));
-
-        public static RoutedCommand About { get; } = new RoutedUICommand(Properties.Resources.About, nameof(About), typeof(MainWindow));
-
         public static RoutedCommand SubmitABug { get; } = new RoutedUICommand(Properties.Resources.SubmitABug, nameof(SubmitABug), typeof(MainWindow));
-
-        public static Func<MainWindowViewModel, object> GetCloseTabParameter { get; } = mainWindow => mainWindow.SelectedItem;
-
-        public static Func<MainWindowViewModel, object> GetCloseOtherTabsParameter { get; } = mainWindow => mainWindow.SelectedItem;
-
-        public static ImageSource NewTabIcon { get; } = GUI.Icons.Properties.Resources.tab_add.ToImageSource();
-
-        public static ImageSource NewWindowIcon { get; } = GUI.Icons.Properties.Resources.application_add.ToImageSource();
-
-        public static ImageSource CloseTabIcon { get; } = GUI.Icons.Properties.Resources.tab_delete.ToImageSource();
-
-        public static ImageSource CopyIcon { get; } = GUI.Icons.Properties.Resources.page_copy.ToImageSource();
-
-        public static ImageSource PasteIcon { get; } = GUI.Icons.Properties.Resources.page_paste.ToImageSource();
-
-        public static ImageSource SubmitABugIcon { get; } = GUI.Icons.Properties.Resources.bug.ToImageSource();
 
         public MainWindow()
         {
-            const string Parameter = "Parameter";
-            const string Resource = "Resource";
-
             _ = Current._OpenWindows.AddFirst(this);
 
-            var mainWindow = new MainWindowViewModel();
+            DataContext = new MainWindowViewModel();
 
-            var xml = new XmlDocument();
-
-            xml.LoadXml(Properties.Resources.Menus);
-
-            XmlElement xmlMenu = xml.DocumentElement;
-
-            var arrayBuilder = new ArrayBuilder<PropertyInfo>();
-
-            PropertyInfo[] mainWindowProperties = typeof(MainWindow).GetProperties(BindingFlags.Public | BindingFlags.Static);
-
-            foreach (PropertyInfo p in mainWindowProperties.Where(p => p.PropertyType.IsAssignableFrom(typeof(RoutedCommand))))
-
-                _ = arrayBuilder.AddLast(p);
-
-            PropertyInfo[] commands = arrayBuilder.ToArray(true);
-
-            foreach (PropertyInfo p in mainWindowProperties.Where(p => p.Name.EndsWith(Parameter)))
-
-                _ = arrayBuilder.AddLast(p);
-
-            PropertyInfo[] commandParameters = arrayBuilder.ToArray(true);
-
-            foreach (PropertyInfo p in mainWindowProperties.Where(p => p.PropertyType.IsAssignableFrom(typeof(ImageSource))))
-
-                _ = arrayBuilder.AddLast(p);
-
-            PropertyInfo[] iconImageSources = arrayBuilder.ToArray(true);
-
-            string getStringResource(string resourceId) => (string)ResourceProperties.First(p => p.Name == resourceId).GetValue(null);
-
-            RoutedCommand getCommand(string resourceId) => (RoutedCommand)commands.FirstOrDefault(c => c.Name == resourceId)?.GetValue(null);
-
-            Func getCommandParameter(string resourceId)
-            {
-                PropertyInfo p = commandParameters.FirstOrDefault(p => p.Name == $"{resourceId}{Parameter}");
-
-                object value;
-
-                if (p != null)
-                {
-                    value = p.GetValue(null);
-
-                    return new Func(() => value);
-                }
-
-                p = commandParameters.FirstOrDefault(p => p.Name == $"Get{resourceId}{Parameter}");
-
-                if (p == null) return null;
-
-                value = p.GetValue(null);
-
-                return new Func(() => ((Func<MainWindowViewModel, object>)value)(mainWindow));
-            }
-
-            ImageSource getIconImageSource(string resourceId) => (ImageSource)iconImageSources.FirstOrDefault(i => i.Name == $"{resourceId}Icon")?.GetValue(null);
-
-            void addMenuItem(XmlElement xmlMenuItem, MenuItemViewModel menuItem)
-            {
-                string resourceId;
-
-                foreach (XmlElement _xmlMenuItem in xmlMenuItem)
-                {
-                    resourceId = _xmlMenuItem.Attributes[Resource].Value;
-
-                    addMenuItem(_xmlMenuItem, new MenuItemViewModel(menuItem, getStringResource(resourceId), resourceId, getCommand(resourceId), getCommandParameter(resourceId), getIconImageSource(resourceId)));
-                }
-            }
-
-            string resourceId;
-
-            foreach (XmlElement xmlMenuItem in xmlMenu)
-            {
-                resourceId = xmlMenuItem.Attributes[Resource].Value;
-
-                addMenuItem(xmlMenuItem, new MenuItemViewModel(mainWindow.Menu, getStringResource(resourceId), resourceId, null, null, null));
-            }
-
-            DataContext = mainWindow;
-
-            // InitializeComponent();
+            InitializeComponent();
         }
 
         private void Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -196,11 +74,9 @@ namespace WinCopies
 
         private void AddNewTab(IExplorerControlBrowsableObjectInfoViewModel viewModel, ExecutedRoutedEventArgs e)
         {
-            IExplorerControlBrowsableObjectInfoViewModel explorerControlBrowsableObjectInfo = viewModel;
+            viewModel.IsSelected = true;
 
-            explorerControlBrowsableObjectInfo.IsSelected = true;
-
-            ((MainWindowViewModel)DataContext).Paths.Add(explorerControlBrowsableObjectInfo);
+            ((MainWindowViewModel)DataContext).Paths.Add(viewModel);
 
             e.Handled = true;
         }
@@ -234,7 +110,7 @@ namespace WinCopies
 
         private void CloseOtherTabs_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            _ = RemoveAll(((MainWindowViewModel)DataContext).Paths, (IExplorerControlBrowsableObjectInfoViewModel)(e.Parameter is Func func ? func() : e.Parameter), false, false);
+            _ = RemoveAll(((MainWindowViewModel)DataContext).Paths, ((MainWindowViewModel)DataContext).SelectedItem, false, false);
 
             e.Handled = true;
         }
@@ -248,12 +124,12 @@ namespace WinCopies
                 if (collection[0] == itemToKeep)
                 {
                     if (onlyOne)
-                    {
+
                         while (collection.Count != 1)
                         {
                             if (collection[1] == itemToKeep)
                             {
-                                if (throwIfMultiple) throw new InvalidOperationException("More than one occurences was found.");
+                                if (throwIfMultiple) throw new InvalidOperationException("More than one occurence were found.");
 
                                 else
 
@@ -268,7 +144,6 @@ namespace WinCopies
 
                             return true;
                         }
-                    }
 
                     while (collection.Count != 1)
 
@@ -325,7 +200,7 @@ namespace WinCopies
 
         private void Quit_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ObservableLinkedCollection<MainWindow> openWindows = Current._OpenWindows;
+            ObservableLinkedCollection<Window> openWindows = Current._OpenWindows;
 
             if (openWindows.Count == 1 || MessageBox.Show(this, Properties.Resources.ApplicationClosingMessage, "WinCopies", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
             {
@@ -388,15 +263,6 @@ namespace WinCopies
             e.Handled = true;
         }
 
-        private static void _Paste(in ProcessFactorySelectorDictionaryParameters parameters)
-        {
-            IProcess result = new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(parameters));
-
-            ((System.Collections.ObjectModel.ObservableCollection<IProcess>)ProcessWindow.Instance.Processes).Add(result);
-
-            result.RunWorkerAsync();
-        }
-
         private void Paste_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             //StringCollection sc = System.Windows.Clipboard.GetFileDropList();
@@ -437,7 +303,7 @@ namespace WinCopies
             //    copyProcess.RunWorkerAsync();
             //}
 
-            _Paste(new ProcessFactorySelectorDictionaryParameters(((MainWindowViewModel)DataContext).SelectedItem.Path.ProcessFactory.TryGetCopyProcessParameters(10u), App.DefaultProcessPathCollectionFactory));
+            StartInstance(GetProcessParameters(((MainWindowViewModel)DataContext).SelectedItem.Path.ProcessFactory.TryGetCopyProcessParameters(10u)));
 
             e.Handled = true;
         }

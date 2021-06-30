@@ -15,25 +15,55 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack.Shell;
 using System.Collections.ObjectModel;
 
 using WinCopies.GUI.IO.ObjectModel;
-using WinCopies.IO.ObjectModel;
+using WinCopies.GUI.IO.Process;
+using WinCopies.IO.Process;
 using WinCopies.Util.Data;
 
 namespace WinCopies
 {
     public class MainWindowViewModel : ViewModelBase
     {
+        public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
+
         public MenuViewModel Menu { get; }
 
-        public ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> Paths { get; } = new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>() { App.GetDefaultExplorerControlBrowsableObjectInfoViewModel() };
+        public ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> Paths { get; } = new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>();
 
         private ExplorerControlBrowsableObjectInfoViewModel _selectedItem;
 
-        public ExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => _selectedItem; set { _selectedItem = value; OnPropertyChanged(nameof(SelectedItem)); } } 
+        public ExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => _selectedItem; set { _selectedItem = value; OnPropertyChanged(nameof(SelectedItem)); } }
 
-        public MainWindowViewModel() => Menu = new MenuViewModel();
+        public MainWindowViewModel()
+        {
+            Menu = new MenuViewModel();
+
+            Paths.CollectionChanged += Paths_CollectionChanged;
+        }
+
+        private void Paths_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                IExplorerControlBrowsableObjectInfoViewModel item;
+
+                foreach (object _item in e.NewItems)
+                {
+                    (item = ((IExplorerControlBrowsableObjectInfoViewModel)_item)).IsCheckBoxVisible = true;
+
+                    item.CustomProcessParametersGeneratedEventHandler += Item_CustomProcessParametersGeneratedEventHandler;
+                }
+            }
+
+            if (e.OldItems != null)
+
+                foreach (object _item in e.OldItems)
+
+                    ((IExplorerControlBrowsableObjectInfoViewModel)_item).CustomProcessParametersGeneratedEventHandler -= Item_CustomProcessParametersGeneratedEventHandler;
+        }
+
+        private void Item_CustomProcessParametersGeneratedEventHandler(object sender, GUI.IO.CustomProcessParametersGeneratedEventArgs e) => App.StartInstance(App.GetProcessParameters(e.ProcessParameters));
     }
 }

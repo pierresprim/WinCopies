@@ -169,9 +169,6 @@
   <data name="Help" xml:space="preserve">
     <value>_Help</value>
   </data>
-  <data name="Menus" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\menus.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
   <data name="NewFileSystemTab" xml:space="preserve">
     <value>New file system tab</value>
   </data>

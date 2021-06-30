@@ -25,9 +25,28 @@ using WinCopies.GUI.Windows;
 
 namespace WinCopies
 {
-    /// <summary>
-    /// Logique d'interaction pour About.xaml
-    /// </summary>
+    public class FrameworkVersions
+    {
+        public string WinCopiesUtilities { get; }
+
+        public string WinCopies { get; }
+
+        public string WindowsAPICodePack { get; }
+
+        public FrameworkVersions()
+        {
+            string assemblyDirectory = App.GetAssemblyDirectory();
+
+            string getVersion(in string assemblyName) => Assembly.LoadFile($"{assemblyDirectory}\\{assemblyName}.dll").GetName().Version.ToString();
+
+            WinCopiesUtilities = getVersion($"{nameof(WinCopies)}.Util");
+
+            WinCopies = getVersion($"{nameof(WinCopies)}.IO");
+
+            WindowsAPICodePack = getVersion($"{nameof(WinCopies)}.{nameof(WindowsAPICodePack)}");
+        }
+    }
+
     public partial class About : DialogWindow
     {
         private static string GetVersion() => $"Version {FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion} Alpha";
@@ -38,12 +57,18 @@ namespace WinCopies
 
         public string Version => (string)GetValue(VersionProperty);
 
+        private static readonly DependencyPropertyKey FrameworkVersionsPropertyKey = DependencyProperty.RegisterReadOnly(nameof(FrameworkVersions), typeof(FrameworkVersions), typeof(About), new PropertyMetadata(new FrameworkVersions()));
+
+        public static readonly DependencyProperty FrameworkVersionsProperty = FrameworkVersionsPropertyKey.DependencyProperty;
+
+        public FrameworkVersions FrameworkVersions => (FrameworkVersions)GetValue(FrameworkVersionsProperty);
+
         public About()
         {
             InitializeComponent();
 
             DataContext = this;
-            
+
             var s = new MemoryStream();
 
             var w = new StreamWriter(s);
@@ -52,7 +77,7 @@ namespace WinCopies
 
             var textRange = new TextRange(RTB.Document.ContentStart, RTB.Document.ContentEnd);
 
-            textRange.Load(s, DataFormats.Rtf); 
+            textRange.Load(s, DataFormats.Rtf);
         }
     }
 }
