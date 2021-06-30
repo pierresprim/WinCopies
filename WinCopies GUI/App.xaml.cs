@@ -207,32 +207,32 @@ namespace WinCopies
         private static void Run(IQueue<string> queue)
         {
             var t = new Thread(() =>
-              {
-                  var app = new App();
+            {
+                var app = new App();
 
-                  app.OpenWindows = new UIntCountableProvider<Window, IEnumeratorInfo2<Window>>(() => new EnumeratorInfo<Window>(app._OpenWindows), () => app._OpenWindows.Count);
+                app.OpenWindows = new UIntCountableProvider<Window, IEnumeratorInfo2<Window>>(() => new EnumeratorInfo<Window>(app._OpenWindows), () => app._OpenWindows.Count);
 
-                  app.MainWindow = new MainWindow();
+                app.MainWindow = new MainWindow();
 
-                  System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((MainWindowViewModel)(app.MainWindow).DataContext).Paths;
+                System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((MainWindowViewModel)(app.MainWindow).DataContext).Paths;
 
-                  if (queue != null)
-                  {
-                      while (queue.Count != 0)
+                if (queue != null)
+                {
+                    while (queue.Count != 0)
 
-                          paths.Add(ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(queue.Dequeue(), ClientVersion))));
-                  }
+                        paths.Add(ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(queue.Dequeue(), ClientVersion))));
+                }
 
-                  else
+                else
 
-                      paths.Add(GetDefaultExplorerControlBrowsableObjectInfoViewModel());
+                    paths.Add(GetDefaultExplorerControlBrowsableObjectInfoViewModel());
 
-                  // app.MainWindow = new MainWindow();
+                // app.MainWindow = new MainWindow();
 
-                  // System.Windows.Application.LoadComponent(app.Resources, new Uri("/wincopies;component/ResourceDictionary.xaml", UriKind.Relative));
+                // System.Windows.Application.LoadComponent(app.Resources, new Uri("/wincopies;component/ResourceDictionary.xaml", UriKind.Relative));
 
-                  _ = app.Run();
-              });
+                _ = app.Run();
+            });
 
             t.SetApartmentState(ApartmentState.STA);
 
