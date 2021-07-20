@@ -15,15 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,15 +34,157 @@ using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
-using WinCopies.IPCService.Client;
-using WinCopies.IPCService.Hosting;
+using WinCopies.IPCService.Extensions;
 
 using static WinCopies.ThrowHelper;
 
 namespace WinCopies
 {
+    public interface IUpdater
+    {
+        int Run(string[] args);
+    }
+
+    public static class WinCopiesExtensions
+    {
+        public static async Task Main_Mutex<TClass>(ISingleInstanceApp<IUpdater, int> app, bool paths, IQueue<string> pathQueue) where TClass : class, IUpdater
+        {
+            (Mutex mutex, bool mutexExists, NullableGeneric<int> serverResult) = await app.StartInstanceAsync<IUpdater, TClass, int>();
+
+            using (mutex)
+
+                if (mutexExists)
+
+                    if (paths && pathQueue == null)
+
+                        await IPCService.Extensions.Extensions.StartThread(() => App.GetPathApp(pathQueue).Run(), 0);
+
+                    else
+
+                        Environment.Exit(serverResult == null ? 0 : serverResult.Value);
+        }
+
+        public abstract class SingleInstanceApp<T> : ISingleInstanceApp<IUpdater, int> where T : class
+        {
+            private readonly string _pipeName;
+
+            protected T InnerObject { get; private set; }
+
+            protected SingleInstanceApp(in string pipeName, in T innerObject)
+            {
+                _pipeName = pipeName;
+
+                InnerObject = innerObject;
+            }
+
+            public string GetPipeName() => _pipeName;
+
+            public string GetClientName() => App.ClientVersion.ClientName;
+
+            private void Run()
+            {
+                App app = GetApp();
+
+                InnerObject = null;
+
+                _ = app.Run();
+            }
+
+            public ThreadStart GetThreadStart(out int maxStackSize)
+            {
+                maxStackSize = 0;
+
+                return Run;
+            }
+
+            protected abstract App GetApp();
+
+            protected abstract Expression<Func<IUpdater, int>> GetExpressionOverride();
+
+            public Expression<Func<IUpdater, int>> GetExpression()
+            {
+                Expression<Func<IUpdater, int>> result = GetExpressionOverride();
+
+                InnerObject = null;
+
+                return result;
+            }
+
+            public Expression<Func<IUpdater, Task<int>>> GetAsyncExpression() => null;
+
+            public CancellationToken? GetCancellationToken() => null;
+        }
+    }
+
+    public sealed class SingleInstanceApp_Process : WinCopiesExtensions.SingleInstanceApp<IQueue<IProcessParameters>>
+    {
+        public SingleInstanceApp_Process(in IQueue<IProcessParameters> processParameters) : base("65cae396-971a-4545-97e7-83d4ed042d92", processParameters)
+        {
+            // Left empty.
+        }
+
+        protected override App GetApp()
+        {
+            var app = new App
+            {
+                MainWindow = new ProcessWindow()
+            };
+
+            app._processQueue = InnerObject;
+
+            return app;
+        }
+
+        protected override Expression<Func<IUpdater, int>> GetExpressionOverride()
+        {
+            var processes = new ArrayBuilder<string>();
+
+            while (InnerObject.Count != 0)
+
+                foreach (string value in App.GetProcessParameters(InnerObject.Dequeue()))
+
+                    _ = processes.AddLast(value);
+
+            string[] _processes = processes.ToArray();
+
+            return item => item.Run(_processes);
+        }
+    }
+
+    public class SingleInstanceApp_Path : WinCopiesExtensions.SingleInstanceApp<IQueue<string>>
+    {
+        public SingleInstanceApp_Path(in IQueue<string> paths) : base("5e2e0072-edee-47d2-a0cd-a98d43b8b705", paths)
+        {
+            // Left empty.
+        }
+
+        protected override App GetApp() => App.GetPathApp(InnerObject);
+
+        protected override Expression<Func<IUpdater, int>> GetExpressionOverride()
+        {
+            if (InnerObject == null)
+
+                return item => item.Run(null);
+
+            string[] paths = new string[InnerObject.Count * 2];
+
+            int i = -1;
+
+            while (InnerObject.Count != 0)
+            {
+                paths[++i] = "Path";
+
+                paths[++i] = InnerObject.Dequeue();
+            }
+
+            return item => item.Run(paths);
+        }
+    }
+
     public partial class App : Application/*, INotifyPropertyChanged, ISingleInstanceApp*/
     {
+        internal IQueue<IProcessParameters> _processQueue;
+
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
         private unsafe delegate void Action(int* i);
@@ -52,6 +192,13 @@ namespace WinCopies
         public static string GetAssemblyDirectory() => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         internal static void StartInstance(in System.Collections.Generic.IEnumerable<string> parameters) => System.Diagnostics.Process.Start(GetAssemblyDirectory() + "\\WinCopies.exe", parameters);
+
+        internal static void StartInstance(in IProcessParameters processParameters)
+        {
+            if (processParameters != null)
+
+                StartInstance(GetProcessParameters(processParameters));
+        } 
 
         internal static System.Collections.Generic.IEnumerable<string> GetProcessParameters(IProcessParameters processParameters)
         {
@@ -64,9 +211,9 @@ namespace WinCopies
                 yield return parameter;
         }
 
-        static unsafe void AddPath(in string[] args, in IQueue<string> paths, int* i) => paths.Enqueue(args[(*i)++]);
+        private static unsafe void AddPath(in string[] args, in IQueue<string> paths, int* i) => paths.Enqueue(args[(*i)++]);
 
-        static unsafe System.Collections.Generic.IEnumerable<string> getArray(string[] args, ref ArrayBuilder<string> arrayBuilder, int* i)
+        private static unsafe System.Collections.Generic.IEnumerable<string> GetArray(string[] args, ref ArrayBuilder<string> arrayBuilder, int* i)
         {
             if (arrayBuilder == null)
 
@@ -85,7 +232,7 @@ namespace WinCopies
             return arrayBuilder.ToArray();
         }
 
-        private static unsafe void AddProcess(in string[] args, in IQueue<IProcessParameters> processes, ref ArrayBuilder<string> arrayBuilder, int* i) => processes.Enqueue(new ProcessParameters(args[*i], getArray(args, ref arrayBuilder, i)));
+        private static unsafe void AddProcess(in string[] args, in IQueue<IProcessParameters> processes, ref ArrayBuilder<string> arrayBuilder, int* i) => processes.Enqueue(new ProcessParameters(args[*i], GetArray(args, ref arrayBuilder, i)));
 
         private static unsafe void RunAction(in Action action, int* i)
         {
@@ -94,7 +241,7 @@ namespace WinCopies
             action(i);
         }
 
-        public static unsafe void GetQueues(string[] args, IQueue<string> paths, IQueue<IProcessParameters> processes)
+        public static unsafe void InitQueues(string[] args, IQueue<string> paths, IQueue<IProcessParameters> processes)
         {
             ArrayBuilder<string> arrayBuilder = null;
 
@@ -115,12 +262,62 @@ namespace WinCopies
             arrayBuilder?.Clear();
         }
 
+        public static App GetPathApp(IQueue<string> queue)
+        {
+            var app = new App();
+
+            app.OpenWindows = new UIntCountableProvider<Window, IEnumeratorInfo2<Window>>(() => new EnumeratorInfo<Window>(app._OpenWindows), () => app._OpenWindows.Count);
+
+            app.MainWindow = new MainWindow();
+
+            System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((MainWindowViewModel)app.MainWindow.DataContext).Paths;
+
+            if (queue != null)
+
+                while (queue.Count != 0)
+
+                    try
+                    {
+                        do
+
+                            if (WinCopies.IO.Path.Exists(queue.Peek()))
+
+                                paths.Add(ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(queue.Dequeue(), ClientVersion))));
+
+                            else
+
+                                _ = queue.Dequeue();
+
+                        while (queue.Count != 0);
+                    }
+
+                    catch
+                    {
+
+                    }
+
+            else
+
+                paths.Add(GetDefaultExplorerControlBrowsableObjectInfoViewModel());
+
+            // app.MainWindow = new MainWindow();
+
+            // System.Windows.Application.LoadComponent(app.Resources, new Uri("/wincopies;component/ResourceDictionary.xaml", UriKind.Relative));
+
+            return app;
+        }
+
+        #region Main
+        private static async Task Main_Paths(IQueue<string> paths) => await WinCopiesExtensions.Main_Mutex<PathCollectionUpdater>(new SingleInstanceApp_Path(paths), true, paths);
+
+        public static async Task Main_Process(IQueue<IProcessParameters> processQueue) => await WinCopiesExtensions.Main_Mutex<ProcessCollectionUpdater>(new SingleInstanceApp_Process(processQueue), false, null);
+
         [STAThread]
         public static async Task Main(string[] args)
         {
             if (args.Length == 0)
             {
-                Run(queue: null);
+                await Main_Paths(null);
 
                 return;
             }
@@ -128,116 +325,34 @@ namespace WinCopies
             var pathQueue = new Collections.DotNetFix.Generic.Queue<string>();
             var processQueue = new Collections.DotNetFix.Generic.Queue<IProcessParameters>();
 
-            GetQueues(args, pathQueue, processQueue);
+            InitQueues(args, pathQueue, processQueue);
 
             if (processQueue.Count == 0)
-            {
-                Run(pathQueue);
 
-                return;
-            }
-
-            if (pathQueue.Count != 0)
-            {
-                System.Collections.Generic.IEnumerable<string> pathsToEnumerable()
-                {
-                    while (pathQueue.Count != 0)
-                    {
-                        yield return "Path";
-
-                        yield return pathQueue.Dequeue();
-                    }
-                }
-
-                StartInstance(pathsToEnumerable());
-            }
-
-            using var mutex = new Mutex(false, "65cae396-971a-4545-97e7-83d4ed042d92");
-
-            if (mutex.WaitOne(0))
-            {
-                var t = new Thread(() =>
-                {
-                    var app = new App
-                    {
-                        MainWindow = new ProcessWindow()
-                    };
-
-                    app._processQueue = processQueue;
-
-                    _ = app.Run();
-                });
-
-                t.SetApartmentState(ApartmentState.STA);
-
-                t.Start();
-
-                Host.CreateDefaultBuilder()
-                   .ConfigureServices(services => services.AddScoped<IProcessCollectionUpdater, ProcessCollectionUpdater>())
-                   .ConfigureIPCHost(builder => builder.AddNamedPipeEndpoint<IProcessCollectionUpdater>("65cae396-971a-4545-97e7-83d4ed042d92"))
-                   .ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Debug)).Build().Run();
-            }
+                await Main_Paths(pathQueue);
 
             else
             {
-                ServiceProvider serviceProvider = new ServiceCollection()
-                    .AddNamedPipeClient<IProcessCollectionUpdater>(ClientVersion.ClientName, pipeName: "65cae396-971a-4545-97e7-83d4ed042d92")
-                    .BuildServiceProvider();
-
-                IClientFactory<IProcessCollectionUpdater> clientFactory = serviceProvider.GetRequiredService<IClientFactory<IProcessCollectionUpdater>>();
-
-                IClient<IProcessCollectionUpdater> client = clientFactory.CreateClient(ClientVersion.ClientName);
-
-                var processes = new ArrayBuilder<string>();
-
-                while (processQueue.Count != 0)
-
-                    foreach (string value in GetProcessParameters(processQueue.Dequeue()))
-
-                        _ = processes.AddLast(value);
-
-                string[] _processes = processes.ToArray();
-
-                await client.InvokeAsync(item => item.Run(_processes));
-            }
-        }
-
-        private IQueue<IProcessParameters> _processQueue;
-
-        private static void Run(IQueue<string> queue)
-        {
-            var t = new Thread(() =>
-            {
-                var app = new App();
-
-                app.OpenWindows = new UIntCountableProvider<Window, IEnumeratorInfo2<Window>>(() => new EnumeratorInfo<Window>(app._OpenWindows), () => app._OpenWindows.Count);
-
-                app.MainWindow = new MainWindow();
-
-                System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((MainWindowViewModel)(app.MainWindow).DataContext).Paths;
-
-                if (queue != null)
+                if (pathQueue.Count != 0)
                 {
-                    while (queue.Count != 0)
+                    System.Collections.Generic.IEnumerable<string> pathsToEnumerable()
+                    {
+                        while (pathQueue.Count != 0)
+                        {
+                            yield return "Path";
 
-                        paths.Add(ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(queue.Dequeue(), ClientVersion))));
+                            yield return pathQueue.Dequeue();
+                        }
+                    }
+
+                    StartInstance(pathsToEnumerable());
                 }
 
-                else
-
-                    paths.Add(GetDefaultExplorerControlBrowsableObjectInfoViewModel());
-
-                // app.MainWindow = new MainWindow();
-
-                // System.Windows.Application.LoadComponent(app.Resources, new Uri("/wincopies;component/ResourceDictionary.xaml", UriKind.Relative));
-
-                _ = app.Run();
-            });
-
-            t.SetApartmentState(ApartmentState.STA);
-
-            t.Start();
+                await Main_Process(processQueue);
+            }
         }
+        #endregion
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -257,6 +372,13 @@ namespace WinCopies
                 Run(_processQueue);
 
             MainWindow.Show();
+        }
+
+        public static void Run(IQueue<string> pathQueue)
+        {
+            while (pathQueue.Count != 0)
+
+                Current.Dispatcher.Invoke(() => PathCollectionUpdater.Instance.Paths.Add(ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(pathQueue.Dequeue())))));
         }
 
         public static void Run(IQueue<IProcessParameters> processQueue)

@@ -26,7 +26,7 @@ namespace WinCopies
     {
         private MenuItemViewModel _selectedItem;
 
-        public MenuItemViewModel SelectedItem { get => _selectedItem; internal set { _selectedItem = value.IsSelected ? value : null; OnPropertyChanged(nameof(SelectedItem)); } }
+        public MenuItemViewModel SelectedItem { get => _selectedItem; internal set { UpdateValue(ref _selectedItem, value.IsSelected ? value : null, nameof(SelectedItem)); } }
     }
 
     public class MenuItemViewModel : ViewModelBase
@@ -45,7 +45,11 @@ namespace WinCopies
             {
                 _isSelected = value;
 
-                _parentMenu.SelectedItem = this; OnPropertyChanged(nameof(IsSelected));
+                _parentMenu.SelectedItem = this; OnPropertyChanged(nameof(IsSelected)
+#if !WinCopies4
+                    , null, IsSelected
+#endif
+                    );
             }
         }
 
@@ -71,17 +75,17 @@ namespace WinCopies
 
         //private MenuItemViewModel(in string header, in string resourceId, in RoutedCommand command, Func commandParameter, ImageSource iconImageSource)
         //{
-            //    parentItemsCollection.Add(this);
+        //    parentItemsCollection.Add(this);
 
-            //Header = header;
+        //Header = header;
 
-            //ResourceId = resourceId;
+        //ResourceId = resourceId;
 
-            //Command = command;
+        //Command = command;
 
-            //CommandParameter = commandParameter;
+        //CommandParameter = commandParameter;
 
-            //Icon = iconImageSource;
+        //Icon = iconImageSource;
         //}
 
         public MenuItemViewModel(in MenuViewModel parentMenu/*, in string header, in string resourceId, in RoutedCommand command, Func commandParameter, ImageSource iconImageSource*/) /*: this(parentMenu._Items, header, resourceId, command, commandParameter, iconImageSource)*/ => _parentMenu = parentMenu;

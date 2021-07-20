@@ -8,7 +8,6 @@
         xmlns:commands="clr-namespace:WinCopies.Commands;assembly=WinCopies.Util.Desktop"
         xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
         xmlns:io="clr-namespace:WinCopies.GUI.IO.ObjectModel;assembly=WinCopies.GUI.IO"
-        xmlns:media="clr-namespace:System.Windows.Media;assembly=PresentationCore"
         xmlns:guiResources="clr-namespace:WinCopies.GUI.Icons.Properties;assembly=WinCopies.GUI.Icons"
         mc:Ignorable="d"
         d:DesignHeight="300" d:DesignWidth="400" Title="{Binding SelectedItem.Path.Name, StringFormat={}{0} - WinCopies Alpha}" Icon="{Binding SelectedItem.Path.BitmapSources.SmallBitmapSource}">
@@ -24,7 +23,9 @@
         <CommandBinding Command="{x:Static local:MainWindow.Quit}" CanExecute="Command_CanExecute" Executed="Quit_Executed" />
 
         <CommandBinding Command="{x:Static ApplicationCommands.Copy}" CanExecute="Copy_CanExecute" Executed="Copy_Executed" />
+        <CommandBinding Command="{x:Static ApplicationCommands.Cut}" CanExecute="Copy_CanExecute" Executed="Cut_Executed" />
         <CommandBinding Command="{x:Static ApplicationCommands.Paste}" CanExecute="Paste_CanExecute" Executed="Paste_Executed" />
+        <CommandBinding Command="{x:Static ApplicationCommands.Delete}" CanExecute="Delete_CanExecute" Executed="Delete_Executed" />
 
         <CommandBinding Command="{x:Static ApplicationCommands.Help}" CanExecute="Command_CanExecute" Executed="About_Executed" />
         <CommandBinding Command="{x:Static local:MainWindow.SubmitABug}" CanExecute="Command_CanExecute" Executed="SubmitABug_Executed" />
@@ -113,7 +114,9 @@
             </local:MenuItem>
             <local:MenuItem ResourceKey="Edit">
                 <local:MenuItem ResourceKey="Copy" Icon="{x:Static guiResources:Resources.page_copy}" Command="{x:Static ApplicationCommands.Copy}" />
+                <local:MenuItem ResourceKey="Cut" Icon="{x:Static guiResources:Resources.cut}" Command="{x:Static ApplicationCommands.Cut}" />
                 <local:MenuItem ResourceKey="Paste" Icon="{x:Static guiResources:Resources.page_paste}" Command="{x:Static ApplicationCommands.Paste}" />
+                <local:MenuItem ResourceKey="Delete" Icon="{x:Static guiResources:Resources.delete}" Command="{x:Static ApplicationCommands.Delete}" />
             </local:MenuItem>
             <MenuItem Header="Open _with" ItemsSource="{Binding DataContext.SelectedItem.BrowsabilityPaths, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:MainWindow}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
             <MenuItem Header="_Tools" ItemsSource="{Binding DataContext.SelectedItem.CustomProcesses, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:MainWindow}}}" ItemContainerStyle="{StaticResource MenuItemItemContainerStyle}" />
@@ -334,7 +337,7 @@
                     <Setter Property="Header" Value="{Binding}" />
                     <Setter Property="HeaderTemplate">
                         <Setter.Value>
-                            <DataTemplate DataType="{x:Type io:ExplorerControlBrowsableObjectInfoViewModel}">
+                            <DataTemplate DataType="{x:Type io:IExplorerControlBrowsableObjectInfoViewModel}">
                                 <DockPanel>
                                     <Image DockPanel.Dock="Left" Source="{Binding Path.BitmapSources.MediumBitmapSource}" Height="32" Width="32" />
                                     <controls:Label Content="{Binding Path.Name}" RecognizesAccessKey="False" VerticalContentAlignment="Center" />

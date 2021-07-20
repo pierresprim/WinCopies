@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
+using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
 using WinCopies.IO.Process;
@@ -24,23 +25,58 @@ using WinCopies.Util.Data;
 
 namespace WinCopies
 {
+    public class PathCollectionUpdater : IUpdater
+    {
+        public static IMainWindowModel Instance { get; internal set; }
+
+        public int Run(string[] args)
+        {
+            if (args != null)
+            {
+                IQueue<string> queue = new Collections.DotNetFix.Generic.Queue<string>();
+
+                App.InitQueues(args, queue, null);
+
+                App.Run(queue);
+            }
+
+            return 0;
+        }
+    }
+
+    public interface IMainWindowModel
+    {
+        ICollection<IExplorerControlBrowsableObjectInfoViewModel> Paths { get; }
+    }
+
+    public class MainWindowModel : IMainWindowModel
+    {
+        public ICollection<IExplorerControlBrowsableObjectInfoViewModel> Paths { get; }
+
+        private MainWindowModel(in ICollection<IExplorerControlBrowsableObjectInfoViewModel> paths) => Paths = paths;
+
+        public static void Init(in ICollection<IExplorerControlBrowsableObjectInfoViewModel> paths) => PathCollectionUpdater.Instance ??= new MainWindowModel(paths);
+    }
+
     public class MainWindowViewModel : ViewModelBase
     {
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
         public MenuViewModel Menu { get; }
 
-        public ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> Paths { get; } = new ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>();
+        public System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> Paths { get; } = new System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>();
 
         private ExplorerControlBrowsableObjectInfoViewModel _selectedItem;
 
-        public ExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => _selectedItem; set { _selectedItem = value; OnPropertyChanged(nameof(SelectedItem)); } }
+        public ExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => _selectedItem; set { UpdateValue(ref _selectedItem, value, nameof(SelectedItem)); } }
 
         public MainWindowViewModel()
         {
             Menu = new MenuViewModel();
 
             Paths.CollectionChanged += Paths_CollectionChanged;
+
+            MainWindowModel.Init(Paths);
         }
 
         private void Paths_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

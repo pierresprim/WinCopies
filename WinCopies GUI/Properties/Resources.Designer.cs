@@ -169,11 +169,47 @@ namespace WinCopies.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copies the selected items on the Clipboard..
+        ///   Looks up a localized string similar to Copies the selected items to the Clipboard..
         /// </summary>
         public static string CopyStatusBarLabel {
             get {
                 return ResourceManager.GetString("CopyStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cut.
+        /// </summary>
+        public static string Cut {
+            get {
+                return ResourceManager.GetString("Cut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copies the selected items to the Clipboard and mark them for move..
+        /// </summary>
+        public static string CutStatusBarLabel {
+            get {
+                return ResourceManager.GetString("CutStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        public static string Delete {
+            get {
+                return ResourceManager.GetString("Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deletes the selected items permanently..
+        /// </summary>
+        public static string DeleteStatusBarLabel {
+            get {
+                return ResourceManager.GetString("DeleteStatusBarLabel", resourceCulture);
             }
         }
         

@@ -26,23 +26,37 @@ using WinCopies.IO.Process;
 
 namespace WinCopies
 {
+    public class ProcessCollectionUpdater : IUpdater
+    {
+        public static IProcessWindowModel Instance { get; internal set; }
+
+        public int Run(string[] args)
+        {
+            IQueue<IProcessParameters> queue = new Collections.DotNetFix.Generic.Queue<IProcessParameters>();
+
+            App.InitQueues(args, null, queue);
+
+            App.Run(queue);
+
+            return 0;
+        }
+    }
+
+    public interface IProcessWindowModel
+    {
+        ICollection<IProcess> Processes { get; }
+    }
+
     public class _Processes : IProcessWindowModel
     {
-
         public ICollection<IProcess> Processes { get; }
 
-        private _Processes(in ICollection<IProcess> processes)
-        {
-            Processes = processes;
-        }
+        private _Processes(in ICollection<IProcess> processes) => Processes = processes;
 
         public static void Init(in ICollection<IProcess> processes) => ProcessCollectionUpdater.Instance = new _Processes(processes);
     }
 
-    /// <summary>
-    /// Interaction logic for ProcessWindow.xaml
-    /// </summary>
-    public sealed partial class ProcessWindow : GUI.IO.Controls.Process.ProcessWindow
+    public sealed partial class ProcessWindow : GUI.Windows.Window
     {
         internal ProcessWindow()
         {
@@ -50,7 +64,9 @@ namespace WinCopies
 
             processes.CollectionChanged += Processes_CollectionChanged;
 
-            Processes = processes;
+            ContentTemplateSelector = new InterfaceDataTemplateSelector();
+
+            Content = new ProcessManager<IProcess>() { Processes = processes };
 
             _ = App.Current._OpenWindows.AddLast(this);
 
@@ -73,7 +89,7 @@ namespace WinCopies
         {
             base.OnClosing(e);
 
-            var processes = (Collection<IProcess>)Processes;
+            var processes = (Collection<IProcess>)((ProcessManager<IProcess>)Content).Processes;
 
             bool error = false;
 
@@ -100,37 +116,5 @@ namespace WinCopies
 
                 _ = App.Current._OpenWindows.Remove(this);
         }
-    }
-
-    public interface IProcessCollectionUpdater
-    {
-        void Add(IProcess process);
-
-        IProcessWindowModel Get();
-
-        void Run(string[] args);
-    }
-
-    public class ProcessCollectionUpdater : IProcessCollectionUpdater
-    {
-        public static IProcessWindowModel Instance { get; internal set; }
-
-        public void Run(string[] args)
-        {
-            IQueue<IProcessParameters> queue = new Collections.DotNetFix.Generic.Queue<IProcessParameters>();
-
-            App.GetQueues(args, null, queue);
-
-            App.Run(queue);
-        }
-
-        public void Add(IProcess process) => Instance.Processes.Add(process);
-
-        public IProcessWindowModel Get() => Instance;
-    }
-
-    public interface IProcessWindowModel
-    {
-        ICollection<IProcess> Processes { get; }
     }
 }

@@ -154,7 +154,19 @@
     <value>Copy</value>
   </data>
   <data name="CopyStatusBarLabel" xml:space="preserve">
-    <value>Copies the selected items on the Clipboard.</value>
+    <value>Copies the selected items to the Clipboard.</value>
+  </data>
+  <data name="Cut" xml:space="preserve">
+    <value>Cut</value>
+  </data>
+  <data name="CutStatusBarLabel" xml:space="preserve">
+    <value>Copies the selected items to the Clipboard and mark them for move.</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteStatusBarLabel" xml:space="preserve">
+    <value>Deletes the selected items permanently.</value>
   </data>
   <data name="Edit" xml:space="preserve">
     <value>_Edit</value>
