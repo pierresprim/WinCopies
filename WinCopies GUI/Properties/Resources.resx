@@ -160,7 +160,7 @@
     <value>Cut</value>
   </data>
   <data name="CutStatusBarLabel" xml:space="preserve">
-    <value>Copies the selected items to the Clipboard and mark them for move.</value>
+    <value>Copies the selected items to the Clipboard and mark them to be moved.</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
@@ -170,6 +170,12 @@
   </data>
   <data name="Edit" xml:space="preserve">
     <value>_Edit</value>
+  </data>
+  <data name="EmptyRecycleBin" xml:space="preserve">
+    <value>Empty Recycle Bin</value>
+  </data>
+  <data name="EmptyRecycleBinStatusBarLabel" xml:space="preserve">
+    <value>Empties the Recycle Bin and delete all of its content from the disk.</value>
   </data>
   <data name="File" xml:space="preserve">
     <value>_File</value>
@@ -222,6 +228,12 @@
   </data>
   <data name="QuitStatusBarLabel" xml:space="preserve">
     <value>Closes all windows of the current process.</value>
+  </data>
+  <data name="Recycle" xml:space="preserve">
+    <value>Recycle</value>
+  </data>
+  <data name="RecycleStatusBarLabel" xml:space="preserve">
+    <value>Moves the selected items to the Recycle Bin.</value>
   </data>
   <data name="SetClipboardErrorMessage" xml:space="preserve">
     <value>The clipboard operation did not succeeded.</value>

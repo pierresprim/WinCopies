@@ -19,7 +19,7 @@ namespace WinCopies.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -187,7 +187,7 @@ namespace WinCopies.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copies the selected items to the Clipboard and mark them for move..
+        ///   Looks up a localized string similar to Copies the selected items to the Clipboard and mark them to be moved..
         /// </summary>
         public static string CutStatusBarLabel {
             get {
@@ -219,6 +219,24 @@ namespace WinCopies.Properties {
         public static string Edit {
             get {
                 return ResourceManager.GetString("Edit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Empty Recycle Bin.
+        /// </summary>
+        public static string EmptyRecycleBin {
+            get {
+                return ResourceManager.GetString("EmptyRecycleBin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Empties the Recycle Bin and delete all of its content from the disk..
+        /// </summary>
+        public static string EmptyRecycleBinStatusBarLabel {
+            get {
+                return ResourceManager.GetString("EmptyRecycleBinStatusBarLabel", resourceCulture);
             }
         }
         
@@ -382,6 +400,24 @@ namespace WinCopies.Properties {
         public static string QuitStatusBarLabel {
             get {
                 return ResourceManager.GetString("QuitStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recycle.
+        /// </summary>
+        public static string Recycle {
+            get {
+                return ResourceManager.GetString("Recycle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Moves the selected items to the Recycle Bin..
+        /// </summary>
+        public static string RecycleStatusBarLabel {
+            get {
+                return ResourceManager.GetString("RecycleStatusBarLabel", resourceCulture);
             }
         }
         

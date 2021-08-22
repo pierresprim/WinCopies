@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 
@@ -234,27 +235,45 @@ namespace WinCopies
             e.Handled = true;
         }
 
-        System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetEnumerable() => ((MainWindowViewModel)DataContext).SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
+        private System.Collections.Generic.IEnumerable<IBrowsableObjectInfo> GetEnumerable() => ((MainWindowViewModel)DataContext).SelectedItem.Path.Items.WhereSelect(item => item.IsSelected, item => item.Model);
 
-        private void Copy_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void CanRunCommand(in IProcessFactoryProcessInfo processFactory, in CanExecuteRoutedEventArgs e)
         {
-            // todo:
-            //e.CanExecute = new EmptyCheckEnumerator<IBrowsableObjectInfoViewModel>(((MainWindowViewModel)DataContext).SelectedItem.Path.Items.Where(item => item.IsSelected).GetEnumerator()).HasItems;
-
-            var dataContext = (MainWindowViewModel)DataContext;
-
-            e.CanExecute = dataContext.SelectedItem.Path.ProcessFactory.Copy.CanRun(GetEnumerable());
+            e.CanExecute = processFactory.CanRun(GetEnumerable());
 
             e.Handled = true;
         }
 
+        private static void RunCommand(in Action action, in ExecutedRoutedEventArgs e)
+        {
+            action();
+
+            e.Handled = true;
+        }
+
+        private void Copy_CanExecute(object sender, CanExecuteRoutedEventArgs e) =>
+
+            // todo:
+            //e.CanExecute = new EmptyCheckEnumerator<IBrowsableObjectInfoViewModel>(((MainWindowViewModel)DataContext).SelectedItem.Path.Items.Where(item => item.IsSelected).GetEnumerator()).HasItems;
+
+            CanRunCommand(GetProcessFactory().Copy, e);
+
         private IProcessFactory GetProcessFactory() => ((MainWindowViewModel)DataContext).SelectedItem.Path.ProcessFactory;
+
+        private static void RunCommand(in Action action, in IRunnableProcessFactoryProcessInfo processFactory)
+        {
+            if (processFactory.UserConfirmationRequired && MessageBox.Show(processFactory.GetUserConfirmationText(), Assembly.GetExecutingAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.No)
+
+                return;
+
+            action();
+        }
 
         private void RunProcess(in ExecutedRoutedEventArgs e, in FuncIn<IProcessFactory, IRunnableProcessFactoryProcessInfo> func)
         {
-            func(GetProcessFactory()).Run(GetEnumerable(), 10u);
+            IRunnableProcessFactoryProcessInfo processFactory = func(GetProcessFactory());
 
-            e.Handled = true;
+            RunCommand(() => RunCommand(() => processFactory.Run(GetEnumerable(), 10u), processFactory), e);
         }
 
         private void Copy_Executed(object sender, ExecutedRoutedEventArgs e) => RunProcess(e, (in IProcessFactory processFactory) => processFactory.Copy);
@@ -268,15 +287,8 @@ namespace WinCopies
             e.Handled = true;
         }
 
-        private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = GetProcessFactory().Deletion.CanRun(GetEnumerable());
+        private void Paste_Executed(object sender, ExecutedRoutedEventArgs e) =>
 
-            e.Handled = true;
-        }
-
-        private void Paste_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
             //StringCollection sc = System.Windows.Clipboard.GetFileDropList();
 
             //StringEnumerator paths = sc.GetEnumerator();
@@ -315,19 +327,19 @@ namespace WinCopies
             //    copyProcess.RunWorkerAsync();
             //}
 
-            StartInstance(GetProcessFactory().Copy.TryGetProcessParameters(10u));
+            RunCommand(() => StartInstance(GetProcessFactory().Copy.TryGetProcessParameters(10u)), e);
 
-            e.Handled = true;
-        }
+        private void Recycle_CanExecute(object sender, CanExecuteRoutedEventArgs e) => CanRunCommand(GetProcessFactory().Recycling, e);
 
-        private void Delete_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            if (MessageBox.Show("Are you sure you want to permanently delete the selected items from the disk?", "WinCopies", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
+        private void Recycle_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(() => StartInstance(GetProcessFactory().Recycling.TryGetProcessParameters(GetEnumerable())), e);
 
-                StartInstance(GetProcessFactory().Deletion.TryGetProcessParameters(GetEnumerable()));
+        private void Empty_CanExecute(object sender, CanExecuteRoutedEventArgs e) => CanRunCommand(GetProcessFactory().Clearing, e);
 
-            e.Handled = true;
-        }
+        private void Empty_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(() => StartInstance(GetProcessFactory().Clearing.TryGetProcessParameters(GetEnumerable())), e);
+
+        private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e) => CanRunCommand(GetProcessFactory().Deletion, e);
+
+        private void Delete_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(() => StartInstance(GetProcessFactory().Deletion.TryGetProcessParameters(GetEnumerable())), e);
 
         // todo: replace with WinCopies.Util.Desktop implementation
 

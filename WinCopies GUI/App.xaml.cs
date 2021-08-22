@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack.PortableDevices;
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
@@ -181,7 +180,7 @@ namespace WinCopies
         }
     }
 
-    public partial class App : Application/*, INotifyPropertyChanged, ISingleInstanceApp*/
+    public partial class App : Application
     {
         internal IQueue<IProcessParameters> _processQueue;
 
@@ -198,7 +197,7 @@ namespace WinCopies
             if (processParameters != null)
 
                 StartInstance(GetProcessParameters(processParameters));
-        } 
+        }
 
         internal static System.Collections.Generic.IEnumerable<string> GetProcessParameters(IProcessParameters processParameters)
         {
@@ -227,7 +226,7 @@ namespace WinCopies
 
                 _ = arrayBuilder.AddLast(value);
 
-            (*i)++;
+            // (*i)++;
 
             return arrayBuilder.ToArray();
         }
@@ -262,6 +261,10 @@ namespace WinCopies
             arrayBuilder?.Clear();
         }
 
+        private static IBrowsableObjectInfo GetBrowsableObjectInfo(string path) => ShellObjectInfo.From(ShellObjectFactory.Create(path));
+
+        private static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlViewModel(in string path) => GUI.Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(path, ClientVersion)), GetBrowsableObjectInfo);
+
         public static App GetPathApp(IQueue<string> queue)
         {
             var app = new App();
@@ -282,7 +285,7 @@ namespace WinCopies
 
                             if (WinCopies.IO.Path.Exists(queue.Peek()))
 
-                                paths.Add(ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(queue.Dequeue(), ClientVersion))));
+                                paths.Add(GetExplorerControlViewModel(queue.Dequeue()));
 
                             else
 
@@ -365,7 +368,7 @@ namespace WinCopies
 
             //MainWindow.Closed += MainWindow_Closed;
 
-            GUI.IO.ObjectModel.BrowsableObjectInfo.RegisterDefaultSelectors();
+            GUI.Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultSelectors();
 
             if (_processQueue != null)
 
@@ -378,14 +381,14 @@ namespace WinCopies
         {
             while (pathQueue.Count != 0)
 
-                Current.Dispatcher.Invoke(() => PathCollectionUpdater.Instance.Paths.Add(ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(pathQueue.Dequeue())))));
+                Current.Dispatcher.Invoke(() => PathCollectionUpdater.Instance.Paths.Add(GetExplorerControlViewModel(pathQueue.Dequeue())));
         }
 
         public static void Run(IQueue<IProcessParameters> processQueue)
         {
             while (processQueue.Count != 0)
 
-                Current.Dispatcher.Invoke(() => ProcessCollectionUpdater.Instance.Processes.Add(new Process(IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(processQueue.Dequeue(), App.DefaultProcessPathCollectionFactory)))));
+                Current.Dispatcher.Invoke(() => ProcessCollectionUpdater.Instance.Processes.Add(new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(processQueue.Dequeue(), DefaultProcessPathCollectionFactory)))));
         }
 
         private void _OpenWindows_CollectionChanged(object sender, LinkedCollectionChangedEventArgs<Window> e) => Environment.Exit(0);
@@ -415,7 +418,7 @@ namespace WinCopies
             IUIntCountableEnumerator<TItems> IUIntCountableEnumerable<TItems, IUIntCountableEnumerator<TItems>>.GetEnumerator() => new UIntCountableEnumeratorInfo<TItems>(GetEnumerator(), CountFunc);
         }
 
-        public static ClientVersion ClientVersion { get; } = new ClientVersion(Assembly.GetExecutingAssembly().GetName());
+        public static IO.ClientVersion ClientVersion { get; } = new(Assembly.GetExecutingAssembly().GetName());
 
         public bool IsClosing { get; internal set; }
 
@@ -427,7 +430,7 @@ namespace WinCopies
 
         public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfo browsableObjectInfo)
         {
-            IExplorerControlBrowsableObjectInfoViewModel viewModel = ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(browsableObjectInfo));
+            IExplorerControlBrowsableObjectInfoViewModel viewModel = GUI.Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(browsableObjectInfo), GetBrowsableObjectInfo);
 
             return viewModel;
         }
