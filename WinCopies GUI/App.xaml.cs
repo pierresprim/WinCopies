@@ -184,7 +184,7 @@ namespace WinCopies
 
     public partial class App : Application
     {
-        public static ResourceDictionary GetResourceDictionary() => new ResourceDictionary() { Source = new Uri("ResourceDictionary.xaml", UriKind.Relative) };
+        public static ResourceDictionary GetResourceDictionary() => new() { Source = new Uri("ResourceDictionary.xaml", UriKind.Relative) };
 
         internal IQueue<IProcessParameters> _processQueue;
 
@@ -366,7 +366,7 @@ namespace WinCopies
         {
             base.OnStartup(e);
 
-            _OpenWindows.CollectionChanged += _OpenWindows_CollectionChanged;
+            _OpenWindows.CollectionChanged += OpenWindows_CollectionChanged;
 
             //MainWindow = new MainWindow();
 
@@ -395,7 +395,7 @@ namespace WinCopies
                 Current.Dispatcher.Invoke(() => ProcessCollectionUpdater.Instance.Processes.Add(new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(processQueue.Dequeue(), DefaultProcessPathCollectionFactory)))));
         }
 
-        private void _OpenWindows_CollectionChanged(object sender, LinkedCollectionChangedEventArgs<Window> e) => Environment.Exit(0);
+        private void OpenWindows_CollectionChanged(object sender, LinkedCollectionChangedEventArgs<Window> e) => Environment.Exit(0);
 
         // TODO:
         public class CustomEnumeratorProvider<TItems, TEnumerator> : System.Collections.Generic.IEnumerable<TItems> where TEnumerator : System.Collections.Generic.IEnumerator<TItems>
