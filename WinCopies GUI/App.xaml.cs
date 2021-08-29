@@ -126,6 +126,8 @@ namespace WinCopies
         {
             var app = new App
             {
+                Resources = App.GetResourceDictionary(),
+
                 MainWindow = new ProcessWindow()
             };
 
@@ -182,6 +184,8 @@ namespace WinCopies
 
     public partial class App : Application
     {
+        public static ResourceDictionary GetResourceDictionary() => new ResourceDictionary() { Source = new Uri("ResourceDictionary.xaml", UriKind.Relative) };
+
         internal IQueue<IProcessParameters> _processQueue;
 
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
@@ -270,6 +274,8 @@ namespace WinCopies
             var app = new App();
 
             app.OpenWindows = new UIntCountableProvider<Window, IEnumeratorInfo2<Window>>(() => new EnumeratorInfo<Window>(app._OpenWindows), () => app._OpenWindows.Count);
+
+            app.Resources = GetResourceDictionary();
 
             app.MainWindow = new MainWindow();
 
@@ -361,8 +367,6 @@ namespace WinCopies
             base.OnStartup(e);
 
             _OpenWindows.CollectionChanged += _OpenWindows_CollectionChanged;
-
-            Resources = new ResourceDictionary() { Source = new Uri("ResourceDictionary.xaml", UriKind.Relative) };
 
             //MainWindow = new MainWindow();
 

@@ -60,15 +60,18 @@ namespace WinCopies
 
     public class MainWindowViewModel : ViewModelBase
     {
+        private ExplorerControlBrowsableObjectInfoViewModel _selectedItem;
+        private int _selectedIndex;
+
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
         public MenuViewModel Menu { get; }
 
         public System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> Paths { get; } = new System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>();
 
-        private ExplorerControlBrowsableObjectInfoViewModel _selectedItem;
+        public ExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => _selectedItem; set => UpdateValue(ref _selectedItem, value, nameof(SelectedItem)); }
 
-        public ExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => _selectedItem; set { UpdateValue(ref _selectedItem, value, nameof(SelectedItem)); } }
+        public int SelectedIndex { get => _selectedIndex; set => UpdateValue(ref _selectedIndex, value, nameof(SelectedIndex)); }
 
         public MainWindowViewModel()
         {

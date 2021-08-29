@@ -22,14 +22,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="WinCopies.GUI" Version="3.7-preview" />
     <PackageReference Include="WinCopies.GUI.Icons" Version="3.6" />
-    <PackageReference Include="WinCopies.GUI.Templates" Version="3.6-preview" />
-    <PackageReference Include="WinCopies.IO" Version="3.6-preview" />
-    <PackageReference Include="WinCopies.IO.Shell" Version="3.6-preview" />
-    <PackageReference Include="WinCopies.GUI.IO" Version="3.6-preview" />
-    <PackageReference Include="WinCopies.GUI.Shell" Version="3.6-preview" />
-    <PackageReference Include="WinCopies.Collections" Version="3.12-preview" />
-    <PackageReference Include="WinCopies.Util.Desktop" Version="3.12-preview" />
+    <PackageReference Include="WinCopies.GUI.Templates" Version="3.7-preview" />
+    <PackageReference Include="WinCopies.IO" Version="3.7-preview" />
+    <PackageReference Include="WinCopies.IO.Shell" Version="3.7-preview" />
+    <PackageReference Include="WinCopies.GUI.IO" Version="3.7-preview" />
+    <PackageReference Include="WinCopies.GUI.Shell" Version="3.7-preview" />
+    <PackageReference Include="WinCopies.Collections" Version="3.13-preview" />
+    <PackageReference Include="WinCopies.Util.Desktop" Version="3.13-preview" />
     <PackageReference Include="WinCopies.IPCService.Extensions" Version="4.0" />
     <!--<PackageReference Include="WinCopies.GUI" Version="3.0.0-preview" />
     <PackageReference Include="WinCopies.Util" Version="3.4.0-preview" />-->

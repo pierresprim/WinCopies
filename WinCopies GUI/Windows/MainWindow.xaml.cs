@@ -24,19 +24,31 @@ using System.Windows.Input;
 
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.GUI.IO.ObjectModel;
+using WinCopies.GUI.Windows;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.Linq;
+
+using static System.Windows.MessageBoxButton;
+using static System.Windows.MessageBoxImage;
+using static System.Windows.MessageBoxResult;
 
 using static WinCopies.App;
 using static WinCopies.UtilHelpers;
 
 namespace WinCopies
 {
+    public enum CloseTabsTo : sbyte
+    {
+        Left = 1,
+
+        Right = 2
+    }
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : GUI.Windows.Window
     {
         //public static readonly DependencyProperty MenuProperty = DependencyProperty.Register(nameof(Menu), typeof(MenuViewModel), typeof(MainWindow));
 
@@ -48,15 +60,19 @@ namespace WinCopies
 
         //public MenuItemViewModel SelectedMenuItem { get => (MenuItemViewModel)GetValue(SelectedMenuItemProperty); internal set => SetValue(SelectedMenuItemPropertyKey, value); }
 
-        public static RoutedCommand NewRegistryTab { get; } = new RoutedUICommand(Properties.Resources.NewRegistryTab, nameof(NewRegistryTab), typeof(MainWindow));
+        private static RoutedCommand GetRoutedCommand(in string text, in string name) => new RoutedUICommand(text, name, typeof(MainWindow));
 
-        public static RoutedCommand NewWMITab { get; } = new RoutedUICommand(Properties.Resources.NewWMITab, nameof(NewWMITab), typeof(MainWindow));
+        public static RoutedCommand NewRegistryTab { get; } = GetRoutedCommand(Properties.Resources.NewRegistryTab, nameof(NewRegistryTab));
+
+        public static RoutedCommand NewWMITab { get; } = GetRoutedCommand(Properties.Resources.NewWMITab, nameof(NewWMITab));
 
         public static RoutedCommand CloseOtherTabs { get; } = new RoutedUICommand(Properties.Resources.CloseOtherTabs, nameof(CloseOtherTabs), typeof(MainWindow), new InputGestureCollection() { new KeyGesture(Key.W, ModifierKeys.Control | ModifierKeys.Alt) });
 
-        public static RoutedCommand Quit { get; } = new RoutedUICommand(Properties.Resources.Quit, nameof(Quit), typeof(MainWindow));
+        public static RoutedCommand CloseTabsToTheLeftOrRight { get; } = GetRoutedCommand(Properties.Resources.CloseTabsToTheLeftOrRight, nameof(CloseTabsToTheLeftOrRight));
 
-        public static RoutedCommand SubmitABug { get; } = new RoutedUICommand(Properties.Resources.SubmitABug, nameof(SubmitABug), typeof(MainWindow));
+        public static RoutedCommand Quit { get; } = GetRoutedCommand(Properties.Resources.Quit, nameof(Quit));
+
+        public static RoutedCommand SubmitABug { get; } = GetRoutedCommand(Properties.Resources.SubmitABug, nameof(SubmitABug));
 
         public MainWindow()
         {
@@ -74,11 +90,16 @@ namespace WinCopies
             e.Handled = true;
         }
 
-        private void AddNewTab(IExplorerControlBrowsableObjectInfoViewModel viewModel, ExecutedRoutedEventArgs e)
+        private void AddNewDefaultTab(in IExplorerControlBrowsableObjectInfoViewModel viewModel)
         {
             viewModel.IsSelected = true;
 
             ((MainWindowViewModel)DataContext).Paths.Add(viewModel);
+        }
+
+        private void AddNewTab(IExplorerControlBrowsableObjectInfoViewModel viewModel, ExecutedRoutedEventArgs e)
+        {
+            AddNewDefaultTab(viewModel);
 
             e.Handled = true;
         }
@@ -179,7 +200,7 @@ namespace WinCopies
         {
             System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((MainWindowViewModel)DataContext).Paths;
 
-            if (!Current.IsClosing && paths.Count > 1 && MessageBox.Show(this, Properties.Resources.WindowClosingMessage, "WinCopies", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) != MessageBoxResult.Yes)
+            if (!Current.IsClosing && paths.Count > 1 && MessageBox.Show(this, Properties.Resources.WindowClosingMessage, "WinCopies", YesNo, Question, No) != Yes)
 
                 e.Cancel = true;
 
@@ -202,9 +223,9 @@ namespace WinCopies
 
         private void Quit_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ObservableLinkedCollection<Window> openWindows = Current._OpenWindows;
+            ObservableLinkedCollection<System.Windows.Window> openWindows = Current._OpenWindows;
 
-            if (openWindows.Count == 1 || MessageBox.Show(this, Properties.Resources.ApplicationClosingMessage, "WinCopies", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
+            if (openWindows.Count == 1u || MessageBox.Show(this, Properties.Resources.ApplicationClosingMessage, "WinCopies", YesNo, Question, No) == Yes)
             {
                 Current.IsClosing = true;
 
@@ -262,7 +283,7 @@ namespace WinCopies
 
         private static void RunCommand(in Action action, in IRunnableProcessFactoryProcessInfo processFactory)
         {
-            if (processFactory.UserConfirmationRequired && MessageBox.Show(processFactory.GetUserConfirmationText(), Assembly.GetExecutingAssembly().GetName().Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.No)
+            if (processFactory.UserConfirmationRequired && MessageBox.Show(processFactory.GetUserConfirmationText(), Assembly.GetExecutingAssembly().GetName().Name, YesNo, Question, No) == No)
 
                 return;
 
@@ -287,47 +308,7 @@ namespace WinCopies
             e.Handled = true;
         }
 
-        private void Paste_Executed(object sender, ExecutedRoutedEventArgs e) =>
-
-            //StringCollection sc = System.Windows.Clipboard.GetFileDropList();
-
-            //StringEnumerator paths = sc.GetEnumerator();
-
-            //if (paths.MoveNext())
-            //{
-            //    var _paths = new List<WinCopies.IO.IPathInfo>(sc.Count);
-
-            //    sc = null;
-
-            //    string firstPathDirectory = System.IO.Path.GetDirectoryName(paths.Current);
-
-            //    void addPath() => _paths.Add(new WinCopies.IO.PathInfo(System.IO.Path.GetFileName(paths.Current), System.IO.Directory.Exists(paths.Current)));
-
-            //    addPath();
-
-            //    while (paths.MoveNext())
-
-            //        if (System.IO.Path.GetDirectoryName(paths.Current) == firstPathDirectory)
-
-            //            addPath();
-
-            //        else
-            //        {
-            //            _ = MessageBox.Show("The paths on the Clipboard do not have the same root.", "WinCopies", MessageBoxButton.OK, MessageBoxImage.Information);
-
-            //            e.Handled = true;
-
-            //            return;
-            //        }
-
-            //    var copyProcess = new CopyProcess(new PathCollection(firstPathDirectory, _paths), ((MainWindowViewModel)DataContext).SelectedItem.Path.Path);
-
-            //    (new ProcessWindow() { Content = copyProcess }).Show();
-
-            //    copyProcess.RunWorkerAsync();
-            //}
-
-            RunCommand(() => StartInstance(GetProcessFactory().Copy.TryGetProcessParameters(10u)), e);
+        private void Paste_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(() => StartInstance(GetProcessFactory().Copy.TryGetProcessParameters(10u)), e);
 
         private void Recycle_CanExecute(object sender, CanExecuteRoutedEventArgs e) => CanRunCommand(GetProcessFactory().Recycling, e);
 
@@ -340,6 +321,98 @@ namespace WinCopies
         private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e) => CanRunCommand(GetProcessFactory().Deletion, e);
 
         private void Delete_Executed(object sender, ExecutedRoutedEventArgs e) => RunCommand(() => StartInstance(GetProcessFactory().Deletion.TryGetProcessParameters(GetEnumerable())), e);
+
+        private static InvalidOperationException GetInvalidParameterException() => new("The given parameter is not valid.");
+
+        private void CloseTabsTo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            var parameter = (CloseTabsTo)e.Parameter;
+            var dataContext = (MainWindowViewModel)DataContext;
+
+            e.CanExecute = parameter switch
+            {
+                CloseTabsTo.Left => dataContext.SelectedIndex > 0,
+                CloseTabsTo.Right => dataContext.SelectedIndex < dataContext.Paths.Count - 1,
+                _ => throw GetInvalidParameterException(),
+            };
+
+            e.Handled = true;
+        }
+
+        private void CloseTabsTo_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var parameter = (CloseTabsTo)e.Parameter;
+            var dataContext = (MainWindowViewModel)DataContext;
+
+            switch (parameter)
+            {
+                case CloseTabsTo.Left:
+
+                    for (int i = 0; i < dataContext.SelectedIndex; i++)
+
+                        dataContext.Paths.RemoveAt(0);
+
+                    break;
+
+                case CloseTabsTo.Right:
+
+                    for (int i = dataContext.Paths.Count - 1; i > dataContext.SelectedIndex; i--)
+
+                        dataContext.Paths.RemoveAt(0);
+
+                    break;
+
+                default:
+
+                    throw GetInvalidParameterException();
+            }
+
+            e.Handled = true;
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+
+            var menuItems = new TitleBarMenuItemQueue();
+
+            menuItems.Enqueue(new TitleBarMenuItem() { Command = Commands.ApplicationCommands.NewTab });
+            menuItems.Enqueue(new TitleBarMenuItem() { Command = Commands.ApplicationCommands.CloseTab, CommandParameter = ((MainWindowViewModel)DataContext).SelectedItem });
+
+            TitleBarMenuItems = menuItems;
+        }
+
+        private void Window_PreviousCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = ((MainWindowViewModel)DataContext).SelectedItem.History.CanMovePreviousFromCurrent;
+
+            e.Handled = true;
+        }
+
+        private void Window_NextCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = ((MainWindowViewModel)DataContext).SelectedItem.History.CanMoveNextFromCurrent;
+
+            e.Handled = true;
+        }
+
+        private void Window_PreviousExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            ((MainWindowViewModel)DataContext).SelectedItem.History.CurrentIndex++;
+
+            CommandManager.InvalidateRequerySuggested();
+
+            e.Handled = true;
+        }
+
+        private void Window_NextExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            ((MainWindowViewModel)DataContext).SelectedItem.History.CurrentIndex--;
+
+            CommandManager.InvalidateRequerySuggested();
+
+            e.Handled = true;
+        }
 
         // todo: replace with WinCopies.Util.Desktop implementation
 

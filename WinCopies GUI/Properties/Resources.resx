@@ -144,6 +144,9 @@
   <data name="CloseTabStatusBarLabel" xml:space="preserve">
     <value>Closes the current tab.</value>
   </data>
+  <data name="CloseTabsToTheLeftOrRight" xml:space="preserve">
+    <value>Close tabs to the left or right</value>
+  </data>
   <data name="CloseWindow" xml:space="preserve">
     <value>Close _window</value>
   </data>
@@ -243,6 +246,9 @@
   </data>
   <data name="SubmitABugStatusBarLabel" xml:space="preserve">
     <value>Opens your default browser at the WinCopies' GitHub page.</value>
+  </data>
+  <data name="WinCopies" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\wincopies.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="WindowClosingMessage" xml:space="preserve">
     <value>You have multiple tabs open. Are you sure you want to close the window?</value>

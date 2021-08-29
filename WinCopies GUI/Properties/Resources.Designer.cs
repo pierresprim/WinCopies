@@ -142,6 +142,15 @@ namespace WinCopies.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close tabs to the left or right.
+        /// </summary>
+        public static string CloseTabsToTheLeftOrRight {
+            get {
+                return ResourceManager.GetString("CloseTabsToTheLeftOrRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Close _window.
         /// </summary>
         public static string CloseWindow {
@@ -445,6 +454,16 @@ namespace WinCopies.Properties {
         public static string SubmitABugStatusBarLabel {
             get {
                 return ResourceManager.GetString("SubmitABugStatusBarLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        public static System.Drawing.Icon WinCopies {
+            get {
+                object obj = ResourceManager.GetObject("WinCopies", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
         
