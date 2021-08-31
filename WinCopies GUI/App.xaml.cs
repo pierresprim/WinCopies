@@ -18,106 +18,101 @@
 using Microsoft.WindowsAPICodePack.Shell;
 
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-
-using WinCopies.Collections;
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
-using WinCopies.IPCService.Extensions;
+using WinCopies.Linq;
+using WpfLibrary1;
 
-using static WinCopies.ThrowHelper;
+using static WinCopies.App;
 
 namespace WinCopies
 {
-    public interface IUpdater
+    public sealed class SingleInstanceApp : SingleInstanceApp2<string>
     {
-        int Run(string[] args);
-    }
+        private static readonly SingleInstanceApp _app = new();
 
-    public static class WinCopiesExtensions
-    {
-        public static async Task Main_Mutex<TClass>(ISingleInstanceApp<IUpdater, int> app, bool paths, IQueue<string> pathQueue) where TClass : class, IUpdater
+        public static new SingleInstanceApp App => _app;
+
+        public override WpfLibrary1.App GetDefaultApp<T>(WpfLibrary1.IQueue<T> queue)
         {
-            (Mutex mutex, bool mutexExists, NullableGeneric<int> serverResult) = await app.StartInstanceAsync<IUpdater, TClass, int>();
+            var app = new App();
 
-            using (mutex)
+            SetOpenWindows(app, new Collections.Generic.UIntCountableProvider<Window, IEnumeratorInfo2<Window>>(() => new EnumeratorInfo<Window>(GetOpenWindows(app)), () => GetOpenWindows(app).Count));
 
-                if (mutexExists)
+            app.Resources = WpfLibrary1.App.GetResourceDictionary("ResourceDictionary.xaml");
 
-                    if (paths && pathQueue == null)
+            app.MainWindow = new MainWindow();
 
-                        await IPCService.Extensions.Extensions.StartThread(() => App.GetPathApp(pathQueue).Run(), 0);
+            System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((MainWindowViewModel)app.MainWindow.DataContext).Paths;
 
-                    else
+            if (queue != null)
+            {
+                string arg;
 
-                        Environment.Exit(serverResult == null ? 0 : serverResult.Value);
+                while (queue.Count != 0)
+
+                    try
+                    {
+                        do
+
+                            if (WinCopies.IO.Path.Exists((arg = queue.PeekAsString())))
+                            {
+                                _ = queue.Dequeue();
+
+                                paths.Add(GetExplorerControlViewModel(arg));
+                            }
+
+                            else
+
+                                _ = queue.Dequeue();
+
+                        while (queue.Count != 0);
+                    }
+
+                    catch
+                    {
+
+                    }
+            }
+
+            else
+
+                paths.Add(GetDefaultExplorerControlBrowsableObjectInfoViewModel());
+
+            // app.MainWindow = new MainWindow();
+
+            // System.Windows.Application.LoadComponent(app.Resources, new Uri("/wincopies;component/ResourceDictionary.xaml", UriKind.Relative));
+
+            return app;
         }
 
-        public abstract class SingleInstanceApp<T> : ISingleInstanceApp<IUpdater, int> where T : class
-        {
-            private readonly string _pipeName;
+        public override WpfLibrary1.SingleInstanceAppInstance<WpfLibrary1.IQueue<string>> GetDefaultSingleInstanceApp(WpfLibrary1.IQueue<string> args) => new SingleInstanceApp_Path(args);
 
-            protected T InnerObject { get; private set; }
+        protected override AppLoader<string> GetLoaderOverride() => new Loader();
 
-            protected SingleInstanceApp(in string pipeName, in T innerObject)
-            {
-                _pipeName = pipeName;
-
-                InnerObject = innerObject;
-            }
-
-            public string GetPipeName() => _pipeName;
-
-            public string GetClientName() => App.ClientVersion.ClientName;
-
-            private void Run()
-            {
-                App app = GetApp();
-
-                InnerObject = null;
-
-                _ = app.Run();
-            }
-
-            public ThreadStart GetThreadStart(out int maxStackSize)
-            {
-                maxStackSize = 0;
-
-                return Run;
-            }
-
-            protected abstract App GetApp();
-
-            protected abstract Expression<Func<IUpdater, int>> GetExpressionOverride();
-
-            public Expression<Func<IUpdater, int>> GetExpression()
-            {
-                Expression<Func<IUpdater, int>> result = GetExpressionOverride();
-
-                InnerObject = null;
-
-                return result;
-            }
-
-            public Expression<Func<IUpdater, Task<int>>> GetAsyncExpression() => null;
-
-            public CancellationToken? GetCancellationToken() => null;
-        }
+        internal new static unsafe System.Collections.Generic.IEnumerable<string> GetArray(ref ArrayBuilder<string> arrayBuilder, System.Collections.Generic.IEnumerable<string> keys, int* i, params string[] args) => WpfLibrary1.SingleInstanceApp.GetArray(ref arrayBuilder, keys, i, args);
     }
 
-    public sealed class SingleInstanceApp_Process : WinCopiesExtensions.SingleInstanceApp<IQueue<IProcessParameters>>
+    public abstract class SingleInstanceAppInstance<T> : WpfLibrary1.SingleInstanceAppInstance<WpfLibrary1.IQueue<T>>
     {
-        public SingleInstanceApp_Process(in IQueue<IProcessParameters> processParameters) : base("65cae396-971a-4545-97e7-83d4ed042d92", processParameters)
+        public SingleInstanceAppInstance(in string pipeName, in WpfLibrary1.IQueue<T> innerObject) : base(pipeName, innerObject) { /* Left empty. */ }
+
+        public override string GetClientName() => App.ClientVersion.ClientName;
+    }
+
+    public sealed class SingleInstanceApp_Process : SingleInstanceAppInstance<IProcessParameters>
+    {
+        public SingleInstanceApp_Process(in WpfLibrary1.IQueue<IProcessParameters> processParameters) : base("65cae396-971a-4545-97e7-83d4ed042d92", processParameters)
         {
             // Left empty.
         }
@@ -126,7 +121,7 @@ namespace WinCopies
         {
             var app = new App
             {
-                Resources = App.GetResourceDictionary(),
+                Resources = App.GetResourceDictionary("ResourceDictionary.xaml"),
 
                 MainWindow = new ProcessWindow()
             };
@@ -152,14 +147,14 @@ namespace WinCopies
         }
     }
 
-    public class SingleInstanceApp_Path : WinCopiesExtensions.SingleInstanceApp<IQueue<string>>
+    public class SingleInstanceApp_Path : SingleInstanceAppInstance<string>
     {
-        public SingleInstanceApp_Path(in IQueue<string> paths) : base("5e2e0072-edee-47d2-a0cd-a98d43b8b705", paths)
+        public SingleInstanceApp_Path(in WpfLibrary1.IQueue<string> paths) : base("5e2e0072-edee-47d2-a0cd-a98d43b8b705", paths)
         {
             // Left empty.
         }
 
-        protected override App GetApp() => App.GetPathApp(InnerObject);
+        protected override WpfLibrary1.App GetApp() => SingleInstanceApp.App.GetDefaultApp(InnerObject);
 
         protected override Expression<Func<IUpdater, int>> GetExpressionOverride()
         {
@@ -182,25 +177,75 @@ namespace WinCopies
         }
     }
 
-    public partial class App : Application
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
+    public class KeyAttribute : Attribute
     {
-        public static ResourceDictionary GetResourceDictionary() => new() { Source = new Uri("ResourceDictionary.xaml", UriKind.Relative) };
 
-        internal IQueue<IProcessParameters> _processQueue;
+    }
+
+    public sealed class Keys
+    {
+        [Key]
+        public const string Path = nameof(Path);
+
+        [Key]
+        public const string Process = nameof(Process);
+
+        public static System.Collections.Generic.IEnumerable<string> GetConsts() => typeof(Keys).GetFields(BindingFlags.Public | BindingFlags.Static).WhereSelect(f => f.GetCustomAttribute<KeyAttribute>(false) != null, f => (string)f.GetValue(null));
+    }
+
+    public class PathQueue : Queue
+    {
+        protected override Task Run() => SingleInstanceApp.App.MainDefault(this);
+    }
+
+    public class ProcessQueue : Collections.DotNetFix.Generic.Queue<IProcessParameters>, WpfLibrary1.IQueue<IProcessParameters>
+    {
+        string IQueueBase.DequeueAsString() => throw new InvalidOperationException();
+
+        string IQueueBase.PeekAsString() => throw new InvalidOperationException();
+
+        Task IQueueBase.Run() => Main_Process(this);
+    }
+
+    public class Loader : AppLoader<string>
+    {
+        private readonly WpfLibrary1.IQueue<string> _pathQueue = new PathQueue();
+        private readonly WpfLibrary1.IQueue<IProcessParameters> _processQueue = new ProcessQueue();
+
+        public override string DefaultKey => Keys.Path;
+
+        public override IQueueBase DefaultQueue => _pathQueue;
+
+        public unsafe static void LoadPathParameters(in Collections.DotNetFix.Generic.IQueue<string> queue, in int* i, params string[] args) => queue.Enqueue(args[(*i)++]);
+
+        public unsafe static void LoadProcessParameters(in Collections.DotNetFix.Generic.IQueue<IProcessParameters> queue, ref ArrayBuilder<string> arrayBuilder, in int* i, params string[] args) => queue.Enqueue(new ProcessParameters(args[*i], SingleInstanceApp.GetArray(ref arrayBuilder, Keys.GetConsts(), i, args)));
+
+        public unsafe override IDictionary<string, WpfLibrary1.Action> GetActions() => new Dictionary<string, WpfLibrary1.Action>(2)
+            {
+                { Keys.Path, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) => LoadPathParameters(_pathQueue, i, args) },
+
+                { Keys.Process, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) =>  LoadProcessParameters (_processQueue, ref  arrayBuilder, i, args) }
+            };
+
+        public override System.Collections.Generic.IEnumerable<IQueueBase> GetQueues() => Enumerable.Repeat(_processQueue, 1);
+    }
+
+    public partial class App : WpfLibrary1.App
+    {
+        internal WpfLibrary1.IQueue<IProcessParameters> _processQueue;
 
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
-        private unsafe delegate void Action(int* i);
+        public new bool IsClosing { get => base.IsClosing; internal set => base.IsClosing = value; }
 
-        public static string GetAssemblyDirectory() => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-        internal static void StartInstance(in System.Collections.Generic.IEnumerable<string> parameters) => System.Diagnostics.Process.Start(GetAssemblyDirectory() + "\\WinCopies.exe", parameters);
+        internal new ObservableLinkedCollection<Window> _OpenWindows => base._OpenWindows;
 
         internal static void StartInstance(in IProcessParameters processParameters)
         {
             if (processParameters != null)
 
-                StartInstance(GetProcessParameters(processParameters));
+                WpfLibrary1.SingleInstanceApp.StartInstance("WinCopies.exe", GetProcessParameters(processParameters));
         }
 
         internal static System.Collections.Generic.IEnumerable<string> GetProcessParameters(IProcessParameters processParameters)
@@ -214,223 +259,48 @@ namespace WinCopies
                 yield return parameter;
         }
 
-        private static unsafe void AddPath(in string[] args, in IQueue<string> paths, int* i) => paths.Enqueue(args[(*i)++]);
-
-        private static unsafe System.Collections.Generic.IEnumerable<string> GetArray(string[] args, ref ArrayBuilder<string> arrayBuilder, int* i)
-        {
-            if (arrayBuilder == null)
-
-                arrayBuilder = new ArrayBuilder<string>();
-
-            else
-
-                arrayBuilder.Clear();
-
-            foreach (string value in new Enumerable<string>(() => new ArrayEnumerator(args, i)).TakeWhile(arg => arg is not ("Process" or "Path")))
-
-                _ = arrayBuilder.AddLast(value);
-
-            // (*i)++;
-
-            return arrayBuilder.ToArray();
-        }
-
-        private static unsafe void AddProcess(in string[] args, in IQueue<IProcessParameters> processes, ref ArrayBuilder<string> arrayBuilder, int* i) => processes.Enqueue(new ProcessParameters(args[*i], GetArray(args, ref arrayBuilder, i)));
-
-        private static unsafe void RunAction(in Action action, int* i)
-        {
-            (*i)++;
-
-            action(i);
-        }
-
-        public static unsafe void InitQueues(string[] args, IQueue<string> paths, IQueue<IProcessParameters> processes)
-        {
-            ArrayBuilder<string> arrayBuilder = null;
-
-            for (int i = 0; i < args.Length;)
-
-                if (args[i] == "Process")
-
-                    RunAction(i => AddProcess(args, processes, ref arrayBuilder, i), &i);
-
-                else if (args[i] == "Path")
-
-                    RunAction(i => AddPath(args, paths, i), &i);
-
-                else
-
-                    return;
-
-            arrayBuilder?.Clear();
-        }
-
         private static IBrowsableObjectInfo GetBrowsableObjectInfo(string path) => ShellObjectInfo.From(ShellObjectFactory.Create(path));
 
-        private static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlViewModel(in string path) => GUI.Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(path, ClientVersion)), GetBrowsableObjectInfo);
-
-        public static App GetPathApp(IQueue<string> queue)
-        {
-            var app = new App();
-
-            app.OpenWindows = new UIntCountableProvider<Window, IEnumeratorInfo2<Window>>(() => new EnumeratorInfo<Window>(app._OpenWindows), () => app._OpenWindows.Count);
-
-            app.Resources = GetResourceDictionary();
-
-            app.MainWindow = new MainWindow();
-
-            System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((MainWindowViewModel)app.MainWindow.DataContext).Paths;
-
-            if (queue != null)
-
-                while (queue.Count != 0)
-
-                    try
-                    {
-                        do
-
-                            if (WinCopies.IO.Path.Exists(queue.Peek()))
-
-                                paths.Add(GetExplorerControlViewModel(queue.Dequeue()));
-
-                            else
-
-                                _ = queue.Dequeue();
-
-                        while (queue.Count != 0);
-                    }
-
-                    catch
-                    {
-
-                    }
-
-            else
-
-                paths.Add(GetDefaultExplorerControlBrowsableObjectInfoViewModel());
-
-            // app.MainWindow = new MainWindow();
-
-            // System.Windows.Application.LoadComponent(app.Resources, new Uri("/wincopies;component/ResourceDictionary.xaml", UriKind.Relative));
-
-            return app;
-        }
-
         #region Main
-        private static async Task Main_Paths(IQueue<string> paths) => await WinCopiesExtensions.Main_Mutex<PathCollectionUpdater>(new SingleInstanceApp_Path(paths), true, paths);
-
-        public static async Task Main_Process(IQueue<IProcessParameters> processQueue) => await WinCopiesExtensions.Main_Mutex<ProcessCollectionUpdater>(new SingleInstanceApp_Process(processQueue), false, null);
+        public static async Task Main_Process(WpfLibrary1.IQueue<IProcessParameters> processQueue) => await SingleInstanceApp.App.MainMutex<IProcessParameters, ProcessCollectionUpdater>(new SingleInstanceApp_Process(processQueue), false, null);
 
         [STAThread]
         public static async Task Main(string[] args)
         {
-            if (args.Length == 0)
-            {
-                await Main_Paths(null);
+            SingleInstanceApp app = new SingleInstanceApp();
 
-                return;
-            }
-
-            var pathQueue = new Collections.DotNetFix.Generic.Queue<string>();
-            var processQueue = new Collections.DotNetFix.Generic.Queue<IProcessParameters>();
-
-            InitQueues(args, pathQueue, processQueue);
-
-            if (processQueue.Count == 0)
-
-                await Main_Paths(pathQueue);
-
-            else
-            {
-                if (pathQueue.Count != 0)
-                {
-                    System.Collections.Generic.IEnumerable<string> pathsToEnumerable()
-                    {
-                        while (pathQueue.Count != 0)
-                        {
-                            yield return "Path";
-
-                            yield return pathQueue.Dequeue();
-                        }
-                    }
-
-                    StartInstance(pathsToEnumerable());
-                }
-
-                await Main_Process(processQueue);
-            }
+            await app.Main(args);
         }
         #endregion
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override void OnStartup2(StartupEventArgs e)
         {
-            base.OnStartup(e);
-
-            _OpenWindows.CollectionChanged += OpenWindows_CollectionChanged;
-
-            //MainWindow = new MainWindow();
-
-            //MainWindow.Closed += MainWindow_Closed;
-
             GUI.Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultSelectors();
 
             if (_processQueue != null)
 
                 Run(_processQueue);
-
-            MainWindow.Show();
         }
 
-        public static void Run(IQueue<string> pathQueue)
+        public static void Run(WpfLibrary1.IQueue<string> pathQueue)
         {
             while (pathQueue.Count != 0)
 
                 Current.Dispatcher.Invoke(() => PathCollectionUpdater.Instance.Paths.Add(GetExplorerControlViewModel(pathQueue.Dequeue())));
         }
 
-        public static void Run(IQueue<IProcessParameters> processQueue)
+        public static void Run(WpfLibrary1.IQueue<IProcessParameters> processQueue)
         {
             while (processQueue.Count != 0)
 
                 Current.Dispatcher.Invoke(() => ProcessCollectionUpdater.Instance.Processes.Add(new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(processQueue.Dequeue(), DefaultProcessPathCollectionFactory)))));
         }
 
-        private void OpenWindows_CollectionChanged(object sender, LinkedCollectionChangedEventArgs<Window> e) => Environment.Exit(0);
-
-        // TODO:
-        public class CustomEnumeratorProvider<TItems, TEnumerator> : System.Collections.Generic.IEnumerable<TItems> where TEnumerator : System.Collections.Generic.IEnumerator<TItems>
-        {
-            protected Func<TEnumerator> Func { get; }
-
-            public CustomEnumeratorProvider(in Func<TEnumerator> func) => Func = func;
-
-            public TEnumerator GetEnumerator() => Func();
-
-            System.Collections.Generic.IEnumerator<TItems> System.Collections.Generic.IEnumerable<TItems>.GetEnumerator() => Func();
-
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => Func();
-        }
-
-        public class UIntCountableProvider<TItems, TEnumerator> : CustomEnumeratorProvider<TItems, TEnumerator>, IUIntCountableEnumerable<TItems> where TEnumerator : IEnumeratorInfo2<TItems>
-        {
-            private Func<uint> CountFunc { get; }
-
-            uint IUIntCountable.Count => CountFunc();
-
-            public UIntCountableProvider(in Func<TEnumerator> func, in Func<uint> countFunc) : base(func) => CountFunc = countFunc;
-
-            IUIntCountableEnumerator<TItems> IUIntCountableEnumerable<TItems, IUIntCountableEnumerator<TItems>>.GetEnumerator() => new UIntCountableEnumeratorInfo<TItems>(GetEnumerator(), CountFunc);
-        }
-
         public static IO.ClientVersion ClientVersion { get; } = new(Assembly.GetExecutingAssembly().GetName());
 
-        public bool IsClosing { get; internal set; }
-
-        internal ObservableLinkedCollection<Window> _OpenWindows { get; } = new ObservableLinkedCollection<Window>();
-
-        public IUIntCountableEnumerable<Window> OpenWindows { get; internal set; }
-
         public static new App Current => (App)Application.Current;
+
+        internal static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlViewModel(in string path) => GUI.Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(path, ClientVersion)), GetBrowsableObjectInfo);
 
         public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfo browsableObjectInfo)
         {
@@ -440,82 +310,6 @@ namespace WinCopies
         }
 
         public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel() => GetDefaultExplorerControlBrowsableObjectInfoViewModel(new ShellObjectInfo(KnownFolders.Desktop, ClientVersion));
-
-#if !WinCopies4
-        public class ArrayEnumerator<T> : Enumerator<T>, ICountableDisposableEnumeratorInfo<T>
-        {
-            private System.Collections.Generic.IReadOnlyList<T> _array;
-            private readonly unsafe int* _currentIndex;
-            private readonly int _startIndex;
-            private Func<bool> _condition;
-            private System.Action _moveNext;
-
-            protected System.Collections.Generic.IReadOnlyList<T> Array => IsDisposed ? throw GetExceptionForDispose(false) : _array;
-
-            public int Count => IsDisposed ? throw GetExceptionForDispose(false) : _array.Count;
-
-            protected unsafe int CurrentIndex => IsDisposed ? throw GetExceptionForDispose(false) : *_currentIndex;
-
-            public unsafe ArrayEnumerator(in System.Collections.Generic.IReadOnlyList<T> array, in bool reverse = false, int* startIndex = null)
-            {
-                _array = array ?? throw GetArgumentNullException(nameof(array));
-
-                if (startIndex != null && (*startIndex < 0 || *startIndex >= array.Count))
-
-                    throw new ArgumentOutOfRangeException(nameof(startIndex), *startIndex, $"The given index is less than zero or greater than or equal to {nameof(array.Count)}.");
-
-                _currentIndex = startIndex;
-
-                if (reverse)
-                {
-                    _startIndex = startIndex == null ? _array.Count - 1 : *startIndex;
-                    _condition = () => *_currentIndex > 0;
-                    _moveNext = () => (*_currentIndex)--;
-                }
-
-                else
-                {
-                    _startIndex = startIndex == null ? 0 : *startIndex;
-                    _condition = () => *_currentIndex < _array.Count - 1;
-                    _moveNext = () => (*_currentIndex)++;
-                }
-            }
-
-            protected override unsafe T CurrentOverride => _array[*_currentIndex];
-
-            public override bool? IsResetSupported => true;
-
-            protected override bool MoveNextOverride()
-            {
-                if (_condition())
-                {
-                    _moveNext();
-
-                    return true;
-                }
-
-                return false;
-            }
-
-            protected override unsafe void ResetCurrent() => *_currentIndex = _startIndex;
-
-            protected override void DisposeManaged()
-            {
-                _array = null;
-                _condition = null;
-                _moveNext = null;
-
-                Reset();
-            }
-        }
-#endif
-
-        public class ArrayEnumerator : ArrayEnumerator<string>
-        {
-            public unsafe ArrayEnumerator(in System.Collections.Generic.IReadOnlyList<string> array, int* startIndex = null) : base(array, false, startIndex) { }
-
-            protected override void ResetCurrent() { }
-        }
 
         /*protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType)
 

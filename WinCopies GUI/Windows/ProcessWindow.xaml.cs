@@ -16,6 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using Microsoft.WindowsAPICodePack.Taskbar;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,10 +24,10 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using WinCopies.Collections.DotNetFix.Generic;
-using WinCopies.Commands;
+using WinCopies.Collections.Generic;
 using WinCopies.GUI.IO.Process;
 using WinCopies.IO.Process;
+using WpfLibrary1;
 
 namespace WinCopies
 {
@@ -34,11 +35,11 @@ namespace WinCopies
     {
         public static IProcessWindowModel Instance { get; internal set; }
 
-        public int Run(string[] args)
+        public unsafe int Run(string[] args)
         {
-            IQueue<IProcessParameters> queue = new Collections.DotNetFix.Generic.Queue<IProcessParameters>();
+            IQueue<IProcessParameters> queue = new ProcessQueue();
 
-            App.InitQueues(args, null, queue);
+            WpfLibrary1.SingleInstanceApp.Initialize(new Dictionary<string, WpfLibrary1.Action>(1) { { Keys.Process, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) => Loader.LoadProcessParameters(queue, ref arrayBuilder, i, args) } }, args);
 
             App.Run(queue);
 
@@ -73,7 +74,7 @@ namespace WinCopies
 
             processes.CollectionChanged += Processes_CollectionChanged;
 
-            void addCommandBinding(in ICommand command, Action _delegate) => CommandBindings.Add(new CommandBinding(command, (object sender, ExecutedRoutedEventArgs e) => _delegate(), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true));
+            void addCommandBinding(in ICommand command, System.Action _delegate) => CommandBindings.Add(new CommandBinding(command, (object sender, ExecutedRoutedEventArgs e) => _delegate(), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true));
 
             addCommandBinding(_showWindow, ChangeWindowVisibilityState);
 
@@ -167,7 +168,7 @@ namespace WinCopies
             {
                 var processes = (Collection<IProcess>)((ProcessManager<IProcess>)Content).Processes;
 
-                void cancel(in Action action)
+                void cancel(in System.Action action)
                 {
                     action?.Invoke();
 

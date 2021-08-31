@@ -9,19 +9,9 @@
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.io;component/Themes/Generic.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <!--</ResourceDictionary>-->
-    <!--<sys:String x:Key="EditMenu" >_Édition</sys:String>
-        <sys:String x:Key="Copy" >_Copier</sys:String>
-        <sys:String x:Key="CopyStatusBarLabel" >Place les fichiers sélectionnés dans le presse-papiers.</sys:String>
-        <sys:String x:Key="Cut" >_Couper</sys:String>
-        <sys:String x:Key="CutStatusBarLabel" >Place les fichiers sélectionnés dans le presse-papiers en tant que fichiers à déplacer.</sys:String>
-        <sys:String x:Key="Paste" >_Coller</sys:String>
-        <sys:String x:Key="PasteStatusBarLabel" >Colle les fichiers du presse-papiers dans le répertoire actif.</sys:String>
+    <!--
         <sys:String x:Key="Rename" >Renommer</sys:String>
         <sys:String x:Key="RenameStatusBarLabel" >Renomme le fichier sélectionné.</sys:String>
-        <sys:String x:Key="Delete" >Supprimer</sys:String>
-        <sys:String x:Key="DeleteStatusBarLabel" >Si le dispositif de stockage du fichier supporte la mise à la Corbeille, le fichier est déplacé vers celle-ci ; sinon, le fichier est directement supprimé.</sys:String>
-        <sys:String x:Key="DeletePermanently" >Supprimer de façon définitive</sys:String>
-        <sys:String x:Key="DeletePermanentlyStatusBarLabel" >Supprime directement l'élément sélectionné, sans le placer dans la Corbeille au préalable.</sys:String>
         <sys:String x:Key="ExtractArchive" >Extraire l'archive</sys:String>
         <sys:String x:Key="ExtractArchiveStatusBarLabel" >Extrait les fichiers et dossiers contenus dans l'archive dans le répertoire actif.</sys:String>
         <sys:String x:Key="Selection" >Sélection</sys:String>

@@ -32,8 +32,6 @@
     <PackageReference Include="WinCopies.Collections" Version="3.13-preview" />
     <PackageReference Include="WinCopies.Util.Desktop" Version="3.13-preview" />
     <PackageReference Include="WinCopies.IPCService.Extensions" Version="4.0" />
-    <!--<PackageReference Include="WinCopies.GUI" Version="3.0.0-preview" />
-    <PackageReference Include="WinCopies.Util" Version="3.4.0-preview" />-->
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +54,10 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WpfLibrary1\WpfLibrary1.csproj" />
   </ItemGroup>
 
 </Project>

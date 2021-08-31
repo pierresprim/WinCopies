@@ -18,10 +18,12 @@
 using System.Collections.Generic;
 
 using WinCopies.Collections.DotNetFix.Generic;
+using WinCopies.Collections.Generic;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
 using WinCopies.IO.Process;
 using WinCopies.Util.Data;
+using WpfLibrary1;
 
 namespace WinCopies
 {
@@ -29,13 +31,13 @@ namespace WinCopies
     {
         public static IMainWindowModel Instance { get; internal set; }
 
-        public int Run(string[] args)
+        public unsafe int Run(string[] args)
         {
             if (args != null)
             {
-                IQueue<string> queue = new Collections.DotNetFix.Generic.Queue<string>();
+                WpfLibrary1.IQueue<string> queue = new PathQueue();
 
-                App.InitQueues(args, queue, null);
+                WpfLibrary1.SingleInstanceApp.Initialize(new Dictionary<string, WpfLibrary1.Action>(1) { { Keys.Path, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) => Loader.LoadPathParameters(queue, i, args) } }, args);
 
                 App.Run(queue);
             }
@@ -103,6 +105,6 @@ namespace WinCopies
                     ((IExplorerControlBrowsableObjectInfoViewModel)_item).CustomProcessParametersGeneratedEventHandler -= Item_CustomProcessParametersGeneratedEventHandler;
         }
 
-        private void Item_CustomProcessParametersGeneratedEventHandler(object sender, GUI.IO.CustomProcessParametersGeneratedEventArgs e) => App.StartInstance(App.GetProcessParameters(e.ProcessParameters));
+        private void Item_CustomProcessParametersGeneratedEventHandler(object sender, GUI.IO.CustomProcessParametersGeneratedEventArgs e) => WpfLibrary1.SingleInstanceApp.StartInstance(App.GetProcessParameters(e.ProcessParameters));
     }
 }
