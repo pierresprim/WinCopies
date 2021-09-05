@@ -11,7 +11,7 @@
         xmlns:guiResources="clr-namespace:WinCopies.GUI.Icons.Properties;assembly=WinCopies.GUI.Icons"
         xmlns:windows="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
         mc:Ignorable="d"
-        d:DesignHeight="300" d:DesignWidth="400" Title="{Binding SelectedItem.Path.Name, StringFormat={}{0} - WinCopies Alpha}" Icon="{Binding SelectedItem.Path.BitmapSources.SmallBitmapSource}">
+        d:DesignHeight="300" d:DesignWidth="400" Title="{Binding SelectedItem.Path.Name, StringFormat={}{0} - WinCopies Alpha}" Icon="{Binding SelectedItem.Path.BitmapSources.Small}">
     <Window.CommandBindings>
         <CommandBinding Command="{x:Static NavigationCommands.BrowseBack}" CanExecute="Window_PreviousCanExecute" Executed="Window_PreviousExecuted" />
         <CommandBinding Command="{x:Static NavigationCommands.BrowseForward}" CanExecute="Window_NextCanExecute" Executed="Window_NextExecuted" />
@@ -95,7 +95,7 @@
                         <Setter.Value>
                             <DataTemplate DataType="{x:Type io:IExplorerControlBrowsableObjectInfoViewModel}">
                                 <DockPanel>
-                                    <Image DockPanel.Dock="Left" Source="{Binding Path.BitmapSources.MediumBitmapSource}" Height="32" Width="32" />
+                                    <Image DockPanel.Dock="Left" Source="{Binding Path.BitmapSources.Medium}" Height="32" Width="32" />
                                     <controls:Label Content="{Binding Path.Name}" RecognizesAccessKey="False" VerticalContentAlignment="Center" />
                                     <Button DockPanel.Dock="Right" Content="X" Command="{x:Static commands:ApplicationCommands.CloseTab}" CommandParameter="{Binding}" Height="20" Width="20" />
                                 </DockPanel>

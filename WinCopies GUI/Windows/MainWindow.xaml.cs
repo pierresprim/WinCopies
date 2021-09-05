@@ -281,7 +281,7 @@ namespace WinCopies
 
         private IProcessFactory GetProcessFactory() => ((MainWindowViewModel)DataContext).SelectedItem.Path.ProcessFactory;
 
-        private static void RunCommand(in Action action, in IRunnableProcessFactoryProcessInfo processFactory)
+        private static void RunCommand(in Action action, in IRunnableProcessInfo processFactory)
         {
             if (processFactory.UserConfirmationRequired && MessageBox.Show(processFactory.GetUserConfirmationText(), Assembly.GetExecutingAssembly().GetName().Name, YesNo, Question, No) == No)
 
@@ -290,9 +290,9 @@ namespace WinCopies
             action();
         }
 
-        private void RunProcess(in ExecutedRoutedEventArgs e, in FuncIn<IProcessFactory, IRunnableProcessFactoryProcessInfo> func)
+        private void RunProcess(in ExecutedRoutedEventArgs e, in FuncIn<IProcessFactory, IRunnableProcessInfo> func)
         {
-            IRunnableProcessFactoryProcessInfo processFactory = func(GetProcessFactory());
+            IRunnableProcessInfo processFactory = func(GetProcessFactory());
 
             RunCommand(() => RunCommand(() => processFactory.Run(GetEnumerable(), 10u), processFactory), e);
         }

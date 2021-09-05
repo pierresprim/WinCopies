@@ -35,7 +35,7 @@ namespace WinCopies
 
         public FrameworkVersions()
         {
-            string assemblyDirectory = WpfLibrary1.SingleInstanceApp.GetAssemblyDirectory();
+            string assemblyDirectory = IPCService.Extensions. SingleInstanceApp.GetAssemblyDirectory();
 
             string getVersion(in string assemblyName) => Assembly.LoadFile($"{assemblyDirectory}\\{assemblyName}.dll").GetName().Version.ToString();
 

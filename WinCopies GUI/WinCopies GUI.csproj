@@ -6,7 +6,7 @@
     <RootNamespace>WinCopies</RootNamespace>
     <UseWPF>true</UseWPF>
     <AssemblyName>WinCopies</AssemblyName>
-    <VersionPrefix>2.6</VersionPrefix>
+    <VersionPrefix>2.7</VersionPrefix>
     <VersionSuffix>alpha</VersionSuffix>
     <ApplicationIcon>WinCopies.ico</ApplicationIcon>
     <Authors>Pierre Sprimont</Authors>
@@ -22,16 +22,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.GUI" Version="3.7-preview" />
+    <PackageReference Include="WinCopies.GUI" Version="3.8-preview" />
     <PackageReference Include="WinCopies.GUI.Icons" Version="3.6" />
     <PackageReference Include="WinCopies.GUI.Templates" Version="3.7-preview" />
-    <PackageReference Include="WinCopies.IO" Version="3.7-preview" />
-    <PackageReference Include="WinCopies.IO.Shell" Version="3.7-preview" />
-    <PackageReference Include="WinCopies.GUI.IO" Version="3.7-preview" />
-    <PackageReference Include="WinCopies.GUI.Shell" Version="3.7-preview" />
+    <PackageReference Include="WinCopies.IO" Version="3.8-preview" />
+    <PackageReference Include="WinCopies.IO.Shell" Version="3.8-preview" />
+    <PackageReference Include="WinCopies.GUI.IO" Version="3.8-preview" />
+    <PackageReference Include="WinCopies.GUI.Shell" Version="3.8-preview" />
     <PackageReference Include="WinCopies.Collections" Version="3.13-preview" />
     <PackageReference Include="WinCopies.Util.Desktop" Version="3.13-preview" />
-    <PackageReference Include="WinCopies.IPCService.Extensions" Version="4.0" />
+    <PackageReference Include="WinCopies.IPCService.Extensions" Version="4.1.0" />
+    <PackageReference Include="WinCopies.IPCService.Extensions.Windows" Version="4.1.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,7 +58,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WpfLibrary1\WpfLibrary1.csproj" />
+    <Reference Include="WinCopies.IPCService.Extensions">
+      <HintPath>..\..\IpcServiceFramework\src\WinCopies.IPCService.Extensions.Windows\bin\Debug\net5.0-windows\WinCopies.IPCService.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="WinCopies.IPCService.Extensions.Windows">
+      <HintPath>..\..\IpcServiceFramework\src\WinCopies.IPCService.Extensions.Windows\bin\Debug\net5.0-windows\WinCopies.IPCService.Extensions.Windows.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

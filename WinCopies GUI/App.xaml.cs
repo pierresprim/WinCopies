@@ -24,32 +24,35 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
+using WinCopies.IPCService.Extensions;
 using WinCopies.Linq;
-using WpfLibrary1;
 
 using static WinCopies.App;
 
 namespace WinCopies
 {
-    public sealed class SingleInstanceApp : SingleInstanceApp2<string>
+    public sealed class SingleInstanceApp : SingleInstanceApp2<string, System.Windows.Application>
     {
-        private static readonly SingleInstanceApp _app = new();
+        public static new SingleInstanceApp App { get; } = new();
 
-        public static new SingleInstanceApp App => _app;
+        protected override string FileName => App.FileName;
 
-        public override WpfLibrary1.App GetDefaultApp<T>(WpfLibrary1.IQueue<T> queue)
+        public override App GetDefaultApp<TItems>(IPCService.Extensions.IQueue<TItems> queue)
         {
             var app = new App();
 
-            SetOpenWindows(app, new Collections.Generic.UIntCountableProvider<Window, IEnumeratorInfo2<Window>>(() => new EnumeratorInfo<Window>(GetOpenWindows(app)), () => GetOpenWindows(app).Count));
+            var openWindows = GetOpenWindows(app);
 
-            app.Resources = WpfLibrary1.App.GetResourceDictionary("ResourceDictionary.xaml");
+            SetOpenWindows(app, new Collections.Generic.UIntCountableProvider<Window, IEnumeratorInfo2<Window>>(() => new EnumeratorInfo<Window>(openWindows), () => openWindows.Count));
+
+            app.Resources = IPCService.Extensions.Application.GetResourceDictionary("ResourceDictionary.xaml");
 
             app.MainWindow = new MainWindow();
 
@@ -96,23 +99,23 @@ namespace WinCopies
             return app;
         }
 
-        public override WpfLibrary1.SingleInstanceAppInstance<WpfLibrary1.IQueue<string>> GetDefaultSingleInstanceApp(WpfLibrary1.IQueue<string> args) => new SingleInstanceApp_Path(args);
+        public override SingleInstanceAppInstance<string> GetDefaultSingleInstanceApp(IPCService.Extensions.IQueue<string> args) => new SingleInstanceApp_Path(args);
 
-        protected override AppLoader<string> GetLoaderOverride() => new Loader();
+        protected override AppLoader<string, System.Windows.Application> GetLoaderOverride() => new Loader();
 
-        internal new static unsafe System.Collections.Generic.IEnumerable<string> GetArray(ref ArrayBuilder<string> arrayBuilder, System.Collections.Generic.IEnumerable<string> keys, int* i, params string[] args) => WpfLibrary1.SingleInstanceApp.GetArray(ref arrayBuilder, keys, i, args);
+        internal new static unsafe System.Collections.Generic.IEnumerable<string> GetArray(ref ArrayBuilder<string> arrayBuilder, System.Collections.Generic.IEnumerable<string> keys, int* i, params string[] args) => IPCService.Extensions.SingleInstanceApp.GetArray(ref arrayBuilder, keys, i, args);
     }
 
-    public abstract class SingleInstanceAppInstance<T> : WpfLibrary1.SingleInstanceAppInstance<WpfLibrary1.IQueue<T>>
+    public abstract class SingleInstanceAppInstance<T> : IPCService.Extensions.Windows.SingleInstanceAppInstance<IPCService.Extensions.IQueue<T>>
     {
-        public SingleInstanceAppInstance(in string pipeName, in WpfLibrary1.IQueue<T> innerObject) : base(pipeName, innerObject) { /* Left empty. */ }
+        public SingleInstanceAppInstance(in string pipeName, in IPCService.Extensions.IQueue<T> innerObject) : base(pipeName, innerObject) { /* Left empty. */ }
 
-        public override string GetClientName() => App.ClientVersion.ClientName;
+        public override string GetClientName() => ClientVersion.ClientName;
     }
 
     public sealed class SingleInstanceApp_Process : SingleInstanceAppInstance<IProcessParameters>
     {
-        public SingleInstanceApp_Process(in WpfLibrary1.IQueue<IProcessParameters> processParameters) : base("65cae396-971a-4545-97e7-83d4ed042d92", processParameters)
+        public SingleInstanceApp_Process(in IPCService.Extensions.IQueue<IProcessParameters> processParameters) : base("65cae396-971a-4545-97e7-83d4ed042d92", processParameters)
         {
             // Left empty.
         }
@@ -149,12 +152,12 @@ namespace WinCopies
 
     public class SingleInstanceApp_Path : SingleInstanceAppInstance<string>
     {
-        public SingleInstanceApp_Path(in WpfLibrary1.IQueue<string> paths) : base("5e2e0072-edee-47d2-a0cd-a98d43b8b705", paths)
+        public SingleInstanceApp_Path(in IPCService.Extensions.IQueue<string> paths) : base("5e2e0072-edee-47d2-a0cd-a98d43b8b705", paths)
         {
             // Left empty.
         }
 
-        protected override WpfLibrary1.App GetApp() => SingleInstanceApp.App.GetDefaultApp(InnerObject);
+        protected override IPCService.Extensions.Application GetApp() => SingleInstanceApp.App.GetDefaultApp(InnerObject);
 
         protected override Expression<Func<IUpdater, int>> GetExpressionOverride()
         {
@@ -196,10 +199,10 @@ namespace WinCopies
 
     public class PathQueue : Queue
     {
-        protected override Task Run() => SingleInstanceApp.App.MainDefault(this);
+        protected override Task Run() => SingleInstanceApp.App.MainDefault<PathCollectionUpdater>(this);
     }
 
-    public class ProcessQueue : Collections.DotNetFix.Generic.Queue<IProcessParameters>, WpfLibrary1.IQueue<IProcessParameters>
+    public class ProcessQueue : Collections.DotNetFix.Generic.Queue<IProcessParameters>, IPCService.Extensions.IQueue<IProcessParameters>
     {
         string IQueueBase.DequeueAsString() => throw new InvalidOperationException();
 
@@ -208,20 +211,20 @@ namespace WinCopies
         Task IQueueBase.Run() => Main_Process(this);
     }
 
-    public class Loader : AppLoader<string>
+    public class Loader : AppLoader<string, System.Windows.Application>
     {
-        private readonly WpfLibrary1.IQueue<string> _pathQueue = new PathQueue();
-        private readonly WpfLibrary1.IQueue<IProcessParameters> _processQueue = new ProcessQueue();
+        private readonly IPCService.Extensions.IQueue<string> _pathQueue = new PathQueue();
+        private readonly IPCService.Extensions.IQueue<IProcessParameters> _processQueue = new ProcessQueue();
 
         public override string DefaultKey => Keys.Path;
 
         public override IQueueBase DefaultQueue => _pathQueue;
 
-        public unsafe static void LoadPathParameters(in Collections.DotNetFix.Generic.IQueue<string> queue, in int* i, params string[] args) => queue.Enqueue(args[(*i)++]);
+        public unsafe static void LoadPathParameters(in Collections.DotNetFix.Generic.IQueue<string> queue, in int* i, params string[] args) => queue.Enqueue(args[*i]);
 
         public unsafe static void LoadProcessParameters(in Collections.DotNetFix.Generic.IQueue<IProcessParameters> queue, ref ArrayBuilder<string> arrayBuilder, in int* i, params string[] args) => queue.Enqueue(new ProcessParameters(args[*i], SingleInstanceApp.GetArray(ref arrayBuilder, Keys.GetConsts(), i, args)));
 
-        public unsafe override IDictionary<string, WpfLibrary1.Action> GetActions() => new Dictionary<string, WpfLibrary1.Action>(2)
+        public unsafe override IDictionary<string, IPCService.Extensions.Action> GetActions() => new Dictionary<string, IPCService.Extensions.Action>(2)
             {
                 { Keys.Path, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) => LoadPathParameters(_pathQueue, i, args) },
 
@@ -231,9 +234,11 @@ namespace WinCopies
         public override System.Collections.Generic.IEnumerable<IQueueBase> GetQueues() => Enumerable.Repeat(_processQueue, 1);
     }
 
-    public partial class App : WpfLibrary1.App
+    public partial class App : IPCService.Extensions.Application
     {
-        internal WpfLibrary1.IQueue<IProcessParameters> _processQueue;
+        internal IPCService.Extensions.IQueue<IProcessParameters> _processQueue;
+
+        public const string FileName = "WinCopies.exe";
 
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
@@ -245,7 +250,7 @@ namespace WinCopies
         {
             if (processParameters != null)
 
-                WpfLibrary1.SingleInstanceApp.StartInstance("WinCopies.exe", GetProcessParameters(processParameters));
+                IPCService.Extensions.SingleInstanceApp.StartInstance(FileName, GetProcessParameters(processParameters));
         }
 
         internal static System.Collections.Generic.IEnumerable<string> GetProcessParameters(IProcessParameters processParameters)
@@ -262,14 +267,14 @@ namespace WinCopies
         private static IBrowsableObjectInfo GetBrowsableObjectInfo(string path) => ShellObjectInfo.From(ShellObjectFactory.Create(path));
 
         #region Main
-        public static async Task Main_Process(WpfLibrary1.IQueue<IProcessParameters> processQueue) => await SingleInstanceApp.App.MainMutex<IProcessParameters, ProcessCollectionUpdater>(new SingleInstanceApp_Process(processQueue), false, null);
+        public static async Task Main_Process(IPCService.Extensions.IQueue<IProcessParameters> processQueue) => await SingleInstanceApp.App.MainMutex<IProcessParameters, ProcessCollectionUpdater>(new SingleInstanceApp_Process(processQueue), false, null);
 
         [STAThread]
         public static async Task Main(string[] args)
         {
             SingleInstanceApp app = new SingleInstanceApp();
 
-            await app.Main(args);
+            await app.Main<PathCollectionUpdater>(args);
         }
         #endregion
 
@@ -282,23 +287,23 @@ namespace WinCopies
                 Run(_processQueue);
         }
 
-        public static void Run(WpfLibrary1.IQueue<string> pathQueue)
+        public static void Run(IPCService.Extensions.IQueue<string> pathQueue)
         {
             while (pathQueue.Count != 0)
 
-                Current.Dispatcher.Invoke(() => PathCollectionUpdater.Instance.Paths.Add(GetExplorerControlViewModel(pathQueue.Dequeue())));
+                System.Windows.Application.Current.Dispatcher.Invoke(() => PathCollectionUpdater.Instance.Paths.Add(GetExplorerControlViewModel(pathQueue.Dequeue())));
         }
 
-        public static void Run(WpfLibrary1.IQueue<IProcessParameters> processQueue)
+        public static void Run(IPCService.Extensions.IQueue<IProcessParameters> processQueue)
         {
             while (processQueue.Count != 0)
 
-                Current.Dispatcher.Invoke(() => ProcessCollectionUpdater.Instance.Processes.Add(new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(processQueue.Dequeue(), DefaultProcessPathCollectionFactory)))));
+                System.Windows.Application.Current.Dispatcher.Invoke(() => ProcessCollectionUpdater.Instance.Processes.Add(new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(processQueue.Dequeue(), DefaultProcessPathCollectionFactory)))));
         }
 
         public static IO.ClientVersion ClientVersion { get; } = new(Assembly.GetExecutingAssembly().GetName());
 
-        public static new App Current => (App)Application.Current;
+        public static new App Current => (App)System.Windows.Application.Current;
 
         internal static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlViewModel(in string path) => GUI.Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(path, ClientVersion)), GetBrowsableObjectInfo);
 
@@ -310,6 +315,10 @@ namespace WinCopies
         }
 
         public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel() => GetDefaultExplorerControlBrowsableObjectInfoViewModel(new ShellObjectInfo(KnownFolders.Desktop, ClientVersion));
+
+        internal static new ObservableLinkedCollection<Window> GetOpenWindows(IPCService.Extensions.Application app) => IPCService.Extensions.Application.GetOpenWindows(app);
+
+        internal static void SetOpenWindows(in IPCService.Extensions.Application app, in IUIntCountableEnumerable<Window> enumerable) => IPCService.Extensions.Application.SetOpenWindows(app, enumerable);
 
         /*protected virtual void OnPropertyChanged(string propertyName, string fieldName, object newValue, Type declaringType)
 

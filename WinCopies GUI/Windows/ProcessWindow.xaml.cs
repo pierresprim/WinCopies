@@ -24,10 +24,11 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.IO.Process;
 using WinCopies.IO.Process;
-using WpfLibrary1;
+using WinCopies.IPCService.Extensions;
 
 namespace WinCopies
 {
@@ -39,7 +40,7 @@ namespace WinCopies
         {
             IQueue<IProcessParameters> queue = new ProcessQueue();
 
-            WpfLibrary1.SingleInstanceApp.Initialize(new Dictionary<string, WpfLibrary1.Action>(1) { { Keys.Process, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) => Loader.LoadProcessParameters(queue, ref arrayBuilder, i, args) } }, args);
+            IPCService.Extensions. SingleInstanceApp.Initialize(new Dictionary<string, IPCService.Extensions.Action>(1) { { Keys.Process, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) => Loader.LoadProcessParameters(queue, ref arrayBuilder, i, args) } }, args);
 
             App.Run(queue);
 
