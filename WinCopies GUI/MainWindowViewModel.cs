@@ -34,7 +34,7 @@ namespace WinCopies
         {
             if (args != null)
             {
-                IPCService.Extensions.IQueue<string> queue = new PathQueue();
+                IQueue<string> queue = new PathQueue();
 
                 IPCService.Extensions.SingleInstanceApp.Initialize(new Dictionary<string, Action>(1) { { Keys.Path, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) => Loader.LoadPathParameters(queue, i, args) } }, args);
 
