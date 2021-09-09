@@ -15,14 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
+using Microsoft.WindowsAPICodePack;
+using Microsoft.WindowsAPICodePack.COMNative.Shell;
+using Microsoft.WindowsAPICodePack.Shell;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
-
+using System.Windows.Interop;
 using WinCopies.Collections.DotNetFix.Generic;
+using WinCopies.Desktop;
+using WinCopies.GUI.IO.Controls;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.Windows;
 using WinCopies.IO.ObjectModel;
@@ -50,6 +56,8 @@ namespace WinCopies
     /// </summary>
     public partial class MainWindow : GUI.Windows.Window
     {
+        private System.Windows.Interop.HwndSourceHook _hook;
+
         //public static readonly DependencyProperty MenuProperty = DependencyProperty.Register(nameof(Menu), typeof(MenuViewModel), typeof(MainWindow));
 
         //public MenuViewModel Menu { get => (MenuViewModel)GetValue(MenuProperty); set => SetValue(MenuProperty, value); }
@@ -73,6 +81,47 @@ namespace WinCopies
         public static RoutedCommand Quit { get; } = GetRoutedCommand(Properties.Resources.Quit, nameof(Quit));
 
         public static RoutedCommand SubmitABug { get; } = GetRoutedCommand(Properties.Resources.SubmitABug, nameof(SubmitABug));
+
+        static MainWindow()
+        {
+            EventManager.RegisterClassHandler(typeof(MainWindow), ExplorerControlListView.ContextMenuRequestedEvent, new RoutedEventHandler((object sender, RoutedEventArgs e) =>
+            {
+                var listView = (ExplorerControlListView)e.OriginalSource;
+
+                var window = listView.GetParent<MainWindow>(true);
+
+                var selectedItem = ((MainWindowViewModel)window.DataContext).SelectedItem;
+
+                if (selectedItem.SelectedItems == null)
+
+                    return;
+
+                if (selectedItem.SelectedItems.Count != 1)
+
+                    return;
+
+                if (((IBrowsableObjectInfoViewModel)selectedItem.SelectedItems[0]).InnerObject is ShellObject shellObject)
+                {
+                    var folder = (ShellContainer)selectedItem.Path.InnerObject;
+
+                    ShellContextMenu contextMenu;
+
+                    contextMenu = new ShellContextMenu((ShellContainer)ShellObjectFactory.Create(folder.ParsingName), new HookRegistration(hook =>
+                    {
+                        window._hook = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) => hook((WindowMessage)msg, wParam, lParam, ref handled);
+
+                        HwndSource.FromHwnd(new WindowInteropHelper(window).Handle).AddHook(window._hook);
+                    }, hook => HwndSource.FromHwnd(new WindowInteropHelper(window).Handle).RemoveHook(window._hook)), ShellObjectFactory.Create(shellObject.ParsingName));
+
+                    _ = contextMenu.Query(1u, uint.MaxValue, ContextMenuFlags.Explore | ContextMenuFlags.CanRename);
+
+                    Point point = ((ExplorerControlListViewContextMenuRequestedEventArgs)e).MouseButtonEventArgs.GetPosition(null);
+                    System.Drawing.Point _point = new System.Drawing.Point((int)point.X, (int)point.Y);
+
+                    contextMenu.Show(new WindowInteropHelper(window).Handle, _point);
+                }
+            }));
+        }
 
         public MainWindow()
         {

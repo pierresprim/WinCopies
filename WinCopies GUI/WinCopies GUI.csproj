@@ -6,7 +6,7 @@
     <RootNamespace>WinCopies</RootNamespace>
     <UseWPF>true</UseWPF>
     <AssemblyName>WinCopies</AssemblyName>
-    <VersionPrefix>2.7</VersionPrefix>
+    <VersionPrefix>2.8</VersionPrefix>
     <VersionSuffix>alpha</VersionSuffix>
     <ApplicationIcon>WinCopies.ico</ApplicationIcon>
     <Authors>Pierre Sprimont</Authors>
@@ -22,13 +22,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinCopies.GUI" Version="3.8-preview" />
+    <PackageReference Include="WinCopies.GUI" Version="3.9-preview" />
     <PackageReference Include="WinCopies.GUI.Icons" Version="3.6" />
     <PackageReference Include="WinCopies.GUI.Templates" Version="3.7-preview" />
-    <PackageReference Include="WinCopies.IO" Version="3.8-preview" />
-    <PackageReference Include="WinCopies.IO.Shell" Version="3.8-preview" />
-    <PackageReference Include="WinCopies.GUI.IO" Version="3.8-preview" />
-    <PackageReference Include="WinCopies.GUI.Shell" Version="3.8-preview" />
+    <PackageReference Include="WinCopies.IO" Version="3.9-preview" />
+    <PackageReference Include="WinCopies.IO.Shell" Version="3.9.1-preview" />
+    <PackageReference Include="WinCopies.GUI.IO" Version="3.9.1-preview" />
+    <PackageReference Include="WinCopies.GUI.Shell" Version="3.9-preview" />
     <PackageReference Include="WinCopies.Collections" Version="3.13-preview" />
     <PackageReference Include="WinCopies.Util.Desktop" Version="3.13-preview" />
     <PackageReference Include="WinCopies.IPCService.Extensions" Version="4.1.0" />

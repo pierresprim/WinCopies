@@ -280,7 +280,11 @@ namespace WinCopies
 
         protected override void OnStartup2(StartupEventArgs e)
         {
-            GUI.Shell.ObjectModel.BrowsableObjectInfo.RegisterDefaultSelectors();
+            IO.IBrowsableObjectInfoPlugin pluginParameters = GUI. Shell.ObjectModel.BrowsableObjectInfo.GetPluginParameters();
+
+            pluginParameters.RegisterBrowsabilityPaths();
+            pluginParameters.RegisterItemSelectors();
+            pluginParameters.RegisterProcessSelectors();
 
             if (_processQueue != null)
 
