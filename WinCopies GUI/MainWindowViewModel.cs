@@ -16,13 +16,11 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System.Collections.Generic;
-
+using System.Collections.Specialized;
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.IO.ObjectModel;
-using WinCopies.GUI.IO.Process;
-using WinCopies.IO.Process;
+using WinCopies.GUI.Shell;
 using WinCopies.IPCService.Extensions;
-using WinCopies.Util.Data;
 
 namespace WinCopies
 {
@@ -59,43 +57,20 @@ namespace WinCopies
         public static void Init(in ICollection<IExplorerControlBrowsableObjectInfoViewModel> paths) => PathCollectionUpdater.Instance ??= new MainWindowModel(paths);
     }
 
-    public class MainWindowViewModel : ViewModelBase
+    public class MainWindowPathCollectionViewModel : BrowsableObjectInfoCollectionViewModel
     {
-        private ExplorerControlBrowsableObjectInfoViewModel _selectedItem;
-        private int _selectedIndex;
+        private void Item_CustomProcessParametersGeneratedEventHandler(object sender, GUI.IO.CustomProcessParametersGeneratedEventArgs e) => IPCService.Extensions.SingleInstanceApp.StartInstance(App.FileName, App.GetProcessParameters(e.ProcessParameters));
 
-        public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
-
-        public MenuViewModel Menu { get; }
-
-        public System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> Paths { get; } = new System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel>();
-
-        public ExplorerControlBrowsableObjectInfoViewModel SelectedItem { get => _selectedItem; set => UpdateValue(ref _selectedItem, value, nameof(SelectedItem)); }
-
-        public int SelectedIndex { get => _selectedIndex; set => UpdateValue(ref _selectedIndex, value, nameof(SelectedIndex)); }
-
-        public MainWindowViewModel()
+        protected override void OnPathAdded(IExplorerControlBrowsableObjectInfoViewModel path)
         {
-            Menu = new MenuViewModel();
+            base.OnPathAdded(path);
 
-            Paths.CollectionChanged += Paths_CollectionChanged;
-
-            MainWindowModel.Init(Paths);
+            path.CustomProcessParametersGeneratedEventHandler += Item_CustomProcessParametersGeneratedEventHandler;
         }
 
-        private void Paths_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        protected override void OnPathCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems != null)
-            {
-                IExplorerControlBrowsableObjectInfoViewModel item;
-
-                foreach (object _item in e.NewItems)
-                {
-                    (item = ((IExplorerControlBrowsableObjectInfoViewModel)_item)).IsCheckBoxVisible = true;
-
-                    item.CustomProcessParametersGeneratedEventHandler += Item_CustomProcessParametersGeneratedEventHandler;
-                }
-            }
+            base.OnPathCollectionChanged(e);
 
             if (e.OldItems != null)
 
@@ -103,7 +78,12 @@ namespace WinCopies
 
                     ((IExplorerControlBrowsableObjectInfoViewModel)_item).CustomProcessParametersGeneratedEventHandler -= Item_CustomProcessParametersGeneratedEventHandler;
         }
+    }
 
-        private void Item_CustomProcessParametersGeneratedEventHandler(object sender, GUI.IO.CustomProcessParametersGeneratedEventArgs e) => IPCService.Extensions.SingleInstanceApp.StartInstance(App.FileName, App.GetProcessParameters(e.ProcessParameters));
+    public class MainWindowViewModel : BrowsableObjectInfoWindowViewModel, IMainWindowModel
+    {
+        ICollection<IExplorerControlBrowsableObjectInfoViewModel> IMainWindowModel.Paths => Paths.Paths;
+
+        public MainWindowViewModel() : base(new MainWindowPathCollectionViewModel()) { /* Left empty. */ }
     }
 }

@@ -20,48 +20,4 @@ using System.Windows;
 
 namespace WinCopies
 {
-    public partial class MenuItem : System.Windows.Controls.MenuItem
-    {
-        private static readonly DependencyPropertyKey IsSelectedPropertyKey = DependencyProperty.RegisterReadOnly(nameof(IsSelected), typeof(bool), typeof(MenuItem), new PropertyMetadata(false, (DependencyObject d, DependencyPropertyChangedEventArgs e)=>((MenuItemViewModel)((MenuItem)d).DataContext).IsSelected=(bool)e.NewValue));
-
-        public static readonly DependencyProperty IsSelectedProperty = IsSelectedPropertyKey.DependencyProperty;
-
-        public bool IsSelected { get => (bool)GetValue(IsSelectedProperty); internal set => SetValue(IsSelectedPropertyKey, value); }
-
-        public static DependencyProperty StatusBarLabelProperty = DependencyProperty.Register(nameof(StatusBarLabel), typeof(string), typeof(MenuItem));
-
-        public string StatusBarLabel { get => (string)GetValue(StatusBarLabelProperty); set => SetValue(StatusBarLabelProperty, value); }
-
-        public static readonly DependencyProperty ResourceKeyProperty = DependencyProperty.Register(nameof(ResourceKey), typeof(string), typeof(MenuItem), new PropertyMetadata(null, (DependencyObject d, DependencyPropertyChangedEventArgs e) => ((MenuItem)d).OnResourceKeyChanged((string)e.NewValue)));
-
-        public string ResourceKey { get => (string)GetValue(ResourceKeyProperty); set => SetValue(ResourceKeyProperty, value); }
-
-        public MenuItem()
-        {
-            InitializeComponent();
-        }
-
-        protected void OnResourceKeyChanged( string newResourceKey)
-        {
-            DataContext = DataContext is MenuItemViewModel menuItemViewModel ? new MenuItemViewModel(menuItemViewModel) : new MenuItemViewModel((MenuViewModel)DataContext);
-
-            ((MenuItemViewModel)DataContext).ResourceId = newResourceKey;
-
-            Header = (string)typeof(Properties.Resources).GetProperties().FirstOrDefault(p => p.Name == newResourceKey)?.GetValue(null);
-
-            //StatusBarLabel = getResource($"{newResourceKey}StatusBarLabel");
-        }
-
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            base.OnGotFocus(e);
-            IsSelected = true;
-        }
-
-        protected override void OnLostFocus(RoutedEventArgs e)
-        {
-            base.OnLostFocus(e);
-            IsSelected = false;
-        }
-    }
 }

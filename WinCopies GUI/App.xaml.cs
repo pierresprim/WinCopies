@@ -48,7 +48,7 @@ namespace WinCopies
         {
             var app = new App();
 
-            var openWindows = GetOpenWindows(app);
+            ObservableLinkedCollection<Window> openWindows = GetOpenWindows(app);
 
             SetOpenWindows(app, new Collections.Generic.UIntCountableProvider<Window, IEnumeratorInfo2<Window>>(() => new EnumeratorInfo<Window>(openWindows), () => openWindows.Count));
 
@@ -56,7 +56,7 @@ namespace WinCopies
 
             app.MainWindow = new MainWindow();
 
-            System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((MainWindowViewModel)app.MainWindow.DataContext).Paths;
+            System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((MainWindowViewModel)app.MainWindow.DataContext).Paths.Paths;
 
             if (queue != null)
             {
@@ -88,9 +88,9 @@ namespace WinCopies
                     }
             }
 
-            else
+            //else
 
-                paths.Add(GetDefaultExplorerControlBrowsableObjectInfoViewModel());
+            //    paths.Add(GUI.Shell.ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlBrowsableObjectInfoViewModel());
 
             // app.MainWindow = new MainWindow();
 
@@ -110,7 +110,7 @@ namespace WinCopies
     {
         public SingleInstanceAppInstance(in string pipeName, in IPCService.Extensions.IQueue<T> innerObject) : base(pipeName, innerObject) { /* Left empty. */ }
 
-        public override string GetClientName() => ClientVersion.ClientName;
+        public override string GetClientName() => GUI.Shell.ObjectModel.BrowsableObjectInfo.ClientVersion.ClientName;
     }
 
     public sealed class SingleInstanceApp_Process : SingleInstanceAppInstance<IProcessParameters>
@@ -264,15 +264,13 @@ namespace WinCopies
                 yield return parameter;
         }
 
-        private static IBrowsableObjectInfo GetBrowsableObjectInfo(string path) => ShellObjectInfo.From(ShellObjectFactory.Create(path));
-
         #region Main
         public static async Task Main_Process(IPCService.Extensions.IQueue<IProcessParameters> processQueue) => await SingleInstanceApp.App.MainMutex<IProcessParameters, ProcessCollectionUpdater>(new SingleInstanceApp_Process(processQueue), false, null);
 
         [STAThread]
         public static async Task Main(string[] args)
         {
-            SingleInstanceApp app = new SingleInstanceApp();
+            var app = new SingleInstanceApp();
 
             await app.Main<PathCollectionUpdater>(args);
         }
@@ -280,7 +278,7 @@ namespace WinCopies
 
         protected override void OnStartup2(StartupEventArgs e)
         {
-            IO.IBrowsableObjectInfoPlugin pluginParameters = GUI. Shell.ObjectModel.BrowsableObjectInfo.GetPluginParameters();
+            IO.IBrowsableObjectInfoPlugin pluginParameters = GUI.Shell.ObjectModel.BrowsableObjectInfo.GetPluginParameters();
 
             pluginParameters.RegisterBrowsabilityPaths();
             pluginParameters.RegisterItemSelectors();
@@ -305,20 +303,9 @@ namespace WinCopies
                 System.Windows.Application.Current.Dispatcher.Invoke(() => ProcessCollectionUpdater.Instance.Processes.Add(new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(processQueue.Dequeue(), DefaultProcessPathCollectionFactory)))));
         }
 
-        public static IO.ClientVersion ClientVersion { get; } = new(Assembly.GetExecutingAssembly().GetName());
-
         public static new App Current => (App)System.Windows.Application.Current;
 
-        internal static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlViewModel(in string path) => GUI.Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(path, ClientVersion)), GetBrowsableObjectInfo);
-
-        public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel(in IBrowsableObjectInfo browsableObjectInfo)
-        {
-            IExplorerControlBrowsableObjectInfoViewModel viewModel = GUI.Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(browsableObjectInfo), GetBrowsableObjectInfo);
-
-            return viewModel;
-        }
-
-        public static IExplorerControlBrowsableObjectInfoViewModel GetDefaultExplorerControlBrowsableObjectInfoViewModel() => GetDefaultExplorerControlBrowsableObjectInfoViewModel(new ShellObjectInfo(KnownFolders.Desktop, ClientVersion));
+        internal static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlViewModel(in string path) => GUI.Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(path, GUI.Shell.ObjectModel.BrowsableObjectInfo.ClientVersion)), GUI.Shell.ObjectModel.BrowsableObjectInfo.GetBrowsableObjectInfo);
 
         internal static new ObservableLinkedCollection<Window> GetOpenWindows(IPCService.Extensions.Application app) => IPCService.Extensions.Application.GetOpenWindows(app);
 
