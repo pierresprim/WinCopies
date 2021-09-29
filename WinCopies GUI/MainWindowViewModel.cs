@@ -84,6 +84,6 @@ namespace WinCopies
     {
         ICollection<IExplorerControlBrowsableObjectInfoViewModel> IMainWindowModel.Paths => Paths.Paths;
 
-        public MainWindowViewModel() : base(new MainWindowPathCollectionViewModel()) { /* Left empty. */ }
+        public MainWindowViewModel() : base(new MainWindowPathCollectionViewModel()) => Paths.IsCheckBoxVisible = true;
     }
 }

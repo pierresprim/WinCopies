@@ -15,26 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack;
-using Microsoft.WindowsAPICodePack.COMNative.Shell;
-using Microsoft.WindowsAPICodePack.Shell;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reflection;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Interop;
+
 using WinCopies.Collections.DotNetFix.Generic;
-using WinCopies.Desktop;
-using WinCopies.GUI.IO.Controls;
-using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.Shell;
-using WinCopies.GUI.Windows;
-using WinCopies.IO.ObjectModel;
-using WinCopies.IO.Process;
-using WinCopies.Linq;
 
 using static System.Windows.MessageBoxButton;
 using static System.Windows.MessageBoxImage;
@@ -50,7 +35,12 @@ namespace WinCopies
     /// </summary>
     public partial class MainWindow : BrowsableObjectInfoWindow
     {
-        public MainWindow() : base(new MainWindowViewModel()) => InitializeComponent();
+        public MainWindow() : base(new MainWindowViewModel())
+        {
+            InitializeComponent();
+
+            _ = Current._OpenWindows.AddFirst(this);
+        }
 
         protected override BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow() => new MainWindow();
 
@@ -62,9 +52,16 @@ namespace WinCopies
 
         protected override void OnPaste() => StartInstance(GetProcessFactory().Copy.TryGetProcessParameters(10u));
 
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+
+            _ = Current._OpenWindows.Remove2(this);
+        }
+
         protected override void OnQuit()
         {
-            ObservableLinkedCollection<System.Windows.Window> openWindows = Current._OpenWindows;
+            ObservableLinkedCollection<Window> openWindows = Current._OpenWindows;
 
             if (openWindows.Count == 1u || MessageBox.Show(this, Properties.Resources.ApplicationClosingMessage, "WinCopies", YesNo, Question, No) == Yes)
             {
