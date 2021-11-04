@@ -16,7 +16,7 @@
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
 using System.Collections.Generic;
-using System.Collections.Specialized;
+
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.Shell;
@@ -45,44 +45,40 @@ namespace WinCopies
 
     public interface IMainWindowModel
     {
-        ICollection<IExplorerControlBrowsableObjectInfoViewModel> Paths { get; }
+        ICollection<IExplorerControlViewModel> Paths { get; }
     }
 
     public class MainWindowModel : IMainWindowModel
     {
-        public ICollection<IExplorerControlBrowsableObjectInfoViewModel> Paths { get; }
+        public ICollection<IExplorerControlViewModel> Paths { get; }
 
-        private MainWindowModel(in ICollection<IExplorerControlBrowsableObjectInfoViewModel> paths) => Paths = paths;
+        private MainWindowModel(in ICollection<IExplorerControlViewModel> paths) => Paths = paths;
 
-        public static void Init(in ICollection<IExplorerControlBrowsableObjectInfoViewModel> paths) => PathCollectionUpdater.Instance ??= new MainWindowModel(paths);
+        public static void Init(in ICollection<IExplorerControlViewModel> paths) => PathCollectionUpdater.Instance ??= new MainWindowModel(paths);
     }
 
     public class MainWindowPathCollectionViewModel : BrowsableObjectInfoCollectionViewModel
     {
-        private void Item_CustomProcessParametersGeneratedEventHandler(object sender, GUI.IO.CustomProcessParametersGeneratedEventArgs e) => IPCService.Extensions.SingleInstanceApp.StartInstance(App.FileName, App.GetProcessParameters(e.ProcessParameters));
+        private void Item_CustomProcessParametersGenerated(object sender, GUI.IO.CustomProcessParametersGeneratedEventArgs e) => IPCService.Extensions.SingleInstanceApp.StartInstance(App.FileName, App.GetProcessParameters(e.ProcessParameters));
 
-        protected override void OnPathAdded(IExplorerControlBrowsableObjectInfoViewModel path)
+        protected override void OnPathAdded(IExplorerControlViewModel path)
         {
             base.OnPathAdded(path);
 
-            path.CustomProcessParametersGeneratedEventHandler += Item_CustomProcessParametersGeneratedEventHandler;
+            path.CustomProcessParametersGenerated += Item_CustomProcessParametersGenerated;
         }
 
-        protected override void OnPathCollectionChanged(NotifyCollectionChangedEventArgs e)
+        protected override void OnPathRemoved(IExplorerControlViewModel path)
         {
-            base.OnPathCollectionChanged(e);
+            path.CustomProcessParametersGenerated -= Item_CustomProcessParametersGenerated;
 
-            if (e.OldItems != null)
-
-                foreach (object _item in e.OldItems)
-
-                    ((IExplorerControlBrowsableObjectInfoViewModel)_item).CustomProcessParametersGeneratedEventHandler -= Item_CustomProcessParametersGeneratedEventHandler;
+            base.OnPathRemoved(path);
         }
     }
 
     public class MainWindowViewModel : BrowsableObjectInfoWindowViewModel, IMainWindowModel
     {
-        ICollection<IExplorerControlBrowsableObjectInfoViewModel> IMainWindowModel.Paths => Paths.Paths;
+        ICollection<IExplorerControlViewModel> IMainWindowModel.Paths => Paths.Paths;
 
         public MainWindowViewModel() : base(new MainWindowPathCollectionViewModel()) => Paths.IsCheckBoxVisible = true;
     }

@@ -17,9 +17,11 @@
 
 using System;
 using System.Windows;
+using System.Windows.Input;
 
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.GUI.Shell;
+using WinCopies.IO.Process;
 
 using static System.Windows.MessageBoxButton;
 using static System.Windows.MessageBoxImage;
@@ -35,7 +37,11 @@ namespace WinCopies
     /// </summary>
     public partial class MainWindow : BrowsableObjectInfoWindow
     {
-        public MainWindow() : base(new MainWindowViewModel())
+        public MainWindow() : base(new MainWindowViewModel()) => Init();
+
+        public MainWindow(in IBrowsableObjectInfoWindowViewModel dataContext) : base(dataContext) => Init();
+
+        private void Init()
         {
             InitializeComponent();
 
@@ -44,13 +50,17 @@ namespace WinCopies
 
         protected override BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow() => new MainWindow();
 
-        protected override void OnAboutWindowRequested() => new About().ShowDialog();
+        protected override BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow(in IBrowsableObjectInfoWindowViewModel dataContext) => new MainWindow(dataContext);
 
-        protected override void OnDelete() => StartInstance(GetProcessFactory().Deletion.TryGetProcessParameters(GetEnumerable()));
+        protected override void OnAboutWindowRequested(ExecutedRoutedEventArgs e) => new About().ShowDialog();
 
-        protected override void OnEmpty() => StartInstance(GetProcessFactory().Clearing.TryGetProcessParameters(GetEnumerable()));
+        private IProcessParameters GetProcessParameters(in IDirectProcessInfo processInfo) => processInfo.TryGetProcessParameters(GetEnumerable());
 
-        protected override void OnPaste() => StartInstance(GetProcessFactory().Copy.TryGetProcessParameters(10u));
+        protected override void OnDelete(ExecutedRoutedEventArgs e) => StartInstance(GetProcessFactory().Deletion, GetProcessParameters);
+
+        protected override void OnEmpty(ExecutedRoutedEventArgs e) => StartInstance(GetProcessFactory().Clearing, GetProcessParameters);
+
+        protected override void OnPaste(ExecutedRoutedEventArgs e) => StartInstance(GetProcessFactory().Copy, (in IRunnableProcessInfo processInfo) => processInfo.TryGetProcessParameters(10u));
 
         protected override void OnClosed(EventArgs e)
         {
@@ -59,7 +69,7 @@ namespace WinCopies
             _ = Current._OpenWindows.Remove2(this);
         }
 
-        protected override void OnQuit()
+        protected override void OnQuit(ExecutedRoutedEventArgs e)
         {
             ObservableLinkedCollection<Window> openWindows = Current._OpenWindows;
 
@@ -76,9 +86,9 @@ namespace WinCopies
             }
         }
 
-        protected override void OnRecycle() => StartInstance(GetProcessFactory().Recycling.TryGetProcessParameters(GetEnumerable()));
+        protected override void OnRecycle(ExecutedRoutedEventArgs e) => StartInstance(GetProcessFactory().Recycling, GetProcessParameters);
 
-        protected override void OnSubmitABug()
+        protected override void OnSubmitABug(ExecutedRoutedEventArgs e)
         {
             string url = "https://github.com/pierresprim/WinCopies/issues";
 

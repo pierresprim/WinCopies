@@ -26,6 +26,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 using WinCopies.Collections.Generic;
+using WinCopies.Commands;
+using WinCopies.Desktop;
 using WinCopies.GUI.IO.Process;
 using WinCopies.IO.Process;
 using WinCopies.IPCService.Extensions;
@@ -40,7 +42,7 @@ namespace WinCopies
         {
             IQueue<IProcessParameters> queue = new ProcessQueue();
 
-            IPCService.Extensions. SingleInstanceApp.Initialize(new Dictionary<string, IPCService.Extensions.Action>(1) { { Keys.Process, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) => Loader.LoadProcessParameters(queue, ref arrayBuilder, i, args) } }, args);
+            IPCService.Extensions.SingleInstanceApp.Initialize(new Dictionary<string, IPCService.Extensions.Action>(1) { { Keys.Process, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) => Loader.LoadProcessParameters(queue, ref arrayBuilder, i, args) } }, args);
 
             App.Run(queue);
 
@@ -62,149 +64,29 @@ namespace WinCopies
         public static void Init(in ICollection<IProcess> processes) => ProcessCollectionUpdater.Instance = new _Processes(processes);
     }
 
-    public sealed partial class ProcessWindow : GUI.Windows.Window
+    public sealed partial class ProcessWindow : GUI.IO.Process.ProcessWindow
     {
-        private NotificationIcon _icon;
-        private readonly RoutedUICommand _showWindow = GetRoutedUICommand(string.Empty, "ShowWindow");
-        private readonly RoutedUICommand _close = GetRoutedUICommand("Quit", "Quit");
-        private System.Windows.Controls.MenuItem _showWindowMenuItem;
-
-        internal ProcessWindow()
+        public ProcessWindow()
         {
-            var processes = new System.Collections.ObjectModel.ObservableCollection<IProcess>();
 
-            processes.CollectionChanged += Processes_CollectionChanged;
-
-            void addCommandBinding(in ICommand command, System.Action _delegate) => CommandBindings.Add(new CommandBinding(command, (object sender, ExecutedRoutedEventArgs e) => _delegate(), (object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true));
-
-            addCommandBinding(_showWindow, ChangeWindowVisibilityState);
-
-            addCommandBinding(_close, () =>
+            CommandBindings.Add(NotificationIconCommands.Close, () =>
             {
                 App.Current.IsClosing = true;
 
                 Close();
             });
-
-            ContentTemplateSelector = new InterfaceDataTemplateSelector();
-
-            Content = new ProcessManager<IProcess>() { Processes = processes };
-
             _ = App.Current._OpenWindows.AddLast(this);
 
-            _Processes.Init(processes);
+            _Processes.Init(((ProcessManager<IProcess>)Content).Processes);
         }
 
-        private static RoutedUICommand GetRoutedUICommand(in string text, in string name) => new(text, name, typeof(ProcessWindow));
+        protected override NotificationIconData GetNotificationIconData() => new NotificationIconData(Properties.Resources.WinCopies, "WinCopies");
 
-        private void HideWindow()
-        {
-            Hide();
+        protected override void OnClosingCancelled() => App.Current.IsClosing = false;
 
-            _showWindowMenuItem.Header = "Show window";
-        }
+        protected override bool ValidateClosing() => App.Current.IsClosing;
 
-        private void ChangeWindowVisibilityState()
-        {
-            if (Visibility == Visibility.Visible)
+        protected override void OnClosingValidated() => App.Current._OpenWindows.Remove(this);
 
-                HideWindow();
-
-            else
-            {
-                Show();
-
-                _ = Activate();
-
-                _showWindowMenuItem.Header = "Minimize window";
-            }
-        }
-
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            base.OnSourceInitialized(e);
-
-            var contextMenu = new ContextMenu();
-
-            System.Windows.Controls.MenuItem addMenuItem(in ICommand command, in string header)
-            {
-                var menuItem = new System.Windows.Controls.MenuItem() { Command = command, CommandTarget = this };
-
-                _ = contextMenu.Items.Add(menuItem);
-
-                if (header != null)
-
-                    menuItem.Header = header;
-
-                return menuItem;
-            }
-
-            _showWindowMenuItem = addMenuItem(_showWindow, "Minimize window");
-
-            _ = addMenuItem(_close, null);
-
-            contextMenu.ContextMenuOpening += (object sender, ContextMenuEventArgs e) => CommandManager.InvalidateRequerySuggested();
-
-            _icon = new NotificationIcon(this, Guid.NewGuid(), Properties.Resources.WinCopies, "WinCopies", contextMenu, true);
-
-            _icon.LeftButtonUp += (object? sender, EventArgs e) => ChangeWindowVisibilityState();
-
-            _ = _icon.Initialize();
-        }
-
-        private void Processes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
-
-                foreach (object process in e.NewItems)
-
-                    ((IProcess)process).RunWorkerAsync();
-        }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            base.OnClosing(e);
-
-            if (App.Current.IsClosing)
-            {
-                var processes = (Collection<IProcess>)((ProcessManager<IProcess>)Content).Processes;
-
-                void cancel(in System.Action action)
-                {
-                    action?.Invoke();
-
-                    App.Current.IsClosing = false;
-
-                    e.Cancel = true;
-                }
-
-                for (int i = 0; i < processes.Count; i++)
-
-                    if (processes[i].IsBusy)
-                    {
-                        cancel(() => MessageBox.Show("There are running processes. All processes have to be completed in order to close the application.", "WinCopies", MessageBoxButton.OK, MessageBoxImage.Information));
-
-                        return;
-                    }
-
-                    else if (processes[i].Status == ProcessStatus.Error && MessageBox.Show("There are errors in some processes. Are you sure you want to cancel they?", "WinCopies", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.No)
-                    {
-                        cancel(null);
-
-                        return;
-                    }
-
-                _icon.Dispose();
-
-                _ = App.Current._OpenWindows.Remove(this);
-            }
-
-            else
-            {
-                HideWindow();
-
-                e.Cancel = true;
-            }
-        }
     }
 }

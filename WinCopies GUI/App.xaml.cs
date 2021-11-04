@@ -56,7 +56,7 @@ namespace WinCopies
 
             app.MainWindow = new MainWindow();
 
-            System.Collections.ObjectModel.ObservableCollection<IExplorerControlBrowsableObjectInfoViewModel> paths = ((MainWindowViewModel)app.MainWindow.DataContext).Paths.Paths;
+            var paths = (System.Collections.ObjectModel.ObservableCollection<IExplorerControlViewModel>)((MainWindowViewModel)app.MainWindow.DataContext).Paths.Paths;
 
             if (queue != null)
             {
@@ -68,7 +68,7 @@ namespace WinCopies
                     {
                         do
 
-                            if (WinCopies.IO.Path.Exists((arg = queue.PeekAsString())))
+                            if (WinCopies.IO.Path.Exists(arg = queue.PeekAsString()))
                             {
                                 _ = queue.Dequeue();
 
@@ -124,7 +124,7 @@ namespace WinCopies
         {
             var app = new App
             {
-                Resources = App.GetResourceDictionary("ResourceDictionary.xaml"),
+                Resources = IPCService.Extensions.Application.GetResourceDictionary("ResourceDictionary.xaml"),
 
                 MainWindow = new ProcessWindow()
             };
@@ -140,7 +140,7 @@ namespace WinCopies
 
             while (InnerObject.Count != 0)
 
-                foreach (string value in App.GetProcessParameters(InnerObject.Dequeue()))
+                foreach (string value in GetProcessParameters(InnerObject.Dequeue()))
 
                     _ = processes.AddLast(value);
 
@@ -246,8 +246,14 @@ namespace WinCopies
 
         internal new ObservableLinkedCollection<Window> _OpenWindows => base._OpenWindows;
 
-        internal static void StartInstance(in IProcessParameters processParameters)
+        internal static void StartInstance<T>(in T processInfo, in FuncIn<T, IProcessParameters> processParametersFunc) where T : IProcessFactoryProcessInfo
         {
+            if (processInfo.UserConfirmationRequired && MessageBox.Show(processInfo.GetUserConfirmationText(), "Process Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.Cancel)
+
+                return;
+
+            IProcessParameters processParameters = processParametersFunc(processInfo);
+
             if (processParameters != null)
 
                 IPCService.Extensions.SingleInstanceApp.StartInstance(FileName, GetProcessParameters(processParameters));
@@ -305,7 +311,7 @@ namespace WinCopies
 
         public static new App Current => (App)System.Windows.Application.Current;
 
-        internal static IExplorerControlBrowsableObjectInfoViewModel GetExplorerControlViewModel(in string path) => GUI.Shell.ObjectModel.ExplorerControlBrowsableObjectInfoViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(path, GUI.Shell.ObjectModel.BrowsableObjectInfo.ClientVersion)), GUI.Shell.ObjectModel.BrowsableObjectInfo.GetBrowsableObjectInfo);
+        internal static IExplorerControlViewModel GetExplorerControlViewModel(in string path) => GUI.Shell.ObjectModel.ExplorerControlViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(path, GUI.Shell.ObjectModel.BrowsableObjectInfo.ClientVersion)), GUI.Shell.ObjectModel.BrowsableObjectInfo.GetBrowsableObjectInfo);
 
         internal static new ObservableLinkedCollection<Window> GetOpenWindows(IPCService.Extensions.Application app) => IPCService.Extensions.Application.GetOpenWindows(app);
 
