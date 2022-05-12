@@ -21,6 +21,9 @@ using System.Windows.Input;
 
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.GUI.Shell;
+using WinCopies.GUI.Shell.ObjectModel;
+using WinCopies.IO;
+using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 
 using static System.Windows.MessageBoxButton;
@@ -37,6 +40,8 @@ namespace WinCopies
     /// </summary>
     public partial class MainWindow : BrowsableObjectInfoWindow
     {
+        public override ClientVersion ClientVersion => GUI.Shell.ObjectModel.BrowsableObjectInfo.ClientVersion;
+
         public MainWindow() : base(new MainWindowViewModel()) => Init();
 
         public MainWindow(in IBrowsableObjectInfoWindowViewModel dataContext) : base(dataContext) => Init();
@@ -47,6 +52,8 @@ namespace WinCopies
 
             _ = Current._OpenWindows.AddFirst(this);
         }
+
+        protected override IBrowsableObjectInfo GetDefaultBrowsableObjectInfo() => new BrowsableObjectInfoStartPage(ClientVersion);
 
         protected override BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow() => new MainWindow();
 

@@ -45,16 +45,16 @@ namespace WinCopies
 
     public interface IMainWindowModel
     {
-        ICollection<IExplorerControlViewModel> Paths { get; }
+        System.Collections.Generic.ICollection<IExplorerControlViewModel> Paths { get; }
     }
 
     public class MainWindowModel : IMainWindowModel
     {
-        public ICollection<IExplorerControlViewModel> Paths { get; }
+        public System.Collections.Generic.ICollection<IExplorerControlViewModel> Paths { get; }
 
-        private MainWindowModel(in ICollection<IExplorerControlViewModel> paths) => Paths = paths;
+        private MainWindowModel(in System.Collections.Generic.ICollection<IExplorerControlViewModel> paths) => Paths = paths;
 
-        public static void Init(in ICollection<IExplorerControlViewModel> paths) => PathCollectionUpdater.Instance ??= new MainWindowModel(paths);
+        public static void Init(in System.Collections.Generic.ICollection<IExplorerControlViewModel> paths) => PathCollectionUpdater.Instance ??= new MainWindowModel(paths);
     }
 
     public class MainWindowPathCollectionViewModel : BrowsableObjectInfoCollectionViewModel
@@ -78,7 +78,7 @@ namespace WinCopies
 
     public class MainWindowViewModel : BrowsableObjectInfoWindowViewModel, IMainWindowModel
     {
-        ICollection<IExplorerControlViewModel> IMainWindowModel.Paths => Paths.Paths;
+        System.Collections.Generic.ICollection<IExplorerControlViewModel> IMainWindowModel.Paths => Paths.Paths;
 
         public MainWindowViewModel() : base(new MainWindowPathCollectionViewModel()) => Paths.IsCheckBoxVisible = true;
     }

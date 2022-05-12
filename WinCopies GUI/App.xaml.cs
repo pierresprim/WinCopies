@@ -15,26 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack.Shell;
-
+#region Usings
+#region System
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+#endregion System
 
+#region WinCopies
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
+using WinCopies.IO;
 using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 using WinCopies.IPCService.Extensions;
 using WinCopies.Linq;
+#endregion WinCopies
 
 using static WinCopies.App;
+#endregion Usings
 
 namespace WinCopies
 {
@@ -54,6 +60,8 @@ namespace WinCopies
 
             app.Resources = IPCService.Extensions.Application.GetResourceDictionary("ResourceDictionary.xaml");
 
+            app.SetPluginParameters();
+
             app.MainWindow = new MainWindow();
 
             var paths = (System.Collections.ObjectModel.ObservableCollection<IExplorerControlViewModel>)((MainWindowViewModel)app.MainWindow.DataContext).Paths.Paths;
@@ -68,7 +76,7 @@ namespace WinCopies
                     {
                         do
 
-                            if (WinCopies.IO.Path.Exists(arg = queue.PeekAsString()))
+                            if (IO.Path.Exists(arg = queue.PeekAsString()))
                             {
                                 _ = queue.Dequeue();
 
@@ -204,9 +212,9 @@ namespace WinCopies
 
     public class ProcessQueue : Collections.DotNetFix.Generic.Queue<IProcessParameters>, IPCService.Extensions.IQueue<IProcessParameters>
     {
-        string IQueueBase.DequeueAsString() => throw new InvalidOperationException();
+        string IQueueBase.DequeueAsString() => throw new NotSupportedException();
 
-        string IQueueBase.PeekAsString() => throw new InvalidOperationException();
+        string IQueueBase.PeekAsString() => throw new NotSupportedException();
 
         Task IQueueBase.Run() => Main_Process(this);
     }
@@ -224,7 +232,7 @@ namespace WinCopies
 
         public unsafe static void LoadProcessParameters(in Collections.DotNetFix.Generic.IQueue<IProcessParameters> queue, ref ArrayBuilder<string> arrayBuilder, in int* i, params string[] args) => queue.Enqueue(new ProcessParameters(args[*i], SingleInstanceApp.GetArray(ref arrayBuilder, Keys.GetConsts(), i, args)));
 
-        public unsafe override IDictionary<string, IPCService.Extensions.Action> GetActions() => new Dictionary<string, IPCService.Extensions.Action>(2)
+        public unsafe override System.Collections.Generic.IDictionary<string, IPCService.Extensions.Action> GetActions() => new Dictionary<string, IPCService.Extensions.Action>(2)
             {
                 { Keys.Path, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) => LoadPathParameters(_pathQueue, i, args) },
 
@@ -234,11 +242,27 @@ namespace WinCopies
         public override System.Collections.Generic.IEnumerable<IQueueBase> GetQueues() => Enumerable.Repeat(_processQueue, 1);
     }
 
+    public class PluginInfo : GUI.Shell.ObjectModel.PluginInfo
+    {
+        public PluginInfo(in IBrowsableObjectInfoPlugin plugin, in ClientVersion clientVersion) : base(plugin, clientVersion) { /* Left empty. */ }
+
+        protected override GUI.Shell.ObjectModel.BrowsableObjectInfoStartPage GetBrowsableObjectInfoStartPage() => new BrowsableObjectInfoStartPage(ClientVersion);
+    }
+
+    public class BrowsableObjectInfoStartPage : GUI.Shell.ObjectModel.BrowsableObjectInfoStartPage
+    {
+        public BrowsableObjectInfoStartPage(in ClientVersion clientVersion) : base(new PluginInfo(Current.PluginParameters, clientVersion), clientVersion) { /* Left empty. */ }
+
+        protected override Icon GetIcon() => Properties.Resources.WinCopies;
+    }
+
     public partial class App : IPCService.Extensions.Application
     {
         internal IPCService.Extensions.IQueue<IProcessParameters> _processQueue;
 
         public const string FileName = "WinCopies.exe";
+
+        internal IBrowsableObjectInfoPlugin PluginParameters { get; private set; }
 
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
@@ -274,25 +298,34 @@ namespace WinCopies
         public static async Task Main_Process(IPCService.Extensions.IQueue<IProcessParameters> processQueue) => await SingleInstanceApp.App.MainMutex<IProcessParameters, ProcessCollectionUpdater>(new SingleInstanceApp_Process(processQueue), false, null);
 
         [STAThread]
-        public static async Task Main(string[] args)
-        {
-            var app = new SingleInstanceApp();
-
-            await app.Main<PathCollectionUpdater>(args);
-        }
+        public static async Task Main(string[] args) => await new SingleInstanceApp().Main<PathCollectionUpdater>(args);
         #endregion
+
+        private static void SetPluginParameters(in ActionIn<IBrowsableObjectInfoPlugin> action) => action(GUI.Shell.ObjectModel.BrowsableObjectInfo.GetPluginParameters());
+
+        internal void SetPluginParameters() => SetPluginParameters((in IBrowsableObjectInfoPlugin pluginParameters) =>
+        {
+            if (PluginParameters == null)
+            {
+                pluginParameters.RegisterBrowsabilityPaths();
+                pluginParameters.RegisterItemSelectors();
+
+                PluginParameters = pluginParameters;
+            }
+        });
 
         protected override void OnStartup2(StartupEventArgs e)
         {
-            IO.IBrowsableObjectInfoPlugin pluginParameters = GUI.Shell.ObjectModel.BrowsableObjectInfo.GetPluginParameters();
+            if (_processQueue == null)
 
-            pluginParameters.RegisterBrowsabilityPaths();
-            pluginParameters.RegisterItemSelectors();
-            pluginParameters.RegisterProcessSelectors();
+                SetPluginParameters();
 
-            if (_processQueue != null)
+            else
+            {
+                SetPluginParameters((in IBrowsableObjectInfoPlugin pluginParameters) => pluginParameters.RegisterProcessSelectors());
 
                 Run(_processQueue);
+            }
         }
 
         public static void Run(IPCService.Extensions.IQueue<string> pathQueue)
@@ -306,12 +339,12 @@ namespace WinCopies
         {
             while (processQueue.Count != 0)
 
-                System.Windows.Application.Current.Dispatcher.Invoke(() => ProcessCollectionUpdater.Instance.Processes.Add(new Process(BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(processQueue.Dequeue(), DefaultProcessPathCollectionFactory)))));
+                System.Windows.Application.Current.Dispatcher.Invoke(() => ProcessCollectionUpdater.Instance.Processes.Add(new Process(WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(processQueue.Dequeue(), DefaultProcessPathCollectionFactory)))));
         }
 
         public static new App Current => (App)System.Windows.Application.Current;
 
-        internal static IExplorerControlViewModel GetExplorerControlViewModel(in string path) => GUI.Shell.ObjectModel.ExplorerControlViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(path, GUI.Shell.ObjectModel.BrowsableObjectInfo.ClientVersion)), GUI.Shell.ObjectModel.BrowsableObjectInfo.GetBrowsableObjectInfo);
+        internal static IExplorerControlViewModel GetExplorerControlViewModel(in string path) => GUI.Shell.ObjectModel.ExplorerControlViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(path, GUI.Shell.ObjectModel.BrowsableObjectInfo.ClientVersion)));
 
         internal static new ObservableLinkedCollection<Window> GetOpenWindows(IPCService.Extensions.Application app) => IPCService.Extensions.Application.GetOpenWindows(app);
 

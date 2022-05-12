@@ -15,15 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the WinCopies Framework.  If not, see <https://www.gnu.org/licenses/>. */
 
-using Microsoft.WindowsAPICodePack.Taskbar;
-
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 
 using WinCopies.Collections.Generic;
 using WinCopies.Commands;
@@ -42,7 +34,7 @@ namespace WinCopies
         {
             IQueue<IProcessParameters> queue = new ProcessQueue();
 
-            IPCService.Extensions.SingleInstanceApp.Initialize(new Dictionary<string, IPCService.Extensions.Action>(1) { { Keys.Process, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) => Loader.LoadProcessParameters(queue, ref arrayBuilder, i, args) } }, args);
+            IPCService.Extensions.SingleInstanceApp.Initialize(new Dictionary<string, Action>(1) { { Keys.Process, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) => Loader.LoadProcessParameters(queue, ref arrayBuilder, i, args) } }, args);
 
             App.Run(queue);
 
@@ -52,41 +44,40 @@ namespace WinCopies
 
     public interface IProcessWindowModel
     {
-        ICollection<IProcess> Processes { get; }
+        System.Collections.Generic.ICollection<IProcess> Processes { get; }
     }
 
     public class _Processes : IProcessWindowModel
     {
-        public ICollection<IProcess> Processes { get; }
+        public System.Collections.Generic.ICollection<IProcess> Processes { get; }
 
-        private _Processes(in ICollection<IProcess> processes) => Processes = processes;
+        private _Processes(in System.Collections.Generic.ICollection<IProcess> processes) => Processes = processes;
 
-        public static void Init(in ICollection<IProcess> processes) => ProcessCollectionUpdater.Instance = new _Processes(processes);
+        public static void Init(in System.Collections.Generic.ICollection<IProcess> processes) => ProcessCollectionUpdater.Instance = new _Processes(processes);
     }
 
     public sealed partial class ProcessWindow : GUI.IO.Process.ProcessWindow
     {
         public ProcessWindow()
         {
-
             CommandBindings.Add(NotificationIconCommands.Close, () =>
             {
                 App.Current.IsClosing = true;
 
                 Close();
             });
+
             _ = App.Current._OpenWindows.AddLast(this);
 
             _Processes.Init(((ProcessManager<IProcess>)Content).Processes);
         }
 
-        protected override NotificationIconData GetNotificationIconData() => new NotificationIconData(Properties.Resources.WinCopies, "WinCopies");
+        protected override NotificationIconData GetNotificationIconData() => new (Properties.Resources.WinCopies, "WinCopies");
 
         protected override void OnClosingCancelled() => App.Current.IsClosing = false;
 
         protected override bool ValidateClosing() => App.Current.IsClosing;
 
         protected override void OnClosingValidated() => App.Current._OpenWindows.Remove(this);
-
     }
 }
