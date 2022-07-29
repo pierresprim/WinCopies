@@ -22,7 +22,7 @@ namespace WinCopies.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resources {
+    internal class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace WinCopies.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WinCopies.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace WinCopies.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,18 +63,9 @@ namespace WinCopies.Properties {
         /// <summary>
         ///   Looks up a localized string similar to You have multiple windows open. Are you sure you want to close the application?.
         /// </summary>
-        public static string ApplicationClosingMessage {
+        internal static string ApplicationClosingMessage {
             get {
                 return ResourceManager.GetString("ApplicationClosingMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Close tabs to the left or right.
-        /// </summary>
-        public static string CloseTabsToTheLeftOrRight {
-            get {
-                return ResourceManager.GetString("CloseTabsToTheLeftOrRight", resourceCulture);
             }
         }
         
@@ -91,25 +82,16 @@ namespace WinCopies.Properties {
         ///&gt;\par}
         ///{\pard \ql \f0 \sa180 \li0 \fi0 Everyone is permi [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string gpl_3_0 {
+        internal static string gpl_3_0 {
             get {
-                return ResourceManager.GetString("gpl_3_0", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The clipboard operation did not succeeded..
-        /// </summary>
-        public static string SetClipboardErrorMessage {
-            get {
-                return ResourceManager.GetString("SetClipboardErrorMessage", resourceCulture);
+                return ResourceManager.GetString("gpl-3.0", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        public static System.Drawing.Icon WinCopies {
+        internal static System.Drawing.Icon WinCopies {
             get {
                 object obj = ResourceManager.GetObject("WinCopies", resourceCulture);
                 return ((System.Drawing.Icon)(obj));

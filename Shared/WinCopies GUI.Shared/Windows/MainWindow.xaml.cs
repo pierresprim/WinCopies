@@ -20,10 +20,9 @@ using System.Windows;
 using System.Windows.Input;
 
 using WinCopies.Collections.DotNetFix.Generic;
-using WinCopies.GUI.Shell;
-using WinCopies.GUI.Shell.ObjectModel;
+using WinCopies.GUI.IO;
+using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.IO;
-using WinCopies.IO.ObjectModel;
 using WinCopies.IO.Process;
 
 using static System.Windows.MessageBoxButton;
@@ -35,14 +34,11 @@ using static WinCopies.UtilHelpers;
 
 namespace WinCopies
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : BrowsableObjectInfoWindow
     {
-        public override ClientVersion ClientVersion => GUI.Shell.ObjectModel.BrowsableObjectInfo.ClientVersion;
+        public override ClientVersion ClientVersion => IO.ObjectModel.BrowsableObjectInfo.DefaultClientVersion;
 
-        public MainWindow() : base(new MainWindowViewModel()) => Init();
+        public MainWindow(in bool createDefaultTab = true) : base(new MainWindowViewModel(), createDefaultTab) => Init();
 
         public MainWindow(in IBrowsableObjectInfoWindowViewModel dataContext) : base(dataContext) => Init();
 
@@ -51,9 +47,9 @@ namespace WinCopies
             InitializeComponent();
 
             _ = Current._OpenWindows.AddFirst(this);
-        }
 
-        protected override IBrowsableObjectInfo GetDefaultBrowsableObjectInfo() => new BrowsableObjectInfoStartPage(ClientVersion);
+            MainWindowModel.Init(((IBrowsableObjectInfoWindowViewModel)DataContext).Paths.Paths);
+        }
 
         protected override BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow() => new MainWindow();
 
@@ -101,6 +97,10 @@ namespace WinCopies
 
             _ = StartProcessNetCore(url);
         }
+
+        protected override IBrowsableObjectInfoWindowViewModel GetDefaultDataContextOverride() => new MainWindowViewModel(GetDefaultBrowsableObjectInfoCollection());
+        protected override IBrowsableObjectInfoCollectionViewModel GetDefaultBrowsableObjectInfoCollection() => new MainWindowPathCollectionViewModel();
+        protected override IBrowsableObjectInfoCollectionViewModel GetDefaultBrowsableObjectInfoCollection(in System.Collections.Generic.IEnumerable<IExplorerControlViewModel> items) => new MainWindowPathCollectionViewModel(items);
 
         //public static readonly DependencyProperty MenuProperty = DependencyProperty.Register(nameof(Menu), typeof(MenuViewModel), typeof(MainWindow));
 

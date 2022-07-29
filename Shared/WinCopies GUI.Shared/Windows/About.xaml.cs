@@ -25,7 +25,7 @@ using WinCopies.GUI.Windows;
 
 namespace WinCopies
 {
-    public class FrameworkVersions
+    public struct FrameworkVersions
     {
         public string WinCopiesUtilities { get; }
 
@@ -35,7 +35,7 @@ namespace WinCopies
 
         public FrameworkVersions()
         {
-            string assemblyDirectory = IPCService.Extensions. SingleInstanceApp.GetAssemblyDirectory();
+            string assemblyDirectory = IPCService.Extensions.SingleInstanceApp.GetAssemblyDirectory();
 
             string getVersion(in string assemblyName) => Assembly.LoadFile($"{assemblyDirectory}\\{assemblyName}.dll").GetName().Version.ToString();
 
@@ -51,33 +51,41 @@ namespace WinCopies
     {
         private static string GetVersion() => $"Version {FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion} Alpha";
 
-        private static readonly DependencyPropertyKey VersionPropertyKey = DependencyProperty.RegisterReadOnly("Version", typeof(string), typeof(About), new PropertyMetadata(GetVersion()));
+        private static DependencyPropertyKey RegisterReadOnly<T>(in string propertyName, in T value) => Util.Desktop.UtilHelpers.RegisterReadOnly<T, About>(propertyName, new PropertyMetadata(value));
+
+        private static readonly DependencyPropertyKey VersionPropertyKey = RegisterReadOnly(nameof(Version), GetVersion());
 
         public static readonly DependencyProperty VersionProperty = VersionPropertyKey.DependencyProperty;
 
         public string Version => (string)GetValue(VersionProperty);
 
-        private static readonly DependencyPropertyKey FrameworkVersionsPropertyKey = DependencyProperty.RegisterReadOnly(nameof(FrameworkVersions), typeof(FrameworkVersions), typeof(About), new PropertyMetadata(new FrameworkVersions()));
+        private static readonly DependencyPropertyKey FrameworkVersionsPropertyKey = RegisterReadOnly(nameof(FrameworkVersions), new FrameworkVersions());
 
         public static readonly DependencyProperty FrameworkVersionsProperty = FrameworkVersionsPropertyKey.DependencyProperty;
 
         public FrameworkVersions FrameworkVersions => (FrameworkVersions)GetValue(FrameworkVersionsProperty);
 
+        private static readonly DependencyPropertyKey DocumentPropertyKey = RegisterReadOnly<FlowDocument>(nameof(Document), null);
+
+        public static readonly DependencyProperty DocumentProperty = DocumentPropertyKey.DependencyProperty;
+
+        public FlowDocument Document => (FlowDocument)GetValue(DocumentProperty);
+
         public About()
         {
             InitializeComponent();
 
+            SetValue(DocumentPropertyKey, new FlowDocument());
+
             DataContext = this;
 
             var s = new MemoryStream();
-
             var w = new StreamWriter(s);
 
             w.Write(Properties.Resources.gpl_3_0);
+            w.Flush();
 
-            var textRange = new TextRange(RTB.Document.ContentStart, RTB.Document.ContentEnd);
-
-            textRange.Load(s, DataFormats.Rtf);
+            new TextRange(Document.ContentStart, Document.ContentEnd).Load(s, DataFormats.Rtf);
         }
     }
 }

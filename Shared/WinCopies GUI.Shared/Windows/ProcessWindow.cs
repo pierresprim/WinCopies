@@ -34,7 +34,7 @@ namespace WinCopies
         {
             IQueue<IProcessParameters> queue = new ProcessQueue();
 
-            IPCService.Extensions.SingleInstanceApp.Initialize(new Dictionary<string, Action>(1) { { Keys.Process, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) => Loader.LoadProcessParameters(queue, ref arrayBuilder, i, args) } }, args);
+            IPCService.Extensions.SingleInstanceApp.Initialize(new Dictionary<string, Action>(1) { { Keys.Process, (string[] args, ref ArrayBuilder<string> arrayBuilder, in int* i) => Loader.LoadProcessParameters(queue, ref arrayBuilder, i, args) } }, App.OnArgumentError, args);
 
             App.Run(queue);
 
@@ -72,7 +72,7 @@ namespace WinCopies
             _Processes.Init(((ProcessManager<IProcess>)Content).Processes);
         }
 
-        protected override NotificationIconData GetNotificationIconData() => new (Properties.Resources.WinCopies, "WinCopies");
+        protected override NotificationIconData GetNotificationIconData() => new(Properties.Resources.WinCopies, "WinCopies");
 
         protected override void OnClosingCancelled() => App.Current.IsClosing = false;
 

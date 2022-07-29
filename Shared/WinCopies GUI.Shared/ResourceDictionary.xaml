@@ -7,7 +7,6 @@
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.templates;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/wincopies.gui.io;component/Themes/Generic.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/wincopies.gui.shell;component/Themes/Generic.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <!--</ResourceDictionary>-->
     <!--

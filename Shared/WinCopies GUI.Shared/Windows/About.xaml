@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WinCopies"
         xmlns:dialogs="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
-                    xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
+        xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
+        xmlns:local="clr-namespace:WinCopies"
         mc:Ignorable="d"
         Title="About" Height="450" Width="800" DialogButton="OK">
     <Grid>
@@ -24,8 +24,8 @@
         <Label Grid.Row="1" Content="{Binding Version}" />
         <TextBlock Grid.Row="2" Margin="5" TextWrapping="Wrap">WinCopies is free software distributed under the GNU GPL (version 3 or later, at your option) license.</TextBlock>
         <GroupBox Grid.Row="3" Header="License">
-        <ScrollViewer>
-            <TextBlock Margin="5" TextWrapping="Wrap">
+            <ScrollViewer>
+                <TextBlock Margin="5" TextWrapping="Wrap">
             <Run Text="Copyright (C) 2021 Pierre Sprimont" />    
             <LineBreak />
     <Run Text="This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version." />
@@ -39,11 +39,11 @@
             <Run Text="WinCopies is provided with its own framework. The WinCopies framework is provided under the same conditions as the WinCopies software." />
                 <LineBreak />
                 <Run Text="The WinCopies logo is Copyright © 2020, Pierre Sprimont. The WinCopies logo cannot be redistributed separately, whether modified or not, or used in another project, even if it is a project based on this software." />
-            </TextBlock>
+                </TextBlock>
             </ScrollViewer>
         </GroupBox>
         <GroupBox Grid.Row="4" Header="GNU License">
-            <RichTextBox x:Name="RTB" IsReadOnly="True" />
+            <controls:RichTextBox IsReadOnly="True" Document="{Binding Document, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:About}}}" />
         </GroupBox>
         <TextBlock Grid.Row="5" Margin="5" TextWrapping="Wrap" VerticalAlignment="Top">
             For the third-parties used by WinCopies and the WinCopies framework, visit the WinCopies website at the address given above.

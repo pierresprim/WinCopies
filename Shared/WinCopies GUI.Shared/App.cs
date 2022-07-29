@@ -30,6 +30,8 @@ using System.Windows;
 #region WinCopies
 using WinCopies.Collections.DotNetFix.Generic;
 using WinCopies.Collections.Generic;
+using WinCopies.Extensions;
+using WinCopies.GUI.IO;
 using WinCopies.GUI.IO.ObjectModel;
 using WinCopies.GUI.IO.Process;
 using WinCopies.IO;
@@ -40,6 +42,7 @@ using WinCopies.Linq;
 #endregion WinCopies
 
 using static WinCopies.App;
+using Action = System.Action;
 #endregion Usings
 
 namespace WinCopies
@@ -60,49 +63,44 @@ namespace WinCopies
 
             app.Resources = IPCService.Extensions.Application.GetResourceDictionary("ResourceDictionary.xaml");
 
-            app.SetPluginParameters();
+            app.SetPluginParametersAction();
 
-            app.MainWindow = new MainWindow();
-
-            var paths = (System.Collections.ObjectModel.ObservableCollection<IExplorerControlViewModel>)((MainWindowViewModel)app.MainWindow.DataContext).Paths.Paths;
-
-            if (queue != null)
+            if (app.PluginParameters != null)
             {
-                string arg;
+                var mainWindow = new MainWindow(queue == null || queue.Count < 1);
+                app.MainWindow = mainWindow;
 
-                while (queue.Count != 0)
+                if (queue != null)
+                {
+                    IExplorerControlViewModel? arg;
+                    var paths = (System.Collections.ObjectModel.ObservableCollection<IExplorerControlViewModel>)((MainWindowViewModel)app.MainWindow.DataContext).Paths.Paths;
 
-                    try
+                    while (queue.Count != 0)
                     {
-                        do
+                        arg = GetExplorerControlViewModel(queue.DequeueAsString());
 
-                            if (IO.Path.Exists(arg = queue.PeekAsString()))
-                            {
-                                _ = queue.Dequeue();
+                        if (arg != null)
 
-                                paths.Add(GetExplorerControlViewModel(arg));
-                            }
-
-                            else
-
-                                _ = queue.Dequeue();
-
-                        while (queue.Count != 0);
+                            paths.Add(arg);
                     }
 
-                    catch
-                    {
+                    if (paths.Count > 0)
 
-                    }
+                        paths[0].IsSelected = true;
+
+                    else
+
+                        paths.Add(mainWindow.GetDefaultExplorerControlViewModel(true));
+                }
+
+                //else
+
+                //    paths.Add(GUI.Shell.ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlBrowsableObjectInfoViewModel());
+
+                // app.MainWindow = new MainWindow();
+
+                // System.Windows.Application.LoadComponent(app.Resources, new Uri("/wincopies;component/ResourceDictionary.xaml", UriKind.Relative));
             }
-
-            //else
-
-            //    paths.Add(GUI.Shell.ObjectModel.BrowsableObjectInfo.GetDefaultExplorerControlBrowsableObjectInfoViewModel());
-
-            // app.MainWindow = new MainWindow();
-
-            // System.Windows.Application.LoadComponent(app.Resources, new Uri("/wincopies;component/ResourceDictionary.xaml", UriKind.Relative));
 
             return app;
         }
@@ -118,7 +116,7 @@ namespace WinCopies
     {
         public SingleInstanceAppInstance(in string pipeName, in IPCService.Extensions.IQueue<T> innerObject) : base(pipeName, innerObject) { /* Left empty. */ }
 
-        public override string GetClientName() => GUI.Shell.ObjectModel.BrowsableObjectInfo.ClientVersion.ClientName;
+        public override string GetClientName() => IO.ObjectModel.BrowsableObjectInfo.DefaultClientVersion.ClientName;
     }
 
     public sealed class SingleInstanceApp_Process : SingleInstanceAppInstance<IProcessParameters>
@@ -128,19 +126,12 @@ namespace WinCopies
             // Left empty.
         }
 
-        protected override App GetApp()
+        protected override App GetApp() => new()
         {
-            var app = new App
-            {
-                Resources = IPCService.Extensions.Application.GetResourceDictionary("ResourceDictionary.xaml"),
-
-                MainWindow = new ProcessWindow()
-            };
-
-            app._processQueue = InnerObject;
-
-            return app;
-        }
+            Resources = IPCService.Extensions.Application.GetResourceDictionary("ResourceDictionary.xaml"),
+            MainWindow = new ProcessWindow(),
+            _processQueue = InnerObject
+        };
 
         protected override Expression<Func<IUpdater, int>> GetExpressionOverride()
         {
@@ -242,33 +233,34 @@ namespace WinCopies
         public override System.Collections.Generic.IEnumerable<IQueueBase> GetQueues() => Enumerable.Repeat(_processQueue, 1);
     }
 
-    public class PluginInfo : GUI.Shell.ObjectModel.PluginInfo
+    public class PluginInfo : GUI.IO.ObjectModel.PluginInfo
     {
         public PluginInfo(in IBrowsableObjectInfoPlugin plugin, in ClientVersion clientVersion) : base(plugin, clientVersion) { /* Left empty. */ }
 
-        protected override GUI.Shell.ObjectModel.BrowsableObjectInfoStartPage GetBrowsableObjectInfoStartPage() => new BrowsableObjectInfoStartPage(ClientVersion);
+        protected override GUI.IO.ObjectModel.BrowsableObjectInfoStartPage GetBrowsableObjectInfoStartPage() => new BrowsableObjectInfoStartPage(ClientVersion);
     }
 
-    public class BrowsableObjectInfoStartPage : GUI.Shell.ObjectModel.BrowsableObjectInfoStartPage
+    public class BrowsableObjectInfoStartPage : GUI.IO.ObjectModel.BrowsableObjectInfoStartPage
     {
-        public BrowsableObjectInfoStartPage(in ClientVersion clientVersion) : base(new PluginInfo(Current.PluginParameters, clientVersion), clientVersion) { /* Left empty. */ }
+        public BrowsableObjectInfoStartPage(ClientVersion clientVersion) : base(Current.PluginParameters.Select(plugin => new PluginInfo(plugin, clientVersion)), clientVersion) { /* Left empty. */ }
+        public BrowsableObjectInfoStartPage() : this(DefaultClientVersion) { /* Left empty. */ }
 
         protected override Icon GetIcon() => Properties.Resources.WinCopies;
     }
 
-    public partial class App : IPCService.Extensions.Application
+    public partial class App : IPCService.Extensions.Application, IApplication
     {
         internal IPCService.Extensions.IQueue<IProcessParameters> _processQueue;
 
         public const string FileName = "WinCopies.exe";
-
-        internal IBrowsableObjectInfoPlugin PluginParameters { get; private set; }
 
         public static IProcessPathCollectionFactory DefaultProcessPathCollectionFactory { get; } = new ProcessPathCollectionFactory();
 
         public new bool IsClosing { get => base.IsClosing; internal set => base.IsClosing = value; }
 
         internal new ObservableLinkedCollection<Window> _OpenWindows => base._OpenWindows;
+
+        internal System.Collections.Generic.IEnumerable<IBrowsableObjectInfoPlugin> PluginParameters { get; private set; }
 
         internal static void StartInstance<T>(in T processInfo, in FuncIn<T, IProcessParameters> processParametersFunc) where T : IProcessFactoryProcessInfo
         {
@@ -294,57 +286,92 @@ namespace WinCopies
                 yield return parameter;
         }
 
+        public static void OnArgumentError(string? arg) => MessageBox.Show($"Module {arg ?? "<No module provided>"} unknown.", "Argument Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
         #region Main
         public static async Task Main_Process(IPCService.Extensions.IQueue<IProcessParameters> processQueue) => await SingleInstanceApp.App.MainMutex<IProcessParameters, ProcessCollectionUpdater>(new SingleInstanceApp_Process(processQueue), false, null);
 
         [STAThread]
-        public static async Task Main(string[] args) => await new SingleInstanceApp().Main<PathCollectionUpdater>(args);
+        public static async Task Main(string[] args) => await new SingleInstanceApp().Main<PathCollectionUpdater>(OnArgumentError, args).Await();
         #endregion
 
-        private static void SetPluginParameters(in ActionIn<IBrowsableObjectInfoPlugin> action) => action(GUI.Shell.ObjectModel.BrowsableObjectInfo.GetPluginParameters());
+        private void SetPluginParameters(in Action<IBrowsableObjectInfoPlugin> action, out System.Collections.Generic.IEnumerable<IBrowsableObjectInfoPlugin> pluginParameters) => GUI.IO.Application.Initialize(this, action, Delegates.EmptyVoid, out pluginParameters);
 
-        internal void SetPluginParameters() => SetPluginParameters((in IBrowsableObjectInfoPlugin pluginParameters) =>
+        private void SetPluginParameters()
         {
-            if (PluginParameters == null)
+            SetPluginParametersAction = Delegates.EmptyVoid;
+
+            SetPluginParameters(pluginParameters =>
             {
                 pluginParameters.RegisterBrowsabilityPaths();
+                pluginParameters.RegisterBrowsableObjectInfoSelectors();
                 pluginParameters.RegisterItemSelectors();
+            },
+            out System.Collections.Generic.IEnumerable<IBrowsableObjectInfoPlugin> pluginParameters);
 
-                PluginParameters = pluginParameters;
-            }
-        });
+            PluginParameters = pluginParameters;
+        }
+
+        internal Action SetPluginParametersAction { get; private set; }
+
+        public App() => SetPluginParametersAction = SetPluginParameters;
 
         protected override void OnStartup2(StartupEventArgs e)
         {
             if (_processQueue == null)
 
-                SetPluginParameters();
+                SetPluginParametersAction();
 
             else
             {
-                SetPluginParameters((in IBrowsableObjectInfoPlugin pluginParameters) => pluginParameters.RegisterProcessSelectors());
+                SetPluginParameters(pluginParameters => pluginParameters.RegisterProcessSelectors(), out System.Collections.Generic.IEnumerable<IBrowsableObjectInfoPlugin> pluginParameters);
 
-                Run(_processQueue);
+                if (pluginParameters == null)
+                {
+                    Shutdown(Environment.ExitCode);
+
+                    Environment.Exit(Environment.ExitCode);
+                }
+
+                else
+
+                    Run(_processQueue);
             }
         }
 
         public static void Run(IPCService.Extensions.IQueue<string> pathQueue)
         {
+            IExplorerControlViewModel? arg;
+
             while (pathQueue.Count != 0)
 
-                System.Windows.Application.Current.Dispatcher.Invoke(() => PathCollectionUpdater.Instance.Paths.Add(GetExplorerControlViewModel(pathQueue.Dequeue())));
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    arg = GetExplorerControlViewModel(pathQueue.Dequeue());
+
+                    if (arg != null)
+
+                        PathCollectionUpdater.Instance.Paths.Add(arg);
+                });
         }
 
         public static void Run(IPCService.Extensions.IQueue<IProcessParameters> processQueue)
         {
             while (processQueue.Count != 0)
 
-                System.Windows.Application.Current.Dispatcher.Invoke(() => ProcessCollectionUpdater.Instance.Processes.Add(new Process(WinCopies.IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(processQueue.Dequeue(), DefaultProcessPathCollectionFactory)))));
+                System.Windows.Application.Current.Dispatcher.Invoke(() => ProcessCollectionUpdater.Instance.Processes.Add(new Process(IO.ObjectModel.BrowsableObjectInfo.DefaultProcessSelectorDictionary.Select(new ProcessFactorySelectorDictionaryParameters(processQueue.Dequeue(), DefaultProcessPathCollectionFactory)))));
         }
 
         public static new App Current => (App)System.Windows.Application.Current;
 
-        internal static IExplorerControlViewModel GetExplorerControlViewModel(in string path) => GUI.Shell.ObjectModel.ExplorerControlViewModel.From(new BrowsableObjectInfoViewModel(ShellObjectInfo.From(path, GUI.Shell.ObjectModel.BrowsableObjectInfo.ClientVersion)));
+        public Extensions.Logger Logger { get; } = FileLogger.GetLogger();
+
+        internal static IExplorerControlViewModel? GetExplorerControlViewModel(in string path)
+        {
+            IBrowsableObjectInfo? result = IO.ObjectModel.BrowsableObjectInfo.Create(path, true, false);
+
+            return result == null ? null : new ExplorerControlViewModel(new BrowsableObjectInfoViewModel(result));
+        }
 
         internal static new ObservableLinkedCollection<Window> GetOpenWindows(IPCService.Extensions.Application app) => IPCService.Extensions.Application.GetOpenWindows(app);
 
@@ -370,11 +397,11 @@ namespace WinCopies
 
                 public bool IsFirstInstance { get; private set; } = false;
 
-        #if DEBUG
+#if DEBUG
                 private ObservableCollection<string> _args = null;
 
                 public ObservableCollection<string> Args { get => _args; set { _args = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Args))); } }
-        #endif
+#endif
 
         public Common CommonProperties { get; } = new Common(true);
 
@@ -477,10 +504,10 @@ namespace WinCopies
 
                         application.IsFirstInstance = true;
 
-        #if DEBUG 
+#if DEBUG
                         application.Args = new ObservableCollection<string>();
                         application.Args.CollectionChanged += Args_CollectionChanged;
-        #endif
+#endif
 
                         application.Startup += Application_Startup;
                         application.InitializeComponent();
@@ -518,19 +545,19 @@ namespace WinCopies
 
                 }
 
-        #if DEBUG
+#if DEBUG
                 private static void Args_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => Console.WriteLine(e.NewItems[0].ToString());
-        #endif
+#endif
 
                 private void AddNewArgs(IList<string> new_args)
 
                 {
 
-        #if DEBUG 
+#if DEBUG
                     foreach (string new_arg in new_args)
 
                         Args.Add(new_arg);
-        #endif
+#endif
 
                     OnNewArgsAdded(new_args);
 
