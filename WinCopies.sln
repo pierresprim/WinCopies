@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinCopies GUI", "WinCopies 
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies GUI.Shared", "Shared\WinCopies GUI.Shared\WinCopies GUI.Shared.shproj", "{C1DE2049-6227-4A09-BB12-783DECD1E5D7}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WinCopies.Setup.Shared", "Shared\WinCopies.Setup.Shared\WinCopies.Setup.Shared.shproj", "{D1C9B1D6-54C8-42DA-B3EF-F2328A507B96}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,5 +29,6 @@ Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Shared\WinCopies GUI.Shared\WinCopies GUI.Shared.projitems*{6ec77368-67e8-419e-aa58-cd3e4b3752c9}*SharedItemsImports = 5
 		Shared\WinCopies GUI.Shared\WinCopies GUI.Shared.projitems*{c1de2049-6227-4a09-bb12-783decd1e5d7}*SharedItemsImports = 13
+		Shared\WinCopies.Setup.Shared\WinCopies.Setup.Shared.projitems*{d1c9b1d6-54c8-42da-b3ef-f2328a507b96}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

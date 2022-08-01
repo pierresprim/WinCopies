@@ -111,7 +111,7 @@ namespace WinCopies.Setup
 
             protected override string RelativePath => RELATIVE_PATH;
 
-            protected override Type RelativePathResourcesType => typeof(Resources.RelativePaths);
+            protected override Type RelativePathResourcesType => null;
 
             protected override Predicate<KeyValuePair<string, System.IO.Stream>> Predicate => item => item.Key.EndsWith("WinCopies.exe");
 
