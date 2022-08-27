@@ -34,10 +34,8 @@ using static WinCopies.UtilHelpers;
 
 namespace WinCopies
 {
-    public partial class MainWindow : BrowsableObjectInfoWindow//BrowsableObjectInfoWindow2
+    public partial class MainWindow : BrowsableObjectInfoWindow2
     {
-        protected override BrowsableObjectInfoWindow GetNewBrowsableObjectInfoWindow() => new MainWindow();
-
         public override ClientVersion ClientVersion => IO.ObjectModel.BrowsableObjectInfo.DefaultClientVersion;
 
         public MainWindow(in bool createDefaultTab = true) : base(new MainWindowViewModel(), createDefaultTab) => Init();
