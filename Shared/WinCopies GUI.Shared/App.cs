@@ -42,7 +42,9 @@ using WinCopies.Linq;
 #endregion WinCopies
 
 using static WinCopies.App;
+
 using Action = System.Action;
+using Enumerable = System.Linq.Enumerable;
 #endregion Usings
 
 namespace WinCopies
@@ -238,6 +240,8 @@ namespace WinCopies
         public PluginInfo(in IBrowsableObjectInfoPlugin plugin, in ClientVersion clientVersion) : base(plugin, clientVersion) { /* Left empty. */ }
 
         protected override GUI.IO.ObjectModel.BrowsableObjectInfoStartPage GetBrowsableObjectInfoStartPage() => new BrowsableObjectInfoStartPage(ClientVersion);
+
+        public override IBrowsableObjectInfo Clone() => new PluginInfo(InnerObjectGeneric, ClientVersion);
     }
 
     public class BrowsableObjectInfoStartPage : GUI.IO.ObjectModel.BrowsableObjectInfoStartPage
@@ -246,6 +250,8 @@ namespace WinCopies
         public BrowsableObjectInfoStartPage() : this(DefaultClientVersion) { /* Left empty. */ }
 
         protected override Icon GetIcon() => Properties.Resources.WinCopies;
+
+        public override IBrowsableObjectInfo Clone() => new BrowsableObjectInfoStartPage(ClientVersion);
     }
 
     public partial class App : IPCService.Extensions.Application, IApplication

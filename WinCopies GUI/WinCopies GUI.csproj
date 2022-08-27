@@ -5,7 +5,7 @@
 		<RootNamespace>WinCopies</RootNamespace>
 		<UseWPF>true</UseWPF>
 		<AssemblyName>WinCopies</AssemblyName>
-		<VersionPrefix>3.0</VersionPrefix>
+		<VersionPrefix>3.0.1</VersionPrefix>
 		<VersionSuffix>alpha</VersionSuffix>
 		<ApplicationIcon>..\Shared\WinCopies GUI.Shared\Resources\WinCopies.ico</ApplicationIcon>
 		<Authors>Pierre Sprimont</Authors>
@@ -21,8 +21,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="WinCopies.GUI.IO" Version="3.17.1.1-preview" />
-		<PackageReference Include="WinCopies.IPCService.Extensions.Windows" Version="5.0" />
+		<PackageReference Include="WinCopies.GUI.IO" Version="3.18.0.1-preview" />
+		<PackageReference Include="WinCopies.IPCService.Extensions.Windows" Version="5.1" />
 	</ItemGroup>
 
 	<ItemGroup>

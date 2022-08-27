@@ -12,100 +12,53 @@ using WinCopies.Desktop;
 using WinCopies.Installer;
 using WinCopies.Installer.GUI;
 #endregion WinCopies
-
-using static WinCopies.Setup.Installer;
-using static WinCopies.Setup.Properties.Resources;
-
-using InstallerPageData = WinCopies.Installer.InstallerPageData;
-using LocalResources = WinCopies.Setup.Properties.Resources;
 #endregion Usings
 
 namespace WinCopies.Setup
 {
-    public class Installer : WinCopies.Installer.Installer
+    public class Installer : Common.Installer
     {
-        public sealed override string ProgramName => "WinCopies";
-
-        public override bool Is32Bit => true;
-
-        public override bool RequiresRestart => false;
-
         protected override IStartPage GetStartPage() => new StartPage(this);
-
-        public static ImageSource GetHorizontalImageSource() => horizontal.ToImageSource();
-
-        public static ImageSource GetVerticalImageSource() => vertical.ToImageSource();
     }
 
-    public class StartPage : WinCopies.Installer.StartPage
+    public class StartPage : Common.StartPage
     {
-        public override ImageSource ImageSource { get; } = GetVerticalImageSource();
+        internal StartPage(in Installer installer) : base(installer) { /* Left empty. */ }
 
-        internal StartPage(in WinCopies.Installer.Installer installer) : base(installer) { /* Left empty. */ }
-
-        protected override ILicenseAgreementPage GetNextPage() => new LicenseAgreementPage(this);
+        protected override ILicenseAgreementPage? GetNextPage() => new LicenseAgreementPage(this);
     }
 
-    public class LicenseAgreementPage : WinCopies.Installer.LicenseAgreementPage
+    public class LicenseAgreementPage : Common.LicenseAgreementPage
     {
-        private class LicenseAgreementData : InstallerPageData, ILicenseAgreementData
-        {
-            public DataFormat DataFormat => DataFormats.GetDataFormat(DataFormats.Rtf);
+        internal LicenseAgreementPage(in StartPage startPage) : base(startPage) { /* Left empty. */ }
 
-            public LicenseAgreementData(in WinCopies.Installer.Installer installer) : base(installer) { /* Left empty. */ }
-
-            public System.IO.Stream GetText() => System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("WinCopies.Setup.Resources.gpl-3.0.rtf");
-        }
-
-        public override ImageSource ImageSource { get; } = GetHorizontalImageSource();
-
-        public override Icon Icon => LocalResources.WinCopies;
-
-        protected internal LicenseAgreementPage(in StartPage startPage) : base(startPage) { /* Left empty. */ }
-
-        protected override IUserGroupPage GetNextPage() => new UserGroupPage(this);
-
-        protected override ILicenseAgreementData GetData() => new LicenseAgreementData(Installer);
+        protected override IUserGroupPage? GetNextPage() => new UserGroupPage(this);
     }
 
-    public class UserGroupPage : WinCopies.Installer.UserGroupPage
+    public class UserGroupPage : Common.UserGroupPage
     {
-        public override ImageSource ImageSource { get; } = GetHorizontalImageSource();
-
-        public override Icon Icon => LocalResources.WinCopies;
-
         internal UserGroupPage(in LicenseAgreementPage previousPage) : base(previousPage) { /* Left empty. */ }
 
-        protected override IDestinationPage GetNextPage() => new DestinationPage(this);
+        protected override IDestinationPage? GetNextPage() => new DestinationPage(this);
     }
 
-    public class DestinationPage : WinCopies.Installer.DestinationPage
+    public class DestinationPage : Common.DestinationPage
     {
-        public override ImageSource ImageSource { get; } = GetHorizontalImageSource();
-
-        public override Icon Icon => LocalResources.WinCopies;
-
-        protected override IOptionsPage GetNextPage() => new OptionsPage(this);
-
         internal DestinationPage(in UserGroupPage previousPage) : base(previousPage) { /* Left empty. */ }
+
+        protected override IOptionsPage? GetNextPage() => new OptionsPage(this);
     }
 
-    public class OptionsPage : WinCopies.Installer.OptionsPage
+    public class OptionsPage : Common.OptionsPage
     {
-        public override ImageSource ImageSource { get; } = GetHorizontalImageSource();
+        internal OptionsPage(in DestinationPage previousPage) : base(previousPage) { /* Left empty. */ }
 
-        public override Icon Icon => LocalResources.WinCopies;
-
-        internal OptionsPage(in WinCopies.Installer.DestinationPage previousPage) : base(previousPage) { /* Left empty. */ }
-
-        protected override IProcessPage GetNextPage() => new ProcessPage(Installer);
-
-        protected override IOptionsData GetData() => new DefaultOptionsData(Installer);
+        protected override IProcessPage? GetNextPage() => new ProcessPage(Installer);
     }
 
-    public class ProcessPage : WinCopies.Installer.ProcessPage
+    public class ProcessPage : Common.ProcessPage
     {
-        protected new class ProcessData : DefaultProcessData
+        protected new class ProcessData : DefaultEmbeddedProcessData
         {
             protected const string RELATIVE_PATH = $"{nameof(WinCopies)}.{nameof(Setup)}.{nameof(Resources)}.Files.";
 
@@ -113,26 +66,14 @@ namespace WinCopies.Setup
 
             protected override Type RelativePathResourcesType => null;
 
-            protected override Predicate<KeyValuePair<string, System.IO.Stream>> Predicate => item => item.Key.EndsWith("WinCopies.exe");
+            protected override Predicate<string> Predicate => item => item.EndsWith($"{nameof(WinCopies)}.exe");
 
             public ProcessData(in WinCopies.Installer.Installer installer) : base(installer) { /* Left empty. */ }
         }
 
-        public override Icon Icon => LocalResources.WinCopies;
-
-        public override ImageSource ImageSource { get; } = GetHorizontalImageSource();
-
-        public ProcessPage(in WinCopies.Installer.Installer installer) : base(installer) { /* Left empty. */ }
+        internal ProcessPage(in WinCopies.Installer.Installer installer) : base(installer) { /* Left empty. */ }
 
         protected override IProcessData GetData() => new ProcessData(Installer);
-        protected override IEndPage GetNextPage() => new EndPage(Installer);
-    }
-
-    public class EndPage : WinCopies.Installer.EndPage
-    {
-        public override ImageSource ImageSource { get; } = GetVerticalImageSource();
-
-        public EndPage(WinCopies.Installer.Installer installer) : base(installer) { /* Left empty. */ }
     }
 
     public partial class MainWindow : InstallerWindow
