@@ -13,6 +13,7 @@
 		<Copyright>Copyright © Pierre Sprimont 2022</Copyright>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

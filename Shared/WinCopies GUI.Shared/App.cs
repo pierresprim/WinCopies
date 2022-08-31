@@ -118,6 +118,13 @@ namespace WinCopies
     {
         public SingleInstanceAppInstance(in string pipeName, in IPCService.Extensions.IQueue<T> innerObject) : base(pipeName, innerObject) { /* Left empty. */ }
 
+        protected override void OnExit()
+        {
+            if (_errorData.Message != null)
+
+                _ = MessageBox.Show(_errorData.Message, _errorData.Caption, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
         public override string GetClientName() => IO.ObjectModel.BrowsableObjectInfo.DefaultClientVersion.ClientName;
     }
 
@@ -256,6 +263,21 @@ namespace WinCopies
 
     public partial class App : IPCService.Extensions.Application, IApplication
     {
+        internal struct ErrorData
+        {
+            public string Caption { get; }
+
+            public string Message { get; }
+
+            public ErrorData(in string caption, in string message)
+            {
+                Caption = caption;
+                Message = message;
+            }
+        }
+
+        internal static ErrorData _errorData;
+
         internal IPCService.Extensions.IQueue<IProcessParameters> _processQueue;
 
         public const string FileName = "WinCopies.exe";
@@ -301,7 +323,14 @@ namespace WinCopies
         public static async Task Main(string[] args) => await new SingleInstanceApp().Main<PathCollectionUpdater>(OnArgumentError, args).Await();
         #endregion
 
-        private void SetPluginParameters(in Action<IBrowsableObjectInfoPlugin> action, out System.Collections.Generic.IEnumerable<IBrowsableObjectInfoPlugin> pluginParameters) => GUI.IO.Application.Initialize(this, action, Delegates.EmptyVoid, out pluginParameters);
+        private void SetPluginParameters(in Action<IBrowsableObjectInfoPlugin> action, out System.Collections.Generic.IEnumerable<IBrowsableObjectInfoPlugin> pluginParameters)
+        {
+            string? message = GUI.IO.Application.Initialize(this, action, Delegates.EmptyVoid, out pluginParameters, out string? caption);
+
+            if (message != null)
+
+                _errorData = new ErrorData(caption, message);
+        }
 
         private void SetPluginParameters()
         {
@@ -324,6 +353,10 @@ namespace WinCopies
 
         protected override void OnStartup2(StartupEventArgs e)
         {
+            if (_errorData.Message != null)
+
+                _ = MessageBox.Show(_errorData.Message, _errorData.Caption, MessageBoxButton.OK, MessageBoxImage.Error);
+
             if (_processQueue == null)
 
                 SetPluginParametersAction();

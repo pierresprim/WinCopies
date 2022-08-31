@@ -6,6 +6,7 @@
         xmlns:dialogs="clr-namespace:WinCopies.GUI.Windows;assembly=WinCopies.GUI"
         xmlns:controls="clr-namespace:WinCopies.GUI.Controls;assembly=WinCopies.GUI"
         xmlns:local="clr-namespace:WinCopies"
+        xmlns:localControls="clr-namespace:WinCopies.Controls"
         mc:Ignorable="d"
         Title="About" Height="450" Width="800" DialogButton="OK">
     <Grid>
@@ -19,14 +20,17 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
         <TextBlock Margin="5">
-            <Run Text="WinCopies" /><Run Text="®" FontFamily="Times New Roman" BaselineAlignment="Top" />
+            <Run>WinCopies</Run><Run FontFamily="Times New Roman" BaselineAlignment="Top">&#174;</Run>
         </TextBlock>
-        <Label Grid.Row="1" Content="{Binding Version}" />
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <localControls:Version DataContext="{Binding UpdateCheckCommand}" />
+            <localControls:Version DataContext="{Binding UpdateCommand}" />
+        </StackPanel>
         <TextBlock Grid.Row="2" Margin="5" TextWrapping="Wrap">WinCopies is free software distributed under the GNU GPL (version 3 or later, at your option) license.</TextBlock>
         <GroupBox Grid.Row="3" Header="License">
             <ScrollViewer>
                 <TextBlock Margin="5" TextWrapping="Wrap">
-            <Run Text="Copyright (C) 2021 Pierre Sprimont" />    
+            <Run>Copyright &#169; 2022 Pierre Sprimont</Run>
             <LineBreak />
     <Run Text="This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version." />
             <LineBreak />
@@ -38,7 +42,7 @@
             <LineBreak />
             <Run Text="WinCopies is provided with its own framework. The WinCopies framework is provided under the same conditions as the WinCopies software." />
                 <LineBreak />
-                <Run Text="The WinCopies logo is Copyright © 2020, Pierre Sprimont. The WinCopies logo cannot be redistributed separately, whether modified or not, or used in another project, even if it is a project based on this software." />
+                <Run Text="The WinCopies logo is Copyright &#169; 2020, Pierre Sprimont. The WinCopies logo cannot be redistributed separately, whether modified or not, or used in another project, even in a project based on the current software." />
                 </TextBlock>
             </ScrollViewer>
         </GroupBox>

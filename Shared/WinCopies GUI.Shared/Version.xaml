@@ -1,0 +1,12 @@
+﻿<Control x:Class="WinCopies.Controls.Version"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Control.Template>
+        <ControlTemplate TargetType="{x:Type Control}">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="{Binding Version}" ContentStringFormat="Version {0} Alpha" />
+                <Button DataContext="{Binding Command}" Command="{Binding}" Content="{Binding Text}" IsEnabled="{Binding IsEnabled}" />
+            </StackPanel>
+        </ControlTemplate>
+    </Control.Template>
+</Control>
